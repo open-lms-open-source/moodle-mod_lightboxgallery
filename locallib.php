@@ -29,6 +29,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once("$CFG->libdir/filelib.php");
+
 define('THUMB_WIDTH', 150);
 define('THUMB_HEIGHT', 150);
 define('MAX_IMAGE_LABEL', 13);
@@ -173,3 +175,21 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     return '<img src="' . $path . '" alt="" ' . (! empty($imageid) ? 'id="' . $imageid . '"' : '' )  . ' />';
 }
 
+
+/**
+ * File browsing support class
+ */
+class lightboxgallery_content_file_info extends file_info_stored {
+    public function get_parent() {
+        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+            return $this->browser->get_file_info($this->context);
+        }
+        return parent::get_parent();
+    }
+    public function get_visible_name() {
+        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+            return $this->topvisiblename;
+        }
+        return parent::get_visible_name();
+    }
+}

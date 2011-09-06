@@ -372,3 +372,59 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
 
 }
 
+
+/**
+ * Lists all browsable file areas
+ * @param object $course
+ * @param object $cm
+ * @param object $context
+ * @return array
+ */
+function lightboxgallery_get_file_areas($course, $cm, $context) {
+    $areas = array();
+    $areas['gallery_images'] = get_string('images', 'lightboxgallery');
+
+    return $areas;
+}
+
+/**
+ * File browsing support for lightboxgallery module content area.
+ * @param object $browser
+ * @param object $areas
+ * @param object $course
+ * @param object $cm
+ * @param object $context
+ * @param string $filearea
+ * @param int $itemid
+ * @param string $filepath
+ * @param string $filename
+ * @return object file_info instance or null if not found
+ */
+function lightboxgallery_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+    global $CFG;
+
+
+    if ($filearea === 'gallery_images') {
+        $fs = get_file_storage();
+
+        $filepath = is_null($filepath) ? '/' : $filepath;
+        $filename = is_null($filename) ? '.' : $filename;
+        if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', 0, $filepath, $filename)) {
+            if ($filepath === '/' and $filename === '.') {
+                $storedfile = new virtual_root_file($context->id, 'mod_lightboxgallery', 'gallery_images', 0);
+            } else {
+                // not found
+                return null;
+            }
+        }
+
+        require_once("$CFG->dirroot/mod/lightboxgallery/locallib.php");
+        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+
+        return new lightboxgallery_content_file_info($browser, $context, $storedfile, $urlbase, $areas[$filearea], true, true, false, false);
+    }
+
+    // note: folder_intro handled in file_browser automatically
+
+    return null;
+}
