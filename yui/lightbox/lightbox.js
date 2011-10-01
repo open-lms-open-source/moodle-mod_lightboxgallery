@@ -467,7 +467,7 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
                 viewportWidth = YAHOO.util.Dom.getViewportWidth();
                 viewportHeight = YAHOO.util.Dom.getViewportHeight();
                 
-                widthRatio = viewportWidth/imagePreloader.width;
+                widthRatio = (viewportWidth-50)/imagePreloader.width;
                 heightRatio = (viewportHeight-250)/imagePreloader.height;
                 
                 if (widthRatio > 1 && heightRatio > 1){
