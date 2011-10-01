@@ -68,9 +68,7 @@ $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 $PAGE->set_button((has_capability('mod/lightboxgallery:edit', $context) ? $OUTPUT->single_button($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$id.'&page='.$page.'&editing='.($editing ? '0' : '1'), get_string('turnediting'.($editing ? 'off' : 'on')), 'get') : '').' '.update_module_button($cm->id, $course->id, get_string('modulename', 'lightboxgallery')));
 $PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
-$PAGE->requires->js('/mod/lightboxgallery/gallery-lightbox-min.js');
-$PAGE->requires->js('/mod/lightboxgallery/module.js');
-
+$PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox','M.mod_lightboxgallery.init');
 echo $OUTPUT->header();
 
 $allowrssfeed = (lightboxgallery_rss_enabled() && $gallery->rss);
