@@ -379,8 +379,8 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 			}
 			
 			this.set(IMAGE_ARRAY, imageArray);
-			
-			var lightboxTop = Y.DOM.docScrollY() + (Y.DOM.winHeight() / 10),
+			border = this.get("borderWidth");
+			var lightboxTop = Y.DOM.docScrollY() + border*2,
 				lightboxLeft = Y.DOM.docScrollX();
 			this.get(LIGHTBOX).setStyles({ display: "", top: lightboxTop + PX, left: lightboxLeft + PX });
 			
@@ -464,11 +464,11 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 				this.get("lightboxImage").set("src", this.get(IMAGE_ARRAY)[imageNum][0]);
                 
                 // Get current viewport width and height
-                viewportWidth = YAHOO.util.Dom.getViewportWidth();
-                viewportHeight = YAHOO.util.Dom.getViewportHeight();
-                
-                widthRatio = (viewportWidth-50)/imagePreloader.width;
-                heightRatio = (viewportHeight-250)/imagePreloader.height;
+                viewportWidth = Y.DOM.winWidth();
+                viewportHeight = Y.DOM.winHeight();
+                border = this.get("borderWidth");
+                widthRatio = (viewportWidth-border*6)/imagePreloader.width;
+                heightRatio = (viewportHeight-border*9)/imagePreloader.height;
                 
                 if (widthRatio > 1 && heightRatio > 1){
                     bestRatio = 1;
