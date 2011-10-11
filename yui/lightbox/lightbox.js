@@ -371,7 +371,8 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 				imageArray.push([selectedLink.get("href"), selectedLink.get("title")]);
 			} else {
 				// If image is part of a set...
-				Y.all(selectedLink.get("tagName") + '[href][rel="' + selectedLink.get("rel") + '"]').each(function () {
+                targetstring = '.lightbox-gallery a[href][rel="lightbox_gallery"]';
+				Y.all(targetstring).each(function () {
 					imageArray.push([this.get("href"), this.get("title")]);
 				});
 				
@@ -428,7 +429,7 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 			Y.delegate(CLICK, Y.bind(function (evt) {
 				evt.halt();
 				this.start(evt.currentTarget);
-			}, this), document.body, this.get("selector"));
+			}, this), Y.one(".lightbox-gallery"), this.get("selector"));
 		},
 		
 		/**
