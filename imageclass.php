@@ -207,7 +207,7 @@ class lightboxgallery_image {
         $html = '<div class="lightbox-gallery-image-container" style="width: '.$width.'%;">'.
                     '<div class="lightbox-gallery-image-wrapper">'.
                         '<div class="lightbox-gallery-image-frame">'.
-                            '<a class="lightbox-gallery-image-thumbnail" href="'.$this->image_url.'"rel="lightbox[gallery]" title="'.$caption.'" style="background-image: url(\''.$this->thumb_url.'\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>'.
+                            '<a class="lightbox-gallery-image-thumbnail" href="'.$this->image_url.'" rel="lightbox_gallery" title="'.$caption.'" style="background-image: url(\''.$this->thumb_url.'\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>'.
                             '<div class="lightbox-gallery-image-caption">'.$caption.'</div>'.
                             ($this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.'<br/>'.$filesize.'KB '.$this->width.'x'.$this->height.'px</div>' : '').
                             ($editing ? $this->get_editing_options() : '').
