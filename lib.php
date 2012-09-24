@@ -441,3 +441,54 @@ function lightboxgallery_get_file_info($browser, $areas, $course, $cm, $context,
 
     return null;
 }
+
+/**
+ * Trim inputted text to the given maximum length.
+ * @param string $text
+ * @param int $length
+ * @return string The trimmed string with a '...' appended for display.
+ */
+function lightboxgallery_resize_text($text, $length) {
+    $textlib = new textlib();
+    return ($textlib->strlen($text) > $length ? $textlib->substr($text, 0, $length) . '...' : $text);
+}
+
+/**
+ * Output the HTML for a comment in the given context.
+ * @param object $comment The comment record to output
+ * @param object $context The context from which this is being displayed
+ */
+function lightboxgallery_print_comment($comment, $context) {
+    global $DB, $CFG, $COURSE, $OUTPUT;
+
+    //TODO: Move to renderer!
+
+    $user = $DB->get_record('user', array('id' => $comment->userid));
+
+    $deleteurl = new moodle_url('/mod/lightboxgallery/comment.php', array('id' => $comment->gallery, 'delete' => $comment->id));
+
+    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">'.
+         '<tr class="header"><td class="picture left">'.$OUTPUT->user_picture($user, array('courseid' => $COURSE->id)).'</td>'.
+         '<td class="topic starter" align="left"><a name="c'.$comment->id.'"></a><div class="author">'.
+         '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$COURSE->id.'">'.
+         fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</a> - '.userdate($comment->timemodified).
+         '</div></td></tr>'.
+         '<tr><td class="left side">'.
+    // TODO: user_group picture?
+         '</td><td class="content" align="left">'.
+         format_text($comment->comment, FORMAT_MOODLE).
+         '<div class="commands">'.
+         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link($deleteurl, get_string('delete')) : '').
+         '</div>'.
+         '</td></tr></table>';
+}
+
+/**
+ * Determine if RSS feeds are enabled for this lightboxgallery
+ * @return bool True if enabled, false otherwise
+ */
+function lightboxgallery_rss_enabled() {
+    global $CFG;
+
+    return ($CFG->enablerssfeeds && get_config('lightboxgallery', 'enablerssfeeds'));
+}

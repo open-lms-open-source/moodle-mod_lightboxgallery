@@ -110,29 +110,6 @@ function lightboxgallery_edit_types($showall = false) {
     return $result;
 }
 
-function lightboxgallery_print_comment($comment, $context) {
-    global $DB, $CFG, $COURSE, $OUTPUT;
-
-    $user = $DB->get_record('user', array('id' => $comment->userid));
-
-    $deleteurl = new moodle_url('/mod/lightboxgallery/comment.php', array('id' => $comment->gallery, 'delete' => $comment->id));
-
-    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">'.
-         '<tr class="header"><td class="picture left">'.$OUTPUT->user_picture($user, array('courseid' => $COURSE->id)).'</td>'.
-         '<td class="topic starter" align="left"><a name="c'.$comment->id.'"></a><div class="author">'.
-         '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$COURSE->id.'">'.
-         fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</a> - '.userdate($comment->timemodified).
-         '</div></td></tr>'.
-         '<tr><td class="left side">'.
-    // TODO: user_group picture?
-         '</td><td class="content" align="left">'.
-         format_text($comment->comment, FORMAT_MOODLE).
-         '<div class="commands">'.
-         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link($deleteurl, get_string('delete')) : '').
-         '</div>'.
-         '</td></tr></table>';
-}
-
 function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     global $CFG, $OUTPUT;
 
@@ -166,17 +143,6 @@ function lightboxgallery_resize_label($label) {
 
 function lightboxgallery_resize_options() {
     return array(1 => '1280x1024', 2 => '1024x768', 3 => '800x600', 4 => '640x480');
-}
-
-function lightboxgallery_resize_text($text, $length) {
-    $textlib = new textlib();
-    return ($textlib->strlen($text) > $length ? $textlib->substr($text, 0, $length) . '...' : $text);
-}
-
-function lightboxgallery_rss_enabled() {
-    global $CFG;
-
-    return ($CFG->enablerssfeeds && get_config('lightboxgallery', 'enablerssfeeds'));
 }
 
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
