@@ -175,15 +175,15 @@ class lightboxgallery_image {
                     '<input type="hidden" name="image" value="'.$this->stored_file->get_filename().'" />'.
                     '<input type="hidden" name="page" value="0" />'.
                     '<select name="tab" class="lightbox-edit-select" onchange="submit();">'.
-                        '<option disabled selected>Choose...</option>'.
-                        '<option value="caption">Caption</option>'.
-                        '<!--<option value="crop">Crop</option>-->'.
-                        '<option value="delete">Delete</option>'.
-                        '<option value="flip">Flip</option>'.
-                        '<option value="resize">Resize</option>'.
-                        '<option value="rotate">Rotate</option>'.
-                        '<option value="tag">Tag</option>'.
-                        '<option value="thumbnail">Thumbnail</option>'.
+                        '<option disabled selected>'.get_string('edit_choose', 'lightboxgallery').'</option>'.
+                        '<option value="caption">'.get_string('edit_caption', 'lightboxgallery').'</option>'.
+                        '<!--<option value="crop">'.get_string('edit_crop', 'lightboxgallery').'</option>-->'.
+                        '<option value="delete">'.get_string('edit_delete', 'lightboxgallery').'</option>'.
+                        '<option value="flip">'.get_string('edit_flip', 'lightboxgallery').'</option>'.
+                        '<option value="resize">'.get_string('edit_resize', 'lightboxgallery').'</option>'.
+                        '<option value="rotate">'.get_string('edit_rotate', 'lightboxgallery').'</option>'.
+                        '<option value="tag">'.get_string('edit_tag', 'lightboxgallery').'</option>'.
+                        '<option value="thumbnail">'.get_string('edit_thumbnail', 'lightboxgallery').'</option>'.
                     '</select>'.
                 '</form>';
 

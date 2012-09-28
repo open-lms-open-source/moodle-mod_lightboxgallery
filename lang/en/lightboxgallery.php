@@ -65,6 +65,7 @@ $string['dirleft'] = 'Left';
 $string['dirright'] = 'Right';
 $string['displayinggallery'] = 'Showing gallery: {$a}';
 $string['editimage'] = 'Edit image';
+$string['edit_choose'] = 'Choose...';
 $string['edit_caption'] = 'Caption';
 $string['edit_crop'] = 'Crop';
 $string['edit_delete'] = 'Delete';

@@ -66,6 +66,7 @@ $string['dirleft'] = 'Links';
 $string['dirright'] = 'Rechts';
 $string['displayinggallery'] = 'Bilder der Galerie: {$a}';
 $string['editimage'] = 'Bild bearbeiten';
+$string['edit_choose'] = 'Auswahl...';
 $string['edit_caption'] = 'Titel';
 $string['edit_crop'] = 'Beschneiden';
 $string['edit_delete'] = 'Löschen';
