@@ -109,43 +109,4 @@ print_tabs(array($tabs), $tab);
 
 echo html_writer::table($table);
 
-/* to be re-implemented at a later stage
-$dataroot = $CFG->dataroot.'/'.$course->id.'/'.$gallery->folder;
-if ($dirimages = lightboxgallery_directory_images($dataroot)) {
-    sort($dirimages);
-    $options = array();
-    foreach ($dirimages as $dirimage) {
-        $options[$dirimage] = $dirimage;
-    }
-    $index = array_search($image, $dirimages);
-
-    echo('<table class="boxaligncenter menubar">
-            <tr>');
-    if ($index > 0) {
-        echo('<td>');
-        print_single_button($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php',
-                            array('id' => $gallery->id, 'tab' => $tab, 'page' => $page, 'image' => $dirimages[$index - 1]), '←');
-        echo('</td>');
-    }
-    echo('<td>
-            <form method="get" action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php">
-              <fieldset class="invisiblefieldset">
-              <input type="hidden" name="id" value="'.$gallery->id.'" />
-              <input type="hidden" name="tab" value="'.$tab.'" />
-              <input type="hidden" name="page" value="'.$page.'" />');
-    choose_from_menu($options, 'image', $image, null, 'submit()');
-    echo('  </fieldset>
-            </form>
-          </td>');
-    if ($index < count($dirimages) - 1) {
-        echo('<td>');
-        print_single_button($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php',
-                            array('id' => $gallery->id, 'tab' => $tab, 'page' => $page, 'image' => $dirimages[$index + 1]), '→');
-        echo('</td>');
-    }
-    echo('  </tr>
-          </table>');
-}
-*/
-
 echo $OUTPUT->footer();

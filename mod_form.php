@@ -130,17 +130,6 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
 
     // Custom functions.
 
-    private function get_course_directories() {
-        global $CFG, $COURSE;
-        $dirs = get_directory_list($CFG->dataroot . '/' . $COURSE->id,
-                                    array($CFG->moddata, 'backupdata', '_thumb'), true, true, false);
-        $result = array('' => get_string('maindirectory', 'resource'));
-        foreach ($dirs as $dir) {
-            $result[$dir] = $dir;
-        }
-        return $result;
-    }
-
     private function get_perpage_options() {
         $perpages = array(10, 25, 50, 100, 200);
         $result = array(0 => get_string('showall', 'lightboxgallery'));
