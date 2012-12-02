@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -20,7 +19,7 @@
  * Global settings page for lightboxgallery
  *
  * @package   mod_lightboxgallery
- * @copyright 2010 John Kelsh
+ * @copyright 2010 John Kelsh <john.kelsh@netspot.com.au>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +29,8 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 $options = lightboxgallery_edit_types(true);
 
-$disableplugins = new admin_setting_configmulticheckbox('disabledplugins', get_string('configdisabledplugins', 'lightboxgallery'), get_string('configdisabledpluginsdesc', 'lightboxgallery'), array(), $options);
+$disableplugins = new admin_setting_configmulticheckbox('disabledplugins', get_string('configdisabledplugins', 'lightboxgallery'),
+                    get_string('configdisabledpluginsdesc', 'lightboxgallery'), array(), $options);
 $disableplugins->plugin = 'lightboxgallery';
 
 $settings->add($disableplugins);
@@ -43,7 +43,8 @@ if (empty($CFG->enablerssfeeds)) {
     $description .= ' (' . get_string('configenablerssfeedsdisabled2', 'admin') . ')';
 }
 
-$enablerss = new admin_setting_configcheckbox('enablerssfeeds', get_string('configenablerssfeeds', 'lightboxgallery'), $description, 0);
+$enablerss = new admin_setting_configcheckbox('enablerssfeeds', get_string('configenablerssfeeds', 'lightboxgallery'),
+                $description, 0);
 $enablerss->plugin = 'lightboxgallery';
 
 $settings->add($enablerss);

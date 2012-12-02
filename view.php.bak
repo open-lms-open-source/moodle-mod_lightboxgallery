@@ -103,9 +103,8 @@ if (has_capability('mod/lightboxgallery:edit', $context)) {
 $button .= update_module_button($cm->id, $course->id, get_string('modulename', 'lightboxgallery'));
 $PAGE->set_button($button);
 $PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
-//$PAGE->requires->js('/mod/lightboxgallery/gallery-lightbox-min.js');
-//$PAGE->requires->js('/mod/lightboxgallery/module.js');
-$PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox','M.mod_lightboxgallery.init');
+$PAGE->requires->js('/mod/lightboxgallery/gallery-lightbox-min.js');
+$PAGE->requires->js('/mod/lightboxgallery/module.js');
 
 $allowrssfeed = (lightboxgallery_rss_enabled() && $gallery->rss);
 $heading = get_string('displayinggallery', 'lightboxgallery', $gallery->name);
@@ -123,12 +122,8 @@ echo $OUTPUT->heading($heading);
 if ($gallery->intro && !$editing) {
     echo $OUTPUT->box(format_module_intro('lightboxgallery', $gallery, $cm->id), 'generalbox', 'intro');
 }
-if($gallery->autoresize == AUTO_RESIZE_SCREEN || $gallery->autoresize == AUTO_RESIZE_BOTH){
-    $resizecss = ' autoresize';
-} else {
-    $resizecss = '';
-}
-echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix'.$resizecss);
+
+echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix');
 
 $fs = get_file_storage();
 $stored_files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');

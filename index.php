@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,7 +30,7 @@ require_once($CFG->libdir.'/rsslib.php');
 $id = required_param('id', PARAM_INT);
 
 if (! $course = $DB->get_record('course', array('id' => $id))) {
-    error('Course ID is incorrect');
+    print_error('invalidcourseid');
 }
 
 require_course_login($course);
@@ -51,31 +50,34 @@ if (! $galleries = get_all_instances_in_course('lightboxgallery', $course)) {
 }
 
 $table = new html_table();
-$table->head	= array(get_string($course->format == 'weeks' ? 'week' : 'topic'),
+$table->head = array(get_string($course->format == 'weeks' ? 'week' : 'topic'),
                         '&nbsp;',
                         get_string('modulenameshort', 'lightboxgallery'),
                         get_string('description'),
                         'RSS');
-$table->align	= array('center', 'center', 'left', 'left', 'center');
-$table->width	= '*';
+$table->align = array('center', 'center', 'left', 'left', 'center');
+$table->width = '*';
 
 $fobj = new object;
 $fobj->para = false;
 
 $prevsection = '';
 
+// TODO: Put this in a renderer.
 foreach ($galleries as $gallery) {
     $cm = get_context_instance(CONTEXT_MODULE, $gallery->coursemodule);
 
     $printsection = ($gallery->section !== $prevsection ? true : false);
-    if($printsection) { $table->data[] = 'hr'; }
+    if ($printsection) {
+        $table->data[] = 'hr';
+    }
 
     if (lightboxgallery_rss_enabled() && $gallery->rss) {
         $rss = rss_get_link($course->id, $USER->id, 'lightboxgallery', $gallery->id, get_string('rsssubscribe', 'lightboxgallery'));
     }
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($cm->id,'mod_lightboxgallery','gallery_images');
+    $files = $fs->get_area_files($cm->id, 'mod_lightboxgallery', 'gallery_images');
     foreach ($files as $file) {
         if ($file->get_filename() != '.') {
             $imagecount++;
@@ -83,11 +85,14 @@ foreach ($galleries as $gallery) {
     }
     $commentcount = $DB->count_records('lightboxgallery_comments', array('gallery' => $gallery->id));
 
+    $viewurl = new moodle_url('/mod/lightboxgallery/view.php', array('id' => $gallery->coursemodule));
     $table->data[] = array(($printsection ? $gallery->section : ''),
                            lightboxgallery_index_thumbnail($course->id, $gallery),
-                           '<a href="'.$CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$gallery->coursemodule.'">'.$gallery->name.'</a><br />'.get_string('imagecounta', 'lightboxgallery', $imagecount).get_string('commentcount', 'lightboxgallery', $commentcount),
+                           html_writer::link($viewurl, $gallery->name).
+                           '<br />'.get_string('imagecounta', 'lightboxgallery', $imagecount).
+                           get_string('commentcount', 'lightboxgallery', $commentcount),
                            format_text($gallery->description, FORMAT_MOODLE, $fobj),
-                           (isset($rss) ? $rss : get_string('norssfeedavailable','lightboxgallery')));
+                           (isset($rss) ? $rss : get_string('norssfeedavailable', 'lightboxgallery')));
 
     $prevsection = $gallery->section;
 }

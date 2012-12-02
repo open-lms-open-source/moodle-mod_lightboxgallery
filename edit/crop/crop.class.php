@@ -1,24 +1,28 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once($CFG->libdir.'/gdlib.php');
 
 class edit_crop extends edit_base {
 
-    function edit_crop($gallery, $cm, $image, $tab) {
-        parent::edit_base($gallery, $cm, $image, $tab, true, false);
+    public function __construct($gallery, $cm, $image, $tab) {
+        parent::__construct($gallery, $cm, $image, $tab, true, false);
     }
 
-    function output() {
-        global $PAGE;
-/*
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/prototype.js'),true);
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/scriptaculous.js'),true);
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/effects.js'),true);
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/builder.js'),true);
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/dragdrop.js'),true);
-        $PAGE->requires->js(new moodle_url('/mod/lightboxgallery/js/cropper.js'),true);
-*/
-
+    public function output() {
 
         $result = '<script type="text/javascript" charset="utf-8">
                         function onEndCrop( coords, dimensions ) {
@@ -26,7 +30,8 @@ class edit_crop extends edit_base {
                             $( \'y1\' ).value = coords.y1;
                             $( \'x2\' ).value = coords.x2;
                             $( \'y2\' ).value = coords.y2;
-                            $( \'cropInfo\' ).innerHTML = \''.get_string('from').': \' + coords.x1 + \'x\' + coords.y1 + \', '.get_string('size').': \' + dimensions.width + \'x\' + dimensions.height;
+                            $( \'cropInfo\' ).innerHTML = \''.get_string('from').': \' + coords.x1 + \'x\' + coords.y1 + \', '.
+                            get_string('size').': \' + dimensions.width + \'x\' + dimensions.height;
                         }
                         Event.observe(
                             window,
@@ -56,11 +61,10 @@ class edit_crop extends edit_base {
                         <td><input type="submit" value="'.get_string('savechanges').'" /></td>
                       </tr>
                     </table>';
-//lightboxgallery_make_img_tag(lightboxgallery_get_image_url($this->gallery->id, $this->image), 'cropImage')
         return $this->enclose_in_form($result);
     }
 
-    function process_form() {
+    public function process_form() {
         $x1 = required_param('x1', PARAM_INT);
         $y1 = required_param('y1', PARAM_INT);
         $x2 = required_param('x2', PARAM_INT);
@@ -77,5 +81,3 @@ class edit_crop extends edit_base {
     }
 
 }
-
-?>

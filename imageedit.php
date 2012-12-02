@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -50,13 +49,16 @@ $PAGE->set_pagelayout('incourse');
 $PAGE->set_url('/mod/lightboxgallery/imageedit.php', array('id' => $cm->id, 'image' => $image, 'tab' => $tab, 'page' => $page));
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
-$PAGE->set_button($OUTPUT->single_button($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$id.'&editing=1&page='.$page, get_string('backtogallery','lightboxgallery')));
+$buttonurl = new moodle_url('/mod/lightboxgallery/view.php', array('id' => $id, 'editing' => 1, 'page' => $page));
+$PAGE->set_button($OUTPUT->single_button($buttonurl, get_string('backtogallery', 'lightboxgallery')));
 
 $edittypes = lightboxgallery_edit_types();
 
 $tabs = array();
 foreach ($edittypes as $type => $name) {
-    $tabs[] = new tabObject($type, $CFG->wwwroot.'/mod/lightboxgallery/imageedit.php?id='.$cm->id.'&amp;image='.$image.'&amp;page='.$page.'&amp;tab='.$type, $name);
+    $editurl = new moodle_url('/mod/lightboxgallery/imageedit.php',
+                                array('id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type));
+    $tabs[] = new tabObject($type, $editurl, $name);
 }
 
 if (!in_array($tab, array_keys($edittypes))) {
@@ -92,7 +94,9 @@ if ($editinstance->showthumb) {
     $table->attributes = array('style' => 'margin-left:auto;margin-right:auto;');
     $table->align = array('center', 'center');
     $table->size = array('*', '*');
-    $table->data[] = array('<img src="'.$image->get_thumbnail_url().'" alt="" /><br /><span title="'.$image->get_image_caption().'">'.$image->get_image_caption().'</span>', $editinstance->output($image->get_image_caption()));
+    $table->data[] = array('<img src="'.$image->get_thumbnail_url().
+                            '" alt="" /><br /><span title="'.$image->get_image_caption().'">'.
+                            $image->get_image_caption().'</span>', $editinstance->output($image->get_image_caption()));
 } else {
     $table->align = array('center');
     $table->size = array('*');
@@ -105,43 +109,4 @@ print_tabs(array($tabs), $tab);
 
 echo html_writer::table($table);
 
-/* to be re-implemented at a later stage
-$dataroot = $CFG->dataroot.'/'.$course->id.'/'.$gallery->folder;
-if ($dirimages = lightboxgallery_directory_images($dataroot)) {
-    sort($dirimages);
-    $options = array();
-    foreach ($dirimages as $dirimage) {
-        $options[$dirimage] = $dirimage;
-    }
-    $index = array_search($image, $dirimages);
-
-    echo('<table class="boxaligncenter menubar">
-            <tr>');
-    if ($index > 0) {
-        echo('<td>');
-        print_single_button($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php', array('id' => $gallery->id, 'tab' => $tab, 'page' => $page, 'image' => $dirimages[$index - 1]), '←');
-        echo('</td>');
-    }
-    echo('<td>
-            <form method="get" action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php">
-              <fieldset class="invisiblefieldset">
-              <input type="hidden" name="id" value="'.$gallery->id.'" />
-              <input type="hidden" name="tab" value="'.$tab.'" />
-              <input type="hidden" name="page" value="'.$page.'" />');
-    choose_from_menu($options, 'image', $image, null, 'submit()');
-    echo('  </fieldset>
-            </form>
-          </td>');
-    if ($index < count($dirimages) - 1) {
-        echo('<td>');
-        print_single_button($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php', array('id' => $gallery->id, 'tab' => $tab, 'page' => $page, 'image' => $dirimages[$index + 1]), '→');
-        echo('</td>');
-    }
-    echo('  </tr>
-          </table>');
-}
-*/
-
 echo $OUTPUT->footer();
-
-?>

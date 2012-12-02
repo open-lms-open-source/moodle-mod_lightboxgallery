@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,13 +28,19 @@ require_once(dirname(__FILE__).'/imageclass.php');
 
 require_once($CFG->libdir.'/filelib.php');
 
-$id = required_param('id', PARAM_INT);
+$cid = required_param('id', PARAM_INT);
 $g = optional_param('gallery', '0', PARAM_INT);
 $search = optional_param('search', '', PARAM_CLEAN);
 
-$cm      = get_coursemodule_from_id('lightboxgallery', $id, 0, false, MUST_EXIST);
-$course  = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance), '*', MUST_EXIST);
+if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $g))) {
+    print_error('invalidlightboxgalleryid', 'lightboxgallery');
+}
+if (!$course = $DB->get_record('course', array('id' => $gallery->course))) {
+    print_error('invalidcourseid');
+}
+if (!$cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $course->id)) {
+    print_error('invalidcoursemodule');
+}
 
 require_login($course, true, $cm);
 
@@ -48,7 +53,7 @@ if ($gallery->ispublic) {
 
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
-add_to_log($course->id, 'lightboxgallery', 'search', 'search.php?id='.$id.'&gallery='.$g.'&search='.$search, $search, 0, $userid);
+add_to_log($course->id, 'lightboxgallery', 'search', 'search.php?id='.$cid.'&gallery='.$g.'&search='.$search, $search, 0, $userid);
 
 $PAGE->set_url('/mod/lightboxgallery/search.php', array('id' => $cm->id, 'search' => $search));
 $PAGE->set_title($gallery->name);
@@ -73,7 +78,7 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
     $table->data[] = array(get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
                            '<input type="text" name="search" size="10" value="'.s($search, true).'" />' .
                            '<input type="hidden" name="id" value="'.$cm->id.'" />',
-                           '<input type="submit" value="'.get_string('search').'" />') ;
+                           '<input type="submit" value="'.get_string('search').'" />');
     echo html_writer::table($table);
 
     echo('</form>');
@@ -81,7 +86,8 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
 
 $fs = get_file_storage();
 
-if ($results = $DB->get_records_select('lightboxgallery_image_meta', $DB->sql_like('description', '?', false).($g > 0 ? 'AND gallery = ?' : ''), array('%'.$search.'%', ($g > 0 ? $g : null)))) {
+if ($results = $DB->get_records_select('lightboxgallery_image_meta',
+        $DB->sql_like('description', '?', false).($g > 0 ? 'AND gallery = ?' : ''), array('%'.$search.'%', ($g > 0 ? $g : null)))) {
     echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix');
 
     $hashes = array();

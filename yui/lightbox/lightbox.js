@@ -11,17 +11,13 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 	
 	var L = Y.Lang,
 		Node = Y.Node,
-		
 		PX = "px",
-		
 		CLICK = "click",
-		
 		ANIM = "anim",
 		ACTIVE_IMAGE = "activeImage",
 		IMAGE_ARRAY = "imageArray",
 		OVERLAY_OPACITY = "overlayOpacity",
 		OVERLAY_DURATION = "overlayDuration",
-		
 		LIGHTBOX = "lightbox",
 		OVERLAY = "overlay",
 		PREV_LINK = "prevLink",
@@ -467,20 +463,27 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
                 // Get current viewport width and height
                 viewportWidth = Y.DOM.winWidth();
                 viewportHeight = Y.DOM.winHeight();
-                border = this.get("borderWidth");
-                widthRatio = (viewportWidth-border*6)/imagePreloader.width;
-                heightRatio = (viewportHeight-border*9)/imagePreloader.height;
-                
-                if (widthRatio > 1 && heightRatio > 1){
-                    bestRatio = 1;
-                } else if (widthRatio < heightRatio){
-                    var bestRatio = widthRatio;
+                imageresize = Y.one('#region-main .autoresize');
+                if (imageresize){
+                    border = this.get("borderWidth");
+                    widthRatio = (viewportWidth-border*6)/imagePreloader.width;
+                    heightRatio = (viewportHeight-border*9)/imagePreloader.height;
+
+                    if (widthRatio > 1 && heightRatio > 1){
+                        bestRatio = 1;
+                    } else if (widthRatio < heightRatio){
+                        var bestRatio = widthRatio;
+                    } else {
+                        var bestRatio = heightRatio;
+                    }
+
+                    imgWidth = imagePreloader.width*bestRatio;
+                    imgHeight = imagePreloader.height*bestRatio;
                 } else {
-                    var bestRatio = heightRatio;
-                }			
-                      
-                imgWidth = imagePreloader.width*bestRatio;
-                imgHeight = imagePreloader.height*bestRatio; 
+                    imgWidth = imagePreloader.width;
+                    imgHeight = imagePreloader.height;
+                }
+
                 
 				this._resizeImageContainer(imgWidth, imgHeight);
 			}, this);

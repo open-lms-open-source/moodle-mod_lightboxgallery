@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -67,6 +66,7 @@ $string['dirleft'] = 'Links';
 $string['dirright'] = 'Rechts';
 $string['displayinggallery'] = 'Bilder der Galerie: {$a}';
 $string['editimage'] = 'Bild bearbeiten';
+$string['edit_choose'] = 'Auswahl...';
 $string['edit_caption'] = 'Titel';
 $string['edit_crop'] = 'Beschneiden';
 $string['edit_delete'] = 'Löschen';
@@ -95,12 +95,18 @@ $string['imageuploaded'] = 'Hochgeladenes Bild: {$a}';
 $string['lightboxgallery'] = 'Lightbox Galerie';
 $string['lightboxgallery:addcomment'] = 'Kommentar zur Lightbox Galerie hinzufügen';
 $string['lightboxgallery:addimage'] = 'Bild zur Lightbox Galerie hinzufügen';
+$string['lightboxgallery:addinstance'] = 'Lightbox Galerie hinzufügen';
 $string['lightboxgallery:edit'] = 'Lightbox Galerie bearbeiten';
 $string['lightboxgallery:submit'] = 'Lightbox Galerie einreichen';
 $string['lightboxgallery:viewcomments'] = 'Kommentare in Lightbox Galerie sehen';
 $string['makepublic'] = 'Öffentlich machen';
 $string['metadata'] = 'Metadaten';
 $string['modulename'] = 'Lightbox Galerie';
+$string['modulename_help'] = 'Das Modul \'Lightbox Galerie\' erlaubt die Präsentation von Bildern in einer Galerie.
+
+Trainer/innen können eine Lightbox Galerie innerhalb ihres Kurses angelegen, bearbeiten und löschen. Bilder können einzeln und als ZIP-Datei hochgeladen werden. Beim Hinzufügen werden automatisch Miniaturbilder erzeugt und in einer Vorschau verwendet. Mit einem Klick auf ein Minaturbild in der Vorschau erscheint dieses Bild in vergrößerter Darstellung. Von hieraus ist es möglich, innerhalb der Galerie bildweise vorwärts und rückwärts zu blättern. Die Lightbox Skripte zeigen schöne Überblendeffekte beim Öffnen und Blättern.
+
+Nutzer/innen können Kommentare in der Galerie schreiben, wenn die entsprechende Option aktiviert ist.';
 $string['modulenameplural'] = 'Lightbox Galerien';
 $string['modulenameshort'] = 'Galerie';
 $string['modulenameadd'] = 'Lightbox Galerie';

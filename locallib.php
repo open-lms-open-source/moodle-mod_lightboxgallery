@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,6 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(dirname(__FILE__).'/lib.php');
 require_once("$CFG->libdir/filelib.php");
 
 define('THUMB_WIDTH', 150);
@@ -40,14 +40,14 @@ define('AUTO_RESIZE_SCREEN', 1);
 define('AUTO_RESIZE_UPLOAD', 2);
 define('AUTO_RESIZE_BOTH', 3);
 
-function lightboxgallery_add_images($stored_file, $context, $cm, $gallery) {
+function lightboxgallery_add_images($stored_file, $context, $cm, $gallery, $resize = 0) {
     require_once(dirname(__FILE__).'/imageclass.php');
 
     $fs = get_file_storage();
 
     $images = array();
     if ($stored_file->get_mimetype() == 'application/zip') {
-        //unpack
+        // Unpack.
         $packer = get_file_packer('application/zip');
         $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
         $stored_file->extract_to_storage($packer, $context->id, 'mod_lightboxgallery', 'unpacktemp', 0, '/');
@@ -71,6 +71,13 @@ function lightboxgallery_add_images($stored_file, $context, $cm, $gallery) {
             if (!$fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $filename)) {
                 $stored_file = $fs->create_file_from_storedfile($fileinfo, $stored_file);
                 $image = new lightboxgallery_image($stored_file, $gallery, $cm);
+
+                if ($resize > 0) {
+                    $resizeoptions = lightboxgallery_resize_options();
+                    list($width, $height) = explode('x', $resizeoptions[$resize]);
+                    $image->resize_image($width, $height);
+                }
+
                 $image->set_caption($filename);
             }
         }
@@ -111,26 +118,6 @@ function lightboxgallery_edit_types($showall = false) {
     return $result;
 }
 
-function lightboxgallery_print_comment($comment, $context) {
-    global $DB, $CFG, $COURSE, $OUTPUT;
-
-    $user = $DB->get_record('user', array('id' => $comment->userid));
-
-    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">'.
-         '<tr class="header"><td class="picture left">'.$OUTPUT->user_picture($user, array('courseid' => $COURSE->id)).'</td>'.
-         '<td class="topic starter" align="left"><a name="c'.$comment->id.'"></a><div class="author">'.
-         '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$COURSE->id.'">'.fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</a> - '.userdate($comment->timemodified).
-         '</div></td></tr>'.
-         '<tr><td class="left side">'.
-//         ($groups = user_group($COURSE->id, $user->id) ? print_group_picture($groups, $COURSE->id, false, false, true) : '&nbsp;').
-         '</td><td class="content" align="left">'.
-         format_text($comment->comment, FORMAT_MOODLE).
-         '<div class="commands">'.
-         (has_capability('mod/lightboxgallery:edit', $context) ? '<a href="'.$CFG->wwwroot.'/mod/lightboxgallery/comment.php?id='.$comment->gallery.'&amp;delete='.$comment->id.'">'.get_string('delete').'</a>' : '').
-         '</div>'.
-         '</td></tr></table>';
-}
-
 function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     global $CFG, $OUTPUT;
 
@@ -148,7 +135,9 @@ function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
 
     $tagarray = array();
     foreach ($tags as $tag) {
-        $tagarray[] = '<a class="taglink" href="'.$CFG->wwwroot.'/mod/lightboxgallery/search.php?id='.$courseid.'&amp;gallery='.$galleryid.'&amp;search='.urlencode(stripslashes($tag->description)).'">'.s($tag->description).'</a>';
+        $tagparams = array('id' => $courseid, 'gallery' => $galleryid, 'search' => stripslashes($tag->description));
+        $tagurl = new moodle_url('/mod/lightboxgallery/search.php', $tagparams);
+        $tagarray[] = html_writer::link($tagurl, s($tag->description), array('class' => 'taglink'));
     }
 
     echo implode(', ', $tagarray);
@@ -156,23 +145,8 @@ function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     echo $OUTPUT->box_end();
 }
 
-function lightboxgallery_resize_label($label) {
-    return lightboxgallery_resize_text($label, MAX_IMAGE_LABEL);
-}
-
 function lightboxgallery_resize_options() {
     return array(1 => '1280x1024', 2 => '1024x768', 3 => '800x600', 4 => '640x480');
-}
-
-function lightboxgallery_resize_text($text, $length) {
-    $textlib = textlib_get_instance();
-    return ($textlib->strlen($text) > $length ? $textlib->substr($text, 0, $length) . '...' : $text);
-}
-
-function lightboxgallery_rss_enabled() {
-    global $CFG;
-
-    return ($CFG->enablerssfeeds && get_config('lightboxgallery', 'enablerssfeeds'));
 }
 
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
@@ -187,18 +161,18 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     $fs = get_file_storage();
     $stored_file = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_index', '0', '/', 'index.png');
 
-    if (!is_null($newimage) && is_object($stored_file)) { //delete any existing index
+    if (!is_null($newimage) && is_object($stored_file)) { // Delete any existing index.
         $stored_file->delete();
     }
     if (is_object($stored_file) && is_null($newimage)) {
-        //grab the index
+        // Grab the index.
         $index = $stored_file;
     } else {
-        //get first image and create an index for that
+        // Get first image and create an index for that.
         if (is_null($newimage)) {
-            $files = $fs->get_area_files($context->id,'mod_lightboxgallery','gallery_images');
+            $files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
             $file = array_shift($files);
-            while (substr($file->get_mimetype(),0,6) != 'image/') {
+            while (substr($file->get_mimetype(), 0, 6) != 'image/') {
                 $file = array_shift($files);
             }
             $image = new lightboxgallery_image($file, $gallery, $cm);

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -47,7 +46,7 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
             $paths[] = $comment;
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -58,9 +57,9 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $oldid = $data->id;
         $data->course = $this->get_courseid();
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        // insert the lightboxgallery record
+        // Insert the lightboxgallery record.
         $newitemid = $DB->insert_record('lightboxgallery', $data);
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
 
@@ -83,7 +82,7 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $oldid = $data->id;
 
         $data->gallery = $this->get_new_parentid('lightboxgallery');
-        //TODO: image var to match image
+        // TODO: image var to match image.
         $newitemid = $DB->insert_record('lightboxgallery_image_meta', $data);
     }
 

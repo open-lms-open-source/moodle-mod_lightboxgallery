@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,10 +32,10 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
 
     protected function define_structure() {
 
-        // To know if we are including userinfo
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated.
         $lightboxgallery = new backup_nested_element('lightboxgallery', array('id'), array(
             'course', 'folder', 'name', 'perpage', 'comments', 'extinfo',
             'timemodified', 'ispublic', 'rss', 'autoresize', 'resize', 'perrow',
@@ -44,7 +43,7 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
         ));
 
         $comments = new backup_nested_element('usercomments');
-        $comment = new backup_nested_element('comment', array('id'),array(
+        $comment = new backup_nested_element('comment', array('id'), array(
             'gallery', 'userid', 'comment', 'timemodified'
         ));
 
@@ -53,30 +52,30 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
             'gallery', 'image', 'description', 'metatype'
         ));
 
-        // Build the tree
+        // Build the tree.
 
         $lightboxgallery->add_child($comments);
         $comments->add_child($comment);
         $lightboxgallery->add_child($image_metas);
         $image_metas->add_child($image_meta);
 
-        // Define sources
+        // Define sources.
         $lightboxgallery->set_source_table('lightboxgallery', array('id' => backup::VAR_ACTIVITYID));
         $image_meta->set_source_table('lightboxgallery_image_meta', array('gallery' => backup::VAR_PARENTID));
 
-        // All the rest of elements only happen if we are including user info
+        // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $comment->set_source_table('lightboxgallery_comments', array('gallery' => backup::VAR_PARENTID));
         }
 
-        // Define file annotations
+        // Define file annotations.
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_images', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_thumbs', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_index', null);
 
         $comment->annotate_ids('user', 'userid');
 
-        // Return the root element (lightboxgallery), wrapped into standard activity structure
+        // Return the root element (lightboxgallery), wrapped into standard activity structure.
         return $this->prepare_activity_structure($lightboxgallery);
     }
 }

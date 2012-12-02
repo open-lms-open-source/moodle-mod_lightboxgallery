@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
+/**
+ * Handles all the RSS related tasks for the module
+ *
+ * @package   mod_lightboxgallery
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('lib.php');
 require_once('imageclass.php');
@@ -18,7 +40,7 @@ function lightboxgallery_rss_get_feed($context, $args) {
 
     $status = true;
 
-    //are RSS feeds enabled?
+    // Are RSS feeds enabled?
     if (empty($config->enablerssfeeds)) {
         debugging('DISABLED (module configuration)');
         return null;
@@ -29,7 +51,7 @@ function lightboxgallery_rss_get_feed($context, $args) {
     if ($cm) {
         $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
 
-        //context id from db should match the submitted one
+        // Context id from db should match the submitted one.
         if ($context->id != $modcontext->id) {
             return null;
         }
@@ -67,36 +89,37 @@ function lightboxgallery_rss_get_feed($context, $args) {
 
         $articles .= rss_full_tag('media:description', 3, false, $description);
         $articles .= rss_full_tag('media:thumbnail', 3, false, '', array('url' => $image->get_thumbnail_url()));
-        $articles .= rss_full_tag('media:content', 3, false, '', array('url' => $image->get_image_url(), 'type' => $file->get_mimetype()));
+        $articles .= rss_full_tag('media:content', 3, false, '',
+                        array('url' => $image->get_image_url(), 'type' => $file->get_mimetype()));
 
         $articles .= rss_end_tag('item', 2, true);
 
     }
 
-    //get the cache file info
+    // Get the cache file info.
     $filename = rss_get_file_name($gallery, $sql);
     $cachedfilepath = rss_get_file_full_name('mod_lightboxgallery', $filename);
 
-    //Is the cache out of date?
+    // Is the cache out of date?
     $cachedfilelastmodified = 0;
     if (file_exists($cachedfilepath)) {
         $cachedfilelastmodified = filemtime($cachedfilepath);
     }
 
-    //First all rss feeds common headers
-    $header = lightboxgallery_rss_header(format_string($gallery->name,true),
+    // First all rss feeds common headers.
+    $header = lightboxgallery_rss_header(format_string($gallery->name, true),
                                   $CFG->wwwroot."/mod/lightboxgallery/view.php?id=".$cm->id,
-                                  format_string($gallery->intro,true));
+                                  format_string($gallery->intro, true));
 
-    //Now all rss feeds common footers
+    // Now all rss feeds common footers.
     if (!empty($header) && !empty($articles)) {
         $footer = rss_standard_footer();
     }
-    //Now, if everything is ok, concatenate it
+    // Now, if everything is ok, concatenate it.
     if (!empty($header) && !empty($articles) && !empty($footer)) {
         $rss = $header.$articles.$footer;
 
-        //Save the XML contents to file.
+        // Save the XML contents to file.
         $status = rss_save_file('mod_lightboxgallery', $filename, $rss);
     }
 
@@ -117,7 +140,7 @@ function lightboxgallery_rss_feeds() {
     } else if (! get_config('lightboxgallery', 'enablerssfeeds')) {
         debugging('DISABLED (module configuration)');
     } else {
-        if ($galleries = get_records('lightboxgallery')) {
+        if ($galleries = $DB->get_records('lightboxgallery')) {
             foreach ($galleries as $gallery) {
                 if ($gallery->rss && $status) {
 
@@ -167,7 +190,7 @@ function lightboxgallery_rss_feeds() {
 }
 
 function lightboxgallery_rss_get_sql($glossary, $time=0) {
-    //do we only want new items?
+    // Do we only want new items?
     if ($time) {
         $time = "AND e.timecreated > $time";
     } else {
@@ -179,7 +202,7 @@ function lightboxgallery_rss_get_sql($glossary, $time=0) {
     return $sql;
 }
 
-function lightboxgallery_rss_header($title = NULL, $link = NULL, $description = NULL) {
+function lightboxgallery_rss_header($title = null, $link = null, $description = null) {
     global $CFG, $USER, $OUTPUT;
 
     $status = true;
@@ -189,7 +212,7 @@ function lightboxgallery_rss_header($title = NULL, $link = NULL, $description = 
 
     if ($status) {
 
-        //Calculate title, link and description
+        // Calculate title, link and description.
         if (empty($title)) {
             $title = format_string($site->fullname);
         }
@@ -200,34 +223,35 @@ function lightboxgallery_rss_header($title = NULL, $link = NULL, $description = 
             $description = $site->summary;
         }
 
-        //xml headers
+        // XML headers.
         $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
+        $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss\"".
+                    "xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
 
-        //open the channel
+        // Open the channel.
         $result .= rss_start_tag('channel', 1, true);
 
-        //write channel info
+        // Write channel info.
         $result .= rss_full_tag('title', 2, false, strip_tags($title));
         $result .= rss_full_tag('link', 2, false, $link);
         $result .= rss_full_tag('description', 2, false, $description);
         $result .= rss_full_tag('generator', 2, false, 'Moodle');
         if (!empty($USER->lang)) {
-            $result .= rss_full_tag('language', 2, false, substr($USER->lang,0,2));
+            $result .= rss_full_tag('language', 2, false, substr($USER->lang, 0, 2));
         }
         $today = getdate();
         $result .= rss_full_tag('copyright', 2, false, '&#169; '. $today['year'] .' '. format_string($site->fullname));
         /*
-       if (!empty($USER->email)) {
+        if (!empty($USER->email)) {
             $result .= rss_full_tag('managingEditor', 2, false, fullname($USER));
             $result .= rss_full_tag('webMaster', 2, false, fullname($USER));
         }
-       */
+        */
 
-        //write image info
+        // Write image info.
         $rsspix = $OUTPUT->pix_url('i/rsssitelogo');
 
-        //write the info
+        // Write the info.
         $result .= rss_start_tag('image', 2, true);
         $result .= rss_full_tag('url', 3, false, $rsspix);
         $result .= rss_full_tag('title', 3, false, 'moodle');

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,15 +25,15 @@
 
 class edit_base {
 
-    var $imageobj;
+    public $imageobj;
 
-    var $gallery;
-    var $image;
-    var $tab;
-    var $showthumb;
-    var $context;
+    public $gallery;
+    public $image;
+    public $tab;
+    public $showthumb;
+    public $context;
 
-    function edit_base($_gallery, $_cm, $_image, $_tab, $_showthumb = true) {
+    public function __construct($_gallery, $_cm, $_image, $_tab, $_showthumb = true) {
         global $CFG;
 
         $this->gallery = $_gallery;
@@ -45,11 +44,11 @@ class edit_base {
         $this->context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
     }
 
-    function processing() {
+    public function processing() {
         return optional_param('process', false, PARAM_BOOL);
     }
 
-    function enclose_in_form($text) {
+    public function enclose_in_form($text) {
         global $CFG, $USER;
 
         return '<form action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php" method="post">'.
@@ -61,14 +60,12 @@ class edit_base {
                '<input type="hidden" name="process" value="1" />'.$text.'</fieldset></form>';
     }
 
-    function output() {
+    public function output() {
 
     }
 
-    function process_form() {
+    public function process_form() {
 
     }
 
 }
-
-?>

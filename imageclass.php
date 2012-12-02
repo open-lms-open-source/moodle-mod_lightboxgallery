@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -50,20 +49,23 @@ class lightboxgallery_image {
         $this->cmid = $cm->id;
         $this->context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
-        if(!$this->stored_file->is_valid_image()) {
-          // error? continue;
-        }
+        /*if (!$this->stored_file->is_valid_image()) {
+          // Error? continue.
+          print_error('invalidimage');
+        }*/
 
-        $this->image_url = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_images/'.$this->stored_file->get_itemid().$this->stored_file->get_filepath().$this->stored_file->get_filename();
-        $this->thumb_url = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_thumbs/0/'.$this->stored_file->get_filepath().$this->stored_file->get_filename().'.png';
+        $this->image_url = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_images/'.
+                           $this->stored_file->get_itemid().$this->stored_file->get_filepath().$this->stored_file->get_filename();
+        $this->thumb_url = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_thumbs/0/'.
+                           $this->stored_file->get_filepath().$this->stored_file->get_filename().'.png';
 
         $image_info = $this->stored_file->get_imageinfo();
 
         $this->height = $image_info['height'];
         $this->width = $image_info['width'];
 
-        if(!$this->thumbnail = $this->get_thumbnail()) {
-            $this->create_thumbnail();
+        if (!$this->thumbnail = $this->get_thumbnail()) {
+            $this->thumbnail = $this->create_thumbnail();
         }
     }
 
@@ -94,12 +96,9 @@ class lightboxgallery_image {
         imagepng($this->get_image_resized(THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH, $offsetx, $offsety));
         $thumbnail = ob_get_clean();
 
-        if ($this->thumbnail) {
-            $this->delete_thumbnail();
-        }
+        $this->delete_thumbnail();
         $fs = get_file_storage();
-        $fs->create_file_from_string($fileinfo, $thumbnail);
-        return;
+        return $fs->create_file_from_string($fileinfo, $thumbnail);
     }
 
     public function create_index() {
@@ -130,7 +129,7 @@ class lightboxgallery_image {
         return $fs->create_file_from_string($fileinfo, $index);
     }
 
-    private function delete_file() {
+    public function delete_file() {
         $this->delete_thumbnail();
         $this->stored_file->delete();
     }
@@ -142,7 +141,10 @@ class lightboxgallery_image {
     }
 
     private function delete_thumbnail() {
-      $this->thumbnail->delete();
+        if (isset($this->thumbnail) && is_object($this->thumbnail)) {
+            $this->thumbnail->delete();
+            unset($this->thumbnail);
+        }
     }
 
     public function flip_image($direction) {
@@ -173,15 +175,15 @@ class lightboxgallery_image {
                     '<input type="hidden" name="image" value="'.$this->stored_file->get_filename().'" />'.
                     '<input type="hidden" name="page" value="0" />'.
                     '<select name="tab" class="lightbox-edit-select" onchange="submit();">'.
-                        '<option disabled selected>Choose...</option>'.
-                        '<option value="caption">Caption</option>'.
-                        '<!--<option value="crop">Crop</option>-->'.
-                        '<option value="delete">Delete</option>'.
-                        '<option value="flip">Flip</option>'.
-                        '<option value="resize">Resize</option>'.
-                        '<option value="rotate">Rotate</option>'.
-                        '<option value="tag">Tag</option>'.
-                        '<option value="thumbnail">Thumbnail</option>'.
+                        '<option disabled selected>'.get_string('edit_choose', 'lightboxgallery').'</option>'.
+                        '<option value="caption">'.get_string('edit_caption', 'lightboxgallery').'</option>'.
+                        '<!--<option value="crop">'.get_string('edit_crop', 'lightboxgallery').'</option>-->'.
+                        '<option value="delete">'.get_string('edit_delete', 'lightboxgallery').'</option>'.
+                        '<option value="flip">'.get_string('edit_flip', 'lightboxgallery').'</option>'.
+                        '<option value="resize">'.get_string('edit_resize', 'lightboxgallery').'</option>'.
+                        '<option value="rotate">'.get_string('edit_rotate', 'lightboxgallery').'</option>'.
+                        '<option value="tag">'.get_string('edit_tag', 'lightboxgallery').'</option>'.
+                        '<option value="thumbnail">'.get_string('edit_thumbnail', 'lightboxgallery').'</option>'.
                     '</select>'.
                 '</form>';
 
@@ -192,7 +194,8 @@ class lightboxgallery_image {
         global $DB;
         $caption = '';
 
-        if($image_meta = $DB->get_record('lightboxgallery_image_meta', array('gallery' => $this->gallery->id, 'image' => $this->stored_file->get_filename(), 'metatype' => 'caption'))) {
+        if ($image_meta = $DB->get_record('lightboxgallery_image_meta',
+                array('gallery' => $this->gallery->id, 'image' => $this->stored_file->get_filename(), 'metatype' => 'caption'))) {
             $caption = $image_meta->description;
         }
 
@@ -203,7 +206,7 @@ class lightboxgallery_image {
         if ($this->gallery->captionfull) {
             $caption = $this->get_image_caption();
         } else {
-            $caption = lightboxgallery_resize_label($this->get_image_caption());
+            $caption = lightboxgallery_resize_text($this->get_image_caption(), MAX_IMAGE_LABEL);
         }
         $timemodified = strftime(get_string('strftimedatetimeshort', 'langconfig'), $this->stored_file->get_timemodified());
         $filesize = round($this->stored_file->get_filesize() / 100) / 10;
@@ -219,11 +222,15 @@ class lightboxgallery_image {
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) {
             $html .= $captiondiv;
         }
-        $html .= '<a class="lightbox-gallery-image-thumbnail" href="'.$this->image_url.'" rel="lightbox_gallery" title="'.$caption.'" style="background-image: url(\''.$this->thumb_url.'\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>';
+        $html .= '<a class="lightbox-gallery-image-thumbnail" href="'.
+                 $this->image_url.'" rel="lightbox_gallery" title="'.$caption.
+                 '" style="background-image: url(\''.$this->thumb_url.
+                 '\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>';
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT) {
             $html .= $captiondiv;
         }
-        $html .= ($this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.'<br/>'.$filesize.'KB '.$this->width.'x'.$this->height.'px</div>' : '');
+        $html .= $this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.
+                 '<br/>'.$filesize.'KB '.$this->width.'x'.$this->height.'px</div>' : '';
         $html .= ($editing ? $this->get_editing_options() : '');
         $html .= '</div>'.
                     '</div>'.
@@ -238,7 +245,7 @@ class lightboxgallery_image {
         $flipped = imagecreatetruecolor($this->width, $this->height);
         $w = $this->width;
         $h = $this->height;
-        if($direction == 'horizontal') {
+        if ($direction == 'horizontal') {
             for ($x = 0; $x < $w; $x++) {
                 for ($y = 0; $y < $h; $y++) {
                     imagecopy($flipped, $image, $x, $h - $y - 1, $x, $y, 1, 1);
@@ -298,11 +305,12 @@ class lightboxgallery_image {
     public function get_tags() {
         global $DB;
 
-        if(isset($this->tags)) {
+        if (isset($this->tags)) {
             return $this->tags;
         }
 
-        $this->tags = $DB->get_records('lightboxgallery_image_meta', array('image' => $this->stored_file->get_filename(), 'metatype' => 'tag'));
+        $this->tags = $DB->get_records('lightboxgallery_image_meta',
+                                        array('image' => $this->stored_file->get_filename(), 'metatype' => 'tag'));
 
         return $this->tags;
     }
@@ -310,7 +318,8 @@ class lightboxgallery_image {
     private function get_thumbnail() {
         $fs = get_file_storage();
 
-        if($thumbnail = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_thumbs', '0', '/', $this->stored_file->get_filename().'.png')) {
+        if ($thumbnail = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_thumbs', '0', '/',
+                                       $this->stored_file->get_filename().'.png')) {
             return $thumbnail;
         }
 
@@ -350,9 +359,12 @@ class lightboxgallery_image {
 
         $this->delete_file();
         $fs = get_file_storage();
-        $fs->create_file_from_string($fileinfo, $resized);
+        $this->stored_file = $fs->create_file_from_string($fileinfo, $resized);
+        $image_info = $this->stored_file->get_imageinfo();
+        $this->height = $image_info['height'];
+        $this->width = $image_info['width'];
 
-        $this->create_thumbnail();
+        $this->thumbnail = $this->create_thumbnail();
 
         return $fileinfo['filename'];
     }
@@ -387,7 +399,8 @@ class lightboxgallery_image {
         $imagemeta->metatype = 'caption';
         $imagemeta->description = $caption;
 
-        if($meta = $DB->get_record('lightboxgallery_image_meta', array('gallery' => $this->cm->instance, 'image' => $this->stored_file->get_filename(), 'metatype' => 'caption'))) {
+        if ($meta = $DB->get_record('lightboxgallery_image_meta', array('gallery' => $this->cm->instance,
+                'image' => $this->stored_file->get_filename(), 'metatype' => 'caption'))) {
             $imagemeta->id = $meta->id;
             return $DB->update_record('lightboxgallery_image_meta', $imagemeta);
         } else {
