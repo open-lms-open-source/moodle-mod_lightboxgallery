@@ -27,6 +27,7 @@ require_once($CFG->libdir.'/gdlib.php');
 
 define('THUMBNAIL_WIDTH', 162);
 define('THUMBNAIL_HEIGHT', 132);
+define('LIGHTBOXGALLERY_POS_HID', 2);
 define('LIGHTBOXGALLERY_POS_TOP', 1);
 define('LIGHTBOXGALLERY_POS_BOT', 0);
 
@@ -213,6 +214,10 @@ class lightboxgallery_image {
 
         $width = round(100 / $this->gallery->perrow);
 
+        // Hide the caption.
+        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
+            $caption = ''; // Hide by cleaning the content (looks better than cleaning the whole div).
+        }
         $posclass = ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) ? 'top' : 'bottom';
         $captiondiv = html_writer::tag('div', $caption, array('class' => "lightbox-gallery-image-caption $posclass"));
 
@@ -226,7 +231,7 @@ class lightboxgallery_image {
                  $this->image_url.'" rel="lightbox_gallery" title="'.$caption.
                  '" style="background-image: url(\''.$this->thumb_url.
                  '\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>';
-        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT) {
+        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT or $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
             $html .= $captiondiv;
         }
         $html .= $this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.

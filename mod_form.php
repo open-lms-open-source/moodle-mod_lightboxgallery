@@ -70,6 +70,7 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $captionposopts = array(
             '0' => get_string('position_bottom', 'lightboxgallery'),
             '1' => get_string('position_top', 'lightboxgallery'),
+            '2' => get_string('hide'),
         );
         $mform->addElement('select', 'captionpos', get_string('captionpos', 'lightboxgallery'), $captionposopts);
         $mform->setAdvanced('captionpos');
