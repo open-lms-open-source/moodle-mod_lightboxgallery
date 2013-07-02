@@ -58,6 +58,7 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
         }
 
         $mform->addElement('hidden', 'id', $cm->id);
+        $mform->setType('id',PARAM_INT);
 
         $this->add_action_buttons(true, get_string('addimage', 'lightboxgallery'));
 
