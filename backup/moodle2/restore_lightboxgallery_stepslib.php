@@ -93,5 +93,6 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $this->add_related_files('mod_lightboxgallery', 'gallery_images', null);
         $this->add_related_files('mod_lightboxgallery', 'gallery_thumbs', null);
         $this->add_related_files('mod_lightboxgallery', 'gallery_index', null);
+        $this->add_related_files('mod_lightboxgallery', 'intro', null);
     }
 }

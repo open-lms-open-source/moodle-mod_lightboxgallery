@@ -72,6 +72,7 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_images', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_thumbs', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_index', null);
+        $lightboxgallery->annotate_files('mod_lightboxgallery', 'intro', null);
 
         $comment->annotate_ids('user', 'userid');
 
