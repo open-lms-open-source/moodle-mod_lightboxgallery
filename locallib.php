@@ -107,6 +107,9 @@ function lightboxgallery_edit_types($showall = false) {
 
     $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 
+    // TODO: Remove this once crop functionality is working.
+    $disabledplugins[] = 'crop';
+
     $edittypes = get_list_of_plugins('mod/lightboxgallery/edit');
 
     foreach ($edittypes as $edittype) {
