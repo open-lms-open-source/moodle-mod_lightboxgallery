@@ -131,7 +131,15 @@ class lightboxgallery_image {
     }
 
     public function delete_file() {
+        global $DB;
+
         $this->delete_thumbnail();
+
+        // Delete all image_meta records for this file.
+        $DB->delete_records('lightboxgallery_image_meta', array(
+            'gallery' => $this->cm->instance,
+            'image' => $this->stored_file->get_filename()));
+
         $this->stored_file->delete();
     }
 
