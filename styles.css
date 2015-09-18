@@ -159,3 +159,8 @@ float: right;
 #page-mod-lightboxgallery-view #imageData #imageDetails {
     width: 65%;
 }
+
+#page-mod-lightboxgallery-view #outerImageContainer,
+#page-mod-lightboxgallery-view #imageDataContainer {
+    min-width: 200px;
+}
