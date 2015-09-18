@@ -301,6 +301,7 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 						)
 						.append(create('<div id="bottomNav"></div>')
 							.append(create('<a id="bottomNavClose" href="#"></a>'))
+                            .append(create('<a id="bottomNavDownload" href="#"></a>'))
 						)
 					)
 				)
@@ -321,6 +322,12 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 			Y.one("#prevLink").on(CLICK, function (evt) { evt.halt(); this._changeImage(this.get(ACTIVE_IMAGE) - 1); }, this);
 			Y.one("#nextLink").on(CLICK, function (evt) { evt.halt(); this._changeImage(this.get(ACTIVE_IMAGE) + 1); }, this);
 			Y.one("#bottomNavClose").on(CLICK, function (evt) { evt.halt(); this.end(); }, this);
+            Y.one('#bottomNavDownload').on(CLICK, function (evt) {
+                evt.halt();
+                var active = this.get(ACTIVE_IMAGE);
+                window.open(this.get(IMAGE_ARRAY)[active][0] + '?forcedownload=1', '_blank');
+
+            }, this);
 
 			L.later(0, this, function () {
 				var ids = "overlay lightbox outerImageContainer imageContainer lightboxImage hoverNav prevLink nextLink loading " +

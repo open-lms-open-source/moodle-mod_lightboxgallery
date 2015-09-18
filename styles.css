@@ -145,3 +145,17 @@ float: right;
 #page-mod-lightboxgallery-view #lightbox {
     z-index: 4033;
 }
+
+#page-mod-lightboxgallery-view #imageData #bottomNavDownload {
+    width: 104px;
+    height: 22px;
+    background: url([[pix:lightboxgallery|download]]) no-repeat;
+    float: right;
+    padding-bottom: 0.7em;
+    padding-right: 0.5em;
+    outline: none;
+}
+
+#page-mod-lightboxgallery-view #imageData #imageDetails {
+    width: 65%;
+}
