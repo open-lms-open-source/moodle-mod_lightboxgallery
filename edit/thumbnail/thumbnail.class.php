@@ -53,6 +53,7 @@ class edit_thumbnail extends edit_base {
         $fs = get_file_storage();
         $stored_file = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
         $image = new lightboxgallery_image($stored_file, $this->gallery, $this->cm);
+        $domove = true;
 
         if (optional_param('index', '', PARAM_TEXT)) {
             return lightboxgallery_index_thumbnail($this->gallery->course, $this->gallery, $image);
@@ -60,7 +61,7 @@ class edit_thumbnail extends edit_base {
             $offsetx = 0;
             $offsety = 0;
         } else {
-            $move = required_param('move', PARAM_INT);
+            $move = optional_param('move', -1, PARAM_INT);
             $offset = optional_param('offset', 20, PARAM_INT);
             switch ($move) {
                 case 1:
@@ -75,10 +76,14 @@ class edit_thumbnail extends edit_base {
                 case 4:
                     $offsetx = $offset; $offsety = 0;
                     break;
+                default:
+                    $domove = false;
             }
         }
 
-        $image->create_thumbnail($offsetx, $offsety);
+        if ($domove) {
+            $image->create_thumbnail($offsetx, $offsety);
+        }
     }
 
 }
