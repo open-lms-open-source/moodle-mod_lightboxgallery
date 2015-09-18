@@ -56,16 +56,13 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
 
         $mform->addElement('select', 'perpage', get_string('imagesperpage', 'lightboxgallery'), $this->get_perpage_options());
         $mform->setType('perpage', PARAM_INTEGER);
-        $mform->setAdvanced('perpage');
 
         $mform->addElement('select', 'perrow', get_string('imagesperrow', 'lightboxgallery'), $this->get_perrow_options());
         $mform->setType('perrow', PARAM_INTEGER);
-        $mform->setAdvanced('perrow');
 
         $yesno = array(0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('select', 'captionfull', get_string('captionfull', 'lightboxgallery'), $yesno);
-        $mform->setAdvanced('captionfull');
 
         $captionposopts = array(
             '0' => get_string('position_bottom', 'lightboxgallery'),
@@ -73,7 +70,6 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
             '2' => get_string('hide'),
         );
         $mform->addElement('select', 'captionpos', get_string('captionpos', 'lightboxgallery'), $captionposopts);
-        $mform->setAdvanced('captionpos');
 
         $autoresizegroup = array();
         $autoresizegroup[] = &$mform->createElement('select', 'autoresize', get_string('autoresize', 'lightboxgallery'),
@@ -82,37 +78,30 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $mform->addGroup($autoresizegroup, 'autoresizegroup', get_string('autoresize', 'lightboxgallery'), ' ', false);
         $mform->setType('autoresize', PARAM_INTEGER);
         $mform->disabledIf('autoresizegroup', 'autoresizedisabled', 'checked');
-        $mform->setAdvanced('autoresizegroup');
         $mform->addHelpButton('autoresizegroup', 'autoresize', 'lightboxgallery');
 
         $mform->addElement('select', 'resize', sprintf('%s (%s)', get_string('edit_resize', 'lightboxgallery'),
                             strtolower(get_string('upload'))), lightboxgallery_resize_options());
         $mform->setType('resize', PARAM_INTEGER);
-        $mform->setAdvanced('resize');
         $mform->disabledIf('resize', 'autoresize', 'eq', 1);
         $mform->disabledIf('resize', 'autoresizedisabled', 'checked');
 
         $mform->addElement('select', 'comments', get_string('allowcomments', 'lightboxgallery'), $yesno);
         $mform->setType('comments', PARAM_INTEGER);
-        $mform->setAdvanced('comments');
 
         $mform->addElement('select', 'ispublic', get_string('makepublic', 'lightboxgallery'), $yesno);
         $mform->setType('ispublic', PARAM_INTEGER);
-        $mform->setAdvanced('ispublic');
 
         if (lightboxgallery_rss_enabled()) {
             $mform->addElement('select', 'rss', get_string('allowrss', 'lightboxgallery'), $yesno);
             $mform->setType('rss', PARAM_INTEGER);
-            $mform->setAdvanced('rss');
         } else {
             $mform->addElement('static', 'rssdisabled', get_string('allowrss', 'lightboxgallery'),
                                 get_string('rssglobaldisabled', 'admin'));
-            $mform->setAdvanced('rssdisabled');
         }
 
         $mform->addElement('select', 'extinfo', get_string('extendedinfo', 'lightboxgallery'), $yesno);
         $mform->setType('extinfo', PARAM_INTEGER);
-        $mform->setAdvanced('extinfo');
 
         // Module options.
 
