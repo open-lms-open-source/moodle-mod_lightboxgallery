@@ -137,3 +137,11 @@ float: right;
 #mod-lightboxgallery-search .generalbox {
    margin-bottom: 10px;
 }
+
+#page-mod-lightboxgallery-view #overlay {
+    z-index: 4032;
+}
+
+#page-mod-lightboxgallery-view #lightbox {
+    z-index: 4033;
+}
