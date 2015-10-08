@@ -130,15 +130,17 @@ class lightboxgallery_image {
         return $fs->create_file_from_string($fileinfo, $index);
     }
 
-    public function delete_file() {
+    public function delete_file($meta = true) {
         global $DB;
 
         $this->delete_thumbnail();
 
         // Delete all image_meta records for this file.
-        $DB->delete_records('lightboxgallery_image_meta', array(
-            'gallery' => $this->cm->instance,
-            'image' => $this->stored_file->get_filename()));
+        if ($meta) {
+            $DB->delete_records('lightboxgallery_image_meta', array(
+                'gallery' => $this->cm->instance,
+                'image' => $this->stored_file->get_filename()));
+        }
 
         $this->stored_file->delete();
     }
@@ -169,7 +171,7 @@ class lightboxgallery_image {
         ob_start();
         $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_flipped($direction));
         $flipped = ob_get_clean();
-        $this->delete_file();
+        $this->delete_file(false);
         $fs = get_file_storage();
         $this->set_stored_file($fs->create_file_from_string($fileinfo, $flipped));
 
@@ -372,7 +374,7 @@ class lightboxgallery_image {
         $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_resized($height, $width));
         $resized = ob_get_clean();
 
-        $this->delete_file();
+        $this->delete_file(false);
         $fs = get_file_storage();
         $this->stored_file = $fs->create_file_from_string($fileinfo, $resized);
         $image_info = $this->stored_file->get_imageinfo();
@@ -397,7 +399,7 @@ class lightboxgallery_image {
         $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_rotated($angle));
         $rotated = ob_get_clean();
 
-        $this->delete_file();
+        $this->delete_file(false);
         $fs = get_file_storage();
         $this->set_stored_file($fs->create_file_from_string($fileinfo, $rotated));
 
