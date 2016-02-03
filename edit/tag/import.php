@@ -49,22 +49,22 @@ if (in_array('tag', $disabledplugins)) {
 }
 
 if ($confirm && confirm_sesskey()) {
-    // For each image, get tags using iptcparse
+    // For each image, get tags using iptcparse.
 
     $fs = get_file_storage();
-    $stored_files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
+    $storedfiles = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
 
     $a = new stdClass();
     $a->tags = 0;
-    $a->images = count($stored_files);
+    $a->images = count($storedfiles);
 
     if ($a->images > 0) {
-        foreach ($stored_files as $stored_file) {
-            if (!$stored_file->is_valid_image()) {
+        foreach ($storedfiles as $storedfile) {
+            if (!$storedfile->is_valid_image()) {
                 continue;
             }
 
-            $path = $stored_file->copy_content_to_temp();
+            $path = $storedfile->copy_content_to_temp();
             $size = getimagesize($path, $info);
             if (isset($info['APP13'])) {
                 $iptc = iptcparse($info['APP13']);
@@ -79,18 +79,18 @@ if ($confirm && confirm_sesskey()) {
                         if (empty($tag)) {
                             continue;
                         }
-                        $sql_select = "gallery = {$gallery->id} AND image = '$image' AND metatype = 'tag' AND description = '$tag'";
-                        $select = "gallery = :gallery AND image = :image AND metatype = :metatype AND ".$DB->sql_compare_text('description', 100).' = :description';
+                        $select = "gallery = :gallery AND image = :image
+                                   AND metatype = :metatype AND ".$DB->sql_compare_text('description', 100).' = :description';
                         $params = array(
                             'gallery' => $gallery->id,
-                            'image' => $stored_file->get_filename(),
+                            'image' => $storedfile->get_filename(),
                             'metatype' => 'tag',
                             'description' => $tag,
                         );
                         if (!$DB->record_exists_select('lightboxgallery_image_meta', $select, $params)) {
                             $record = new stdClass();
                             $record->gallery = $gallery->id;
-                            $record->image = $stored_file->get_filename();
+                            $record->image = $storedfile->get_filename();
                             $record->metatype = 'tag';
                             $record->description = $tag;
                             if ($DB->insert_record('lightboxgallery_image_meta', $record)) {
@@ -103,42 +103,6 @@ if ($confirm && confirm_sesskey()) {
             }
         }
     }
-
-    /*
-    if (count($images) > 0) {
-        foreach ($images as $image) {
-            $path = $dataroot . '/' . $image;
-            $size = getimagesize($path, $info);
-            if (isset($info['APP13'])) {
-                $iptc = iptcparse($info['APP13']);
-                if (isset($iptc['2#025'])) {
-                    sort($iptc['2#025']);
-                    $errorlevel = error_reporting(E_PARSE);
-                    $textlib = textlib_get_instance();
-
-                    foreach ($iptc['2#025'] as $tag) {
-                        $tag = $textlib->typo3cs->utf8_encode($tag, 'iso-8859-1');
-                        $tag = clean_param($tag, PARAM_TAG);
-                        $tag = trim(strip_tags($tag));
-                        $tag = addslashes(strtolower($tag));
-                        $sql_select = "gallery = {$gallery->id} AND image = '$image' AND metatype = 'tag' AND description = '$tag'";
-                        if (! record_exists_select('lightboxgallery_image_meta', $sql_select)) {
-                            $record = new object;
-                            $record->gallery = $gallery->id;
-                            $record->image = $image;
-                            $record->metatype = 'tag';
-                            $record->description = $tag;
-                            if ($DB->insert_record('lightboxgallery_image_meta', $record)) {
-                                $a->tags++;
-                            }
-                        }
-                    }
-                    error_reporting($errorlevel);
-                }
-            }
-        }
-    }
-    */
 
     foreach (array_keys((array)$a) as $b) {
         $a->{$b} = number_format($a->{$b});
@@ -146,8 +110,10 @@ if ($confirm && confirm_sesskey()) {
 
     notice(get_string('tagsimportfinish', 'lightboxgallery', $a), $galleryurl);
 } else {
-    $confirmurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php', array('id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()));
-    $cancelurl = new moodle_url('/mod/lightboxgallery/view.php', array('id' => $cm->id, 'editing' => 1));
+    $confirmurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php',
+        array('id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()));
+    $cancelurl = new moodle_url('/mod/lightboxgallery/view.php',
+        array('id' => $cm->id, 'editing' => 1));
     echo $OUTPUT->confirm(get_string('tagsimportconfirm', 'lightboxgallery'), $confirmurl, $cancelurl);
 }
 

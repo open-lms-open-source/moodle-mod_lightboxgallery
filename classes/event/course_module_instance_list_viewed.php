@@ -15,19 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Lightbox gallery version info.
+ * The mod_lightboxgallery instance list viewed event.
  *
- * @package   mod_lightboxgallery
- * @copyright 2014 NetSpot Pty Ltd
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_lightboxgallery
+ * @copyright  2014 NetSpot Pty Ltd
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_lightboxgallery\event;
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015091801;  // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2014111000;  // Requires this Moodle version.
-$plugin->cron     = 0;           // Period for cron to check this plugin (secs).
+/**
+ * The mod_lightboxgallery instance list viewed event class.
+ *
+ * @package    mod_lightboxgallery
+ * @since      Moodle 2.7
+ * @copyright  2014 NetSpot Pty Ltd
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+    // No code required here as the parent class handles it all.
+}
 
-$plugin->component = 'mod_lightboxgallery';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.8.0.5';

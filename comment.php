@@ -22,15 +22,10 @@ $id      = required_param('id', PARAM_INT);
 $delete  = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
-if (! $gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
+if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
     print_error('invalidlightboxgalleryid', 'lightboxgallery');
 }
-if (! $course = $DB->get_record('course', array('id' => $gallery->course))) {
-    print_error('invalidcourseid');
-}
-if (! $cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id)) {
-    print_error('invalidcoursemodule');
-}
+list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 
 if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', array('gallery' => $gallery->id, 'id' => $delete))) {
     print_error('Invalid comment ID');
@@ -38,13 +33,13 @@ if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', array('g
 
 require_login($course->id);
 
+$PAGE->set_cm($cm);
 $PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $id));
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
-$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'lightboxgallery')));
+$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'lightboxgallery'));
 
-
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 $galleryurl = $CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id;
 
@@ -83,7 +78,15 @@ if ($mform->is_cancelled()) {
     $newcomment->commenttext = $formadata->comment['text'];
     $newcomment->timemodified = time();
     if ($DB->insert_record('lightboxgallery_comments', $newcomment)) {
-        add_to_log($course->id, 'lightboxgallery', 'comment', 'view.php?id='.$cm->id, $gallery->id, $cm->id, $USER->id);
+        $params = array(
+            'context' => $context,
+            'other' => array(
+                'lightboxgalleryid' => $gallery->id,
+            ),
+        );
+        $event = \mod_lightboxgallery\event\gallery_comment_created::create($params);
+        $event->trigger();
+
         redirect($galleryurl, get_string('commentadded', 'lightboxgallery'));
     } else {
         print_error('Comment creation failed');

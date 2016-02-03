@@ -47,8 +47,8 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
             'gallery', 'userid', 'commenttext', 'timemodified'
         ));
 
-        $image_metas = new backup_nested_element('image_metas');
-        $image_meta = new backup_nested_element('image_meta', array('id'), array(
+        $imagemetas = new backup_nested_element('image_metas');
+        $imagemeta = new backup_nested_element('image_meta', array('id'), array(
             'gallery', 'image', 'description', 'metatype'
         ));
 
@@ -56,12 +56,12 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
 
         $lightboxgallery->add_child($comments);
         $comments->add_child($comment);
-        $lightboxgallery->add_child($image_metas);
-        $image_metas->add_child($image_meta);
+        $lightboxgallery->add_child($imagemetas);
+        $imagemetas->add_child($imagemeta);
 
         // Define sources.
         $lightboxgallery->set_source_table('lightboxgallery', array('id' => backup::VAR_ACTIVITYID));
-        $image_meta->set_source_table('lightboxgallery_image_meta', array('gallery' => backup::VAR_PARENTID));
+        $imagemeta->set_source_table('lightboxgallery_image_meta', array('gallery' => backup::VAR_PARENTID));
 
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
@@ -72,6 +72,7 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_images', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_thumbs', null);
         $lightboxgallery->annotate_files('mod_lightboxgallery', 'gallery_index', null);
+        $lightboxgallery->annotate_files('mod_lightboxgallery', 'intro', null);
 
         $comment->annotate_ids('user', 'userid');
 

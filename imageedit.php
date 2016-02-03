@@ -41,7 +41,7 @@ $gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance), '*',
 
 require_login($course->id);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 require_capability('mod/lightboxgallery:edit', $context);
 
 $PAGE->set_cm($cm);
@@ -75,17 +75,29 @@ $editclass = 'edit_'.$tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
 $fs = get_file_storage();
-if (!$stored_file = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
+if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
     print_error(get_string('errornofile', 'lightboxgallery', $image));
 }
 
 if ($editinstance->processing() && confirm_sesskey()) {
-    add_to_log($course->id, 'lightboxgallery', 'editimage', 'view.php?id='.$cm->id, $tab.' '.$image, $cm->id, $USER->id);
+    $params = array(
+        'context' => $context,
+        'other' => array(
+            'imagename' => $image,
+            'tab' => $tab
+        ),
+    );
+    $event = \mod_lightboxgallery\event\image_updated::create($params);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('lightboxgallery', $gallery);
+    $event->trigger();
+
     $editinstance->process_form();
     redirect($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php?id='.$cm->id.'&image='.$editinstance->image.'&tab='.$tab);
 }
 
-$image = new lightboxgallery_image($stored_file, $gallery, $cm);
+$image = new lightboxgallery_image($storedfile, $gallery, $cm);
 
 $table = new html_table();
 $table->width = '*';

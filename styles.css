@@ -5,6 +5,9 @@
 .lightbox-gallery .lightbox-gallery-image-container {
 	float:		left;
 }
+.dir-rtl .lightbox-gallery .lightbox-gallery-image-container {
+float: right;
+}
 
 .lightbox-gallery .lightbox-gallery-image-frame {
 	background-color:#fff;
@@ -133,4 +136,31 @@
 
 #mod-lightboxgallery-search .generalbox {
    margin-bottom: 10px;
+}
+
+#page-mod-lightboxgallery-view #overlay {
+    z-index: 4032;
+}
+
+#page-mod-lightboxgallery-view #lightbox {
+    z-index: 4033;
+}
+
+#page-mod-lightboxgallery-view #imageData #bottomNavDownload {
+    width: 104px;
+    height: 22px;
+    background: url([[pix:lightboxgallery|download]]) no-repeat;
+    float: right;
+    padding-bottom: 0.7em;
+    padding-right: 0.5em;
+    outline: none;
+}
+
+#page-mod-lightboxgallery-view #imageData #imageDetails {
+    width: 65%;
+}
+
+#page-mod-lightboxgallery-view #outerImageContainer,
+#page-mod-lightboxgallery-view #imageDataContainer {
+    min-width: 200px;
 }

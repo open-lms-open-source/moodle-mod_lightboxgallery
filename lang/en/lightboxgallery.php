@@ -79,6 +79,10 @@ $string['errornofile'] = 'The requested file was not found: {$a}';
 $string['errornoimages'] = 'No images were found in this gallery';
 $string['errornosearchresults'] = 'Your search query returned no images';
 $string['erroruploadimage'] = 'The file you upload must be an image file';
+$string['eventgallerycommentcreated'] = 'Comment created';
+$string['eventgallerysearched'] = 'Gallery searched';
+$string['eventimageupdated'] = 'Image updated';
+$string['eventviewed'] = 'Lightbox gallery viewed';
 $string['extendedinfo'] = 'Show extended image info';
 $string['imageadd'] = 'Add images';
 $string['imagecount'] = 'Image count';
@@ -102,11 +106,11 @@ $string['lightboxgallery:viewcomments'] = 'View lightbox gallery comments';
 $string['makepublic'] = 'Make public';
 $string['metadata'] = 'Meta data';
 $string['modulename'] = 'Lightbox Gallery';
-$string['modulename_help'] = 'The lightboxgallery resource module enables participants to view a gallery of images.
+$string['modulename_help'] = 'The Lightbox Gallery resource module enables participants to view a gallery of images.
 
 This resource allows you to create \'Lightbox\' enabled image galleries within your Moodle course.
 
-As a course teacher, you are able to create, edit and delete galleries. Smallthumbnails will then be generated, which are used for the thumbnail view of the gallery.
+As a course teacher, you are able to create, edit and delete galleries. Small thumbnails will then be generated, which are used for the thumbnail view of the gallery.
 Clicking on any of the thumbnails brings that image into focus, and allows you to scroll through the gallery at your leisure. Using the Lightbox scripts creates nice transition effects when loading and scrolling through the images.
 
 If enabled, users are able to leave comments on your gallery.';
@@ -114,6 +118,7 @@ $string['modulenameplural'] = 'Lightbox Galleries';
 $string['modulenameshort'] = 'Gallery';
 $string['modulenameadd'] = 'Lightbox gallery';
 $string['newgallerycomments'] = 'New gallery comments';
+$string['nocomments'] = 'No comments';
 $string['norssfeedavailable'] = 'Feed not available';
 $string['position_bottom'] = 'Bottom';
 $string['position_top'] = 'Top';

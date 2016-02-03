@@ -86,23 +86,6 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
 
             $dbman->create_table($table);
         }
-
-        /* No longer required (I think)
-
-        // Insert add_to_log entry to log_display table
-
-        if (!record_exists('log_display', 'module', 'lightboxgallery', 'action', 'comment')) {
-            $record = new object;
-            $record->module = 'lightboxgallery';
-            $record->action = 'comment';
-            $record->mtable = 'lightboxgallery';
-            $record->field  = 'name';
-
-            $result = $result && insert_record('log_display', $record);
-        }
-
-        */
-
     }
 
     if ($oldversion < 2007121700) {
@@ -206,13 +189,13 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
                 if (!$cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $gallery->course, false)) {
                     continue;
                 }
-                $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-                $coursecontext = get_context_instance(CONTEXT_COURSE, $gallery->course);
+                $context = context_module::instance($cm->id);
+                $coursecontext = context_course::instance($gallery->course);
 
                 // Add files to lightbox area, iterate over the legacy files.
                 $fs = get_file_storage();
-                if ($stored_files = $fs->get_area_files($coursecontext->id, 'course', 'legacy')) {
-                    foreach ($stored_files as $file) {
+                if ($storedfiles = $fs->get_area_files($coursecontext->id, 'course', 'legacy')) {
+                    foreach ($storedfiles as $file) {
                         $path = '/'.$gallery->folder;
                         if ($gallery->folder != '') {
                             $path .= '/';

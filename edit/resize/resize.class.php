@@ -29,8 +29,8 @@ class edit_resize extends edit_base {
 
     public function output() {
         $fs = get_file_storage();
-        $stored_file = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
-        $image = new lightboxgallery_image($stored_file, $this->gallery, $this->cm);
+        $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
+        $image = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
 
         $currentsize = sprintf('%s: %dx%d', get_string('currentsize', 'lightboxgallery'), $image->width, $image->height).
                        '<br /><br />';
@@ -57,8 +57,8 @@ class edit_resize extends edit_base {
         $button = required_param('button', PARAM_TEXT);
 
         $fs = get_file_storage();
-        $stored_file = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
-        $image = new lightboxgallery_image($stored_file, $this->gallery, $this->cm);
+        $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
+        $image = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
 
         switch ($button) {
             case $this->strresize:

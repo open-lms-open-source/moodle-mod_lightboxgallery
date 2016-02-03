@@ -29,12 +29,15 @@ require_once($CFG->libdir.'/rsslib.php');
 
 $id = required_param('id', PARAM_INT);
 
-if (! $course = $DB->get_record('course', array('id' => $id))) {
-    print_error('invalidcourseid');
-}
-
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$context = context_course::instance($course->id);
 require_course_login($course);
-add_to_log($course->id, 'lightboxgallery', 'view all', 'index.php?id='.$course->id, '');
+
+$event = \mod_lightboxgallery\event\course_module_instance_list_viewed::create(array(
+    'context' => $context
+));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 $PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $id));
 $PAGE->set_title($course->fullname);
@@ -65,7 +68,7 @@ $prevsection = '';
 
 // TODO: Put this in a renderer.
 foreach ($galleries as $gallery) {
-    $cm = get_context_instance(CONTEXT_MODULE, $gallery->coursemodule);
+    $cm = context_module::instance($gallery->coursemodule);
 
     $printsection = ($gallery->section !== $prevsection ? true : false);
     if ($printsection) {
@@ -78,6 +81,7 @@ foreach ($galleries as $gallery) {
 
     $fs = get_file_storage();
     $files = $fs->get_area_files($cm->id, 'mod_lightboxgallery', 'gallery_images');
+    $imagecount = 0;
     foreach ($files as $file) {
         if ($file->get_filename() != '.') {
             $imagecount++;
@@ -89,9 +93,9 @@ foreach ($galleries as $gallery) {
     $table->data[] = array(($printsection ? $gallery->section : ''),
                            lightboxgallery_index_thumbnail($course->id, $gallery),
                            html_writer::link($viewurl, $gallery->name).
-                           '<br />'.get_string('imagecounta', 'lightboxgallery', $imagecount).
+                           '<br />'.get_string('imagecounta', 'lightboxgallery', $imagecount).' '.
                            get_string('commentcount', 'lightboxgallery', $commentcount),
-                           format_text($gallery->description, FORMAT_MOODLE, $fobj),
+                           format_text($gallery->intro, FORMAT_MOODLE, $fobj),
                            (isset($rss) ? $rss : get_string('norssfeedavailable', 'lightboxgallery')));
 
     $prevsection = $gallery->section;

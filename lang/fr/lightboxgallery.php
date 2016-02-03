@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -34,7 +33,7 @@ $string['addimage_help'] = 'Naviguez vers une image sur votre machine locale pou
 Vous pouvez également sélectionner une archive zip contenant de multiples images. Celles-ci seront extraites dans le dossier image une fois le chargement terminé.';
 $string['autoresize'] = 'Redimensionnement automatique';
 $string['autoresize_help'] = 'Vous pouvez contrôler si et quand les galleries d\'images sont redimensionnées. Les méthodes suivantes sont disponibles lors de la configuration d\'une gallerie.
-    
+
 * Ecran: les images qui sont plus grandes que l\'écran des utilisateurs seront réduites pour correspondre à la taille de l\'écran.
 * Upload: les images seront redimensionnées aux dimensions spécifiées lors de leur chargement à travers l\'option \'Ajouter des images\'.
 
@@ -104,7 +103,7 @@ $string['makepublic'] = 'Rendre publique';
 $string['metadata'] = 'Données meta';
 $string['modulename'] = 'Gallerie Lightbox';
 $string['modulename_help'] = 'Le module lightboxgallery permet aux partipants de voir une gallerie d\'images.
-    
+
 Cette ressource vous permet de créer des galleries d\'images \'Lightbox\' dans votre cours Moodle.
 
 En tant qu\'enseignant, vous avez la possibilité de créer, éditer et effacer des galleries. Des miniatures seront générées et seront utilisées pour l\'affichage de la gallerie.
