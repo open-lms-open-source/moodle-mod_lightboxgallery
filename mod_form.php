@@ -61,9 +61,6 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $mform->addElement('select', 'perpage', get_string('imagesperpage', 'lightboxgallery'), $this->get_perpage_options());
         $mform->setType('perpage', PARAM_INTEGER);
 
-        $mform->addElement('select', 'perrow', get_string('imagesperrow', 'lightboxgallery'), $this->get_perrow_options());
-        $mform->setType('perrow', PARAM_INTEGER);
-
         $yesno = array(0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('select', 'captionfull', get_string('captionfull', 'lightboxgallery'), $yesno);
@@ -127,14 +124,6 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
     private function get_perpage_options() {
         $perpages = array(10, 25, 50, 100, 200);
         $result = array(0 => get_string('showall', 'lightboxgallery'));
-        foreach ($perpages as $perpage) {
-            $result[$perpage] = $perpage;
-        }
-        return $result;
-    }
-
-    private function get_perrow_options() {
-        $perpages = array(2, 3, 4, 5, 6);
         foreach ($perpages as $perpage) {
             $result[$perpage] = $perpage;
         }

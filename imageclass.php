@@ -231,7 +231,7 @@ class lightboxgallery_image {
         $posclass = ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) ? 'top' : 'bottom';
         $captiondiv = html_writer::tag('div', $caption, array('class' => "lightbox-gallery-image-caption $posclass"));
 
-        $html = '<div class="lightbox-gallery-image-container" style="width: '.$width.'%;">'.
+        $html = '<div class="lightbox-gallery-image-container">'.
                     '<div class="lightbox-gallery-image-wrapper">'.
                         '<div class="lightbox-gallery-image-frame">';
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) {

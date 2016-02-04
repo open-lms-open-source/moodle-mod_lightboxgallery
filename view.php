@@ -146,10 +146,6 @@ foreach ($storedfiles as $storedfile) {
 
     echo $image->get_image_display_html($editing);
 
-    if (!is_float($imagecount / $gallery->perrow)) {
-        echo $OUTPUT->box('', 'clearfix');
-    }
-
     $imagecount++;
 }
 
