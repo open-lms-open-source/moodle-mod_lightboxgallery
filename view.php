@@ -90,7 +90,7 @@ $completion->set_module_viewed($cm);
 $PAGE->set_cm($cm);
 $PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $cm->id));
 $PAGE->set_title($gallery->name);
-$PAGE->set_heading($course->shortname);
+$PAGE->set_heading($course->fullname);
 $button = '';
 if (has_capability('mod/lightboxgallery:edit', $context)) {
     $urlparams = array('id' => $id, 'page' => $page, 'editing' => $editing ? '0' : '1');

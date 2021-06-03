@@ -40,8 +40,8 @@ $event->add_record_snapshot('course', $course);
 $event->trigger();
 
 $PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $id));
-$PAGE->set_title($course->fullname);
-$PAGE->set_heading($course->shortname);
+$PAGE->set_title(get_string('modulenameplural', 'lightboxgallery'));
+$PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
