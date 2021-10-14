@@ -16,11 +16,10 @@ Feature: Set a lightboxgallery as public
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Lightbox Gallery" to section "1" and I fill the form with:
-      | Name        | LBG          |
-      | Description | Test gallery |
-      | ID number   | lbg1         |
-      | Make public | No           |
+    And the following "activities" exist:
+      | activity        | name | course | intro        | idnumber | ispublic |
+      | lightboxgallery | LBG  | C1     | Test gallery | lbg1     | 0        |
+    And I am on "Course 1" course homepage
     And I follow "LBG"
     Then I should see "Test gallery"
     When I log out
