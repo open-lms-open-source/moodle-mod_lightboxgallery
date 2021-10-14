@@ -212,8 +212,8 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
 
     $cm = $modinfo->cms[$cmid];
 
-    $userfields = user_picture::fields('u', null, 'userid');
-    $userfieldsnoalias = user_picture::fields();
+    $userfields = \core_user\fields::for_userpic()->get_sql('u', false, '', 'userid', false)->selects;
+    $userfieldsnoalias = \core_user\fields::get_picture_fields();
     $sql = "SELECT c.*, l.name, $userfields
               FROM {lightboxgallery_comments} c
                    JOIN {lightboxgallery} l ON l.id = c.gallery
@@ -244,8 +244,7 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
             $activity->user = new stdClass();
             $activity->user->id = $comment->userid;
 
-            $fields = explode(',', $userfieldsnoalias);
-            foreach ($fields as $field) {
+            foreach ($userfieldsnoalias as $field) {
                 if ($field == 'id') {
                     continue;
                 }
@@ -292,7 +291,7 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
 function lightboxgallery_print_recent_activity($course, $viewfullnames, $timestart) {
     global $DB, $CFG, $OUTPUT;
 
-    $userfields = get_all_user_name_fields(true, 'u');
+    $userfields = \core_user\fields::for_name()->get_sql('u', true, '', '', false)->selects;
     $sql = "SELECT c.*, l.name, $userfields
               FROM {lightboxgallery_comments} c
                    JOIN {lightboxgallery} l ON l.id = c.gallery
