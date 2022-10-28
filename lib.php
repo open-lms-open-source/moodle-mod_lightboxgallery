@@ -386,7 +386,7 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
         return false;
     }
 
-    send_stored_file($file, 0, 0, true); // Download MUST be forced - security!
+    send_stored_file($file, null, 0, true); // Download MUST be forced - security!
 
     return;
 

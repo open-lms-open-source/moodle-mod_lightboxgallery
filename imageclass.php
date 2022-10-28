@@ -65,10 +65,21 @@ class lightboxgallery_image {
         $this->cmid = $cm->id;
         $this->context = context_module::instance($cm->id);
 
-        $this->imageurl = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_images/'.
-                           $this->storedfile->get_itemid().$this->storedfile->get_filepath().$this->storedfile->get_filename();
-        $this->thumburl = $CFG->wwwroot.'/pluginfile.php/'.$this->context->id.'/mod_lightboxgallery/gallery_thumbs/0'.
-                           $this->storedfile->get_filepath().$this->storedfile->get_filename().'.png';
+        $this->imageurl = moodle_url::make_pluginfile_url($this->context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            $this->storedfile->get_itemid(),
+            $this->storedfile->get_filepath(),
+            $this->storedfile->get_filename());
+        $this->imageurl->param('mtime', $this->storedfile->get_timemodified());
+
+        $this->thumburl = moodle_url::make_pluginfile_url($this->context->id,
+            'mod_lightboxgallery',
+            'gallery_thumbs',
+            0,
+            $this->storedfile->get_filepath(),
+            $this->storedfile->get_filename().'.png');
+        $this->thumburl->param('mtime', $this->storedfile->get_timemodified());
 
         if ($loadextrainfo) {
             $imageinfo = $this->storedfile->get_imageinfo();
