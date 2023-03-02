@@ -23,12 +23,12 @@ $delete  = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
 if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
-    print_error('invalidlightboxgalleryid', 'lightboxgallery');
+    throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
 }
 list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 
 if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', array('gallery' => $gallery->id, 'id' => $delete))) {
-    print_error('Invalid comment ID');
+    throw new \moodle_exception('Invalid comment ID');
 }
 
 require_login($course, true, $cm);
@@ -63,7 +63,7 @@ if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
 require_capability('mod/lightboxgallery:addcomment', $context);
 
 if (! $gallery->comments) {
-    print_error('Comments disabled', $galleryurl);
+    throw new \moodle_exception('Comments disabled', $galleryurl);
 }
 
 $mform = new mod_lightboxgallery_comment_form(null, $gallery);
@@ -88,7 +88,7 @@ if ($mform->is_cancelled()) {
 
         redirect($galleryurl, get_string('commentadded', 'lightboxgallery'));
     } else {
-        print_error('Comment creation failed');
+        throw new \moodle_exception('Comment creation failed');
     }
 }
 
