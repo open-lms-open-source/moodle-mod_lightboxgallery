@@ -61,7 +61,7 @@ class edit_tag extends edit_base {
             $deleteform = '<input type="hidden" name="delete" value="1" />';
             foreach ($tags as $tag) {
                 $deleteform .= '<label><input type="checkbox" name="deletetags[]" value="'.$tag->id.'" /> '.
-                               htmlentities(utf8_decode($tag->description)).'</label><br />';
+                               htmlentities($tag->description).'</label><br />';
             }
             $deleteform .= '<input type="submit" value="' . get_string('remove') . '" />';
             $deleteform = '<span class="tag-head"> ' . get_string('tagscurrent', 'lightboxgallery') . '</span>'
