@@ -76,7 +76,7 @@ $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
 $fs = get_file_storage();
 if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
-    print_error(get_string('errornofile', 'lightboxgallery', $image));
+    throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
 }
 
 if ($editinstance->processing() && confirm_sesskey()) {

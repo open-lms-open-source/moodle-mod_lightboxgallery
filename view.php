@@ -41,11 +41,11 @@ $search  = optional_param('search', '', PARAM_TEXT);
 if ($id) {
     list($course, $cm) = get_course_and_cm_from_cmid($id, 'lightboxgallery');
     if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance))) {
-        print_error('invalidcoursemodule');
+        throw new \moodle_exception('invalidcoursemodule');
     }
 } else {
     if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $l))) {
-        print_error('invalidlightboxgalleryid', 'lightboxgallery');
+        throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
     }
     list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 }
@@ -177,4 +177,3 @@ if (!$editing && $gallery->comments && has_capability('mod/lightboxgallery:viewc
 }
 
 echo $OUTPUT->footer();
-

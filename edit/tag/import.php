@@ -21,13 +21,13 @@ $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
 if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
-    print_error('invalidlightboxgalleryid', 'lightboxgallery');
+    throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
 }
 if (!$course = $DB->get_record('course', array('id' => $gallery->course))) {
-    print_error('invalidcourseid');
+    throw new \moodle_exception('invalidcourseid');
 }
 if (!$cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id)) {
-    print_error('invalidcoursemodule');
+    throw new \moodle_exception('invalidcoursemodule');
 }
 
 require_login($course->id);
@@ -45,7 +45,7 @@ echo $OUTPUT->header();
 
 $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 if (in_array('tag', $disabledplugins)) {
-    print_error(get_string('tagsdisabled', 'lightboxgallery'));
+    throw new \moodle_exception(get_string('tagsdisabled', 'lightboxgallery'));
 }
 
 if ($confirm && confirm_sesskey()) {
