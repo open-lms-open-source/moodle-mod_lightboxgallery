@@ -252,7 +252,7 @@ class lightboxgallery_image {
         } else {
             $caption = lightboxgallery_resize_text($this->get_image_caption(), MAX_IMAGE_LABEL);
         }
-        $timemodified = strftime(get_string('strftimedatetimeshort', 'langconfig'), $this->storedfile->get_timemodified());
+        $timemodified = userdate($this->storedfile->get_timemodified(), get_string('strftimedatetimeshort', 'langconfig'));
         $filesize = round($this->storedfile->get_filesize() / 100) / 10;
 
         // Hide the caption.
