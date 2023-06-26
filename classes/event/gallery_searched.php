@@ -84,18 +84,6 @@ class gallery_searched extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        // The legacy log table expects a relative path to /mod/lightboxgallery/.
-        $logurl = substr($this->get_url()->out_as_local_url(), strlen('/mod/lightboxgallery/'));
-
-        return array($this->courseid, 'lightboxgallery', 'search', $logurl, $this->other['searchterm']);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

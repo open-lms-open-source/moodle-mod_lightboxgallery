@@ -82,18 +82,6 @@ class gallery_comment_created extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        // The legacy log table expects a relative path to /mod/lightboxgallery/.
-        $logurl = new \moodle_url('/mod/lightboxgallery/view.php', array('id' => $this->contextinstanceid));
-        return array($this->courseid, 'lightboxgallery', 'editimage',
-            $logurl, $this->other['lightboxgalleryid'], $this->contextinstanceid);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

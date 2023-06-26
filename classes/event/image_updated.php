@@ -87,18 +87,6 @@ class image_updated extends \core\event\base {
         return $url;
     }
 
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        // The legacy log table expects a relative path to /mod/lightboxgallery/.
-        $logurl = 'view.php?id='.$this->contextinstanceid;
-        return array($this->courseid, 'lightboxgallery', 'editimage', $logurl,
-            $this->other['tab'].' '.$this->other['imagename'], $this->contextinstanceid, $this->userid);
-    }
-
     public static function get_other_mapping() {
         return [];
     }
