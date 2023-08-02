@@ -104,11 +104,6 @@ if ($allowrssfeed) {
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading($heading);
-
-if ($gallery->intro && !$editing) {
-    echo $OUTPUT->box(format_module_intro('lightboxgallery', $gallery, $cm->id), 'generalbox', 'intro');
-}
 if ($gallery->autoresize == AUTO_RESIZE_SCREEN || $gallery->autoresize == AUTO_RESIZE_BOTH) {
     $resizecss = ' autoresize';
 } else {
