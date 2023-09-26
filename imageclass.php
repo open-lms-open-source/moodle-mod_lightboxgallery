@@ -81,11 +81,9 @@ class lightboxgallery_image {
             $this->storedfile->get_filename().'.png');
         $this->thumburl->param('mtime', $this->storedfile->get_timemodified());
 
-        if ($loadextrainfo) {
-            $imageinfo = $this->storedfile->get_imageinfo();
-            $this->height = $imageinfo['height'];
-            $this->width = $imageinfo['width'];
-        }
+        $imageinfo = $this->storedfile->get_imageinfo();
+        $this->height = $imageinfo['height'];
+        $this->width = $imageinfo['width'];
 
         $this->thumbnail = $thumbnail;
 
