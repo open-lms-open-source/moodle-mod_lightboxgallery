@@ -139,6 +139,7 @@ $string['selectrotation'] = 'Select rotation angle';
 $string['selectthumbpos'] = 'Thumbnail offset (from centre)';
 $string['setasindex'] = 'Set as index image';
 $string['showall'] = 'Show all';
+$string['svgzunsupported'] = 'Compressed SVG files (.svgz) are not currently supported.';
 $string['tagscurrent'] = 'Current tags';
 $string['tagsdisabled'] = 'Tagging editor is disabled';
 $string['tagsimport'] = 'Import tags';

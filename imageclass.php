@@ -81,6 +81,10 @@ class lightboxgallery_image {
             $this->storedfile->get_filename().'.png');
         $this->thumburl->param('mtime', $this->storedfile->get_timemodified());
 
+        if ($this->storedfile->get_mimetype() == 'image/svg+xml') {
+            $this->thumburl = $this->imageurl;
+        }
+
         if ($loadextrainfo) {
             $imageinfo = $this->storedfile->get_imageinfo();
             $this->height = $imageinfo['height'];
@@ -110,6 +114,10 @@ class lightboxgallery_image {
     }
 
     public function create_thumbnail($offsetx = 0, $offsety = 0) {
+        if ($this->storedfile->get_mimetype() == 'image/svg+xml') {
+            return $this->storedfile;
+        }
+
         $fileinfo = array(
             'contextid' => $this->context->id,
             'component' => 'mod_lightboxgallery',
@@ -206,21 +214,34 @@ class lightboxgallery_image {
     private function get_editing_options() {
         global $CFG;
 
+        $options = [
+            'caption',
+            'delete',
+            'flip',
+            'resize',
+            'rotate',
+            'tag',
+            'thumbnail',
+        ];
+
+        if ($this->storedfile->get_mimetype() == 'image/svg+xml') {
+            $options = [
+                'caption',
+                'delete',
+                'tag',
+            ];
+        }
+
         $html = '<form action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php" method="post"/>'.
                     '<input type="hidden" name="id" value="'.$this->cmid.'" />'.
                     '<input type="hidden" name="image" value="'.$this->storedfile->get_filename().'" />'.
                     '<input type="hidden" name="page" value="0" />'.
                     '<select name="tab" class="lightbox-edit-select" onchange="submit();">'.
-                        '<option disabled selected>'.get_string('edit_choose', 'lightboxgallery').'</option>'.
-                        '<option value="caption">'.get_string('edit_caption', 'lightboxgallery').'</option>'.
-                        '<!--<option value="crop">'.get_string('edit_crop', 'lightboxgallery').'</option>-->'.
-                        '<option value="delete">'.get_string('edit_delete', 'lightboxgallery').'</option>'.
-                        '<option value="flip">'.get_string('edit_flip', 'lightboxgallery').'</option>'.
-                        '<option value="resize">'.get_string('edit_resize', 'lightboxgallery').'</option>'.
-                        '<option value="rotate">'.get_string('edit_rotate', 'lightboxgallery').'</option>'.
-                        '<option value="tag">'.get_string('edit_tag', 'lightboxgallery').'</option>'.
-                        '<option value="thumbnail">'.get_string('edit_thumbnail', 'lightboxgallery').'</option>'.
-                    '</select>'.
+                        '<option disabled selected>'.get_string('edit_choose', 'lightboxgallery').'</option>';
+        foreach ($options as $option) {
+            $html .= '<option value="'.$option.'">'.get_string('edit_'.$option, 'lightboxgallery').'</option>';
+        }
+        $html .= '</select>'.
                 '</form>';
 
         return $html;
