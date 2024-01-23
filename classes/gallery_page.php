@@ -22,6 +22,9 @@ require_once(dirname(__FILE__).'/../imageclass.php');
 
 class gallery_page {
 
+    const SORTBY_FILENAME = 0;
+    const SORTBY_CAPTION = 1;
+
     private $cm;
     private $editing;
     private $files;
@@ -67,22 +70,9 @@ class gallery_page {
         global $DB;
 
         $filenames = [];
-        $this->imagecount = 0;
         foreach ($this->files as $storedfile) {
             if (!file_mimetype_in_typegroup($storedfile->get_mimetype(), 'web_image')) {
                 continue;
-            }
-
-            $this->imagecount++;
-
-            if ($this->gallery->perpage > 0) {
-                if ($this->imagecount > (($this->gallery->perpage * $this->page) + $this->gallery->perpage)) {
-                    // We've already found all the images to display on this page.
-                    break;
-                } else if ($this->imagecount <= ($this->gallery->perpage * $this->page)) {
-                    // We haven't gotten to the first image of this page yet.
-                    continue;
-                }
             }
 
             $filename = $storedfile->get_filename();
@@ -108,8 +98,43 @@ class gallery_page {
         $metadata = $DB->get_records_select('lightboxgallery_image_meta', $select, $params);
 
         // Store the records keyed on the image name.
+        $captions = [];
         foreach ($metadata as $metarecord) {
             $this->metadata[$metarecord->image][] = $metarecord;
+
+            if ($metarecord->metatype == 'caption') {
+                $captions[$metarecord->image] = $metarecord->description;
+            }
+        }
+
+        // Sort the files.
+        if ($this->gallery->sortby == self::SORTBY_CAPTION) {
+            uasort($this->pagefiles, function ($a, $b) use ($captions) {
+                $filenamea = $a->get_filename();
+                $filenameb = $b->get_filename();
+
+                $captiona = $captions[$filenamea] ?? $filenamea;
+                $captionb = $captions[$filenameb] ?? $filenameb;
+
+                return $captiona <=> $captionb;
+            });
+        }
+
+        $this->imagecount = 0;
+        // Whittle down to the ones for this page.
+        foreach ($this->pagefiles as $filename => $storedfile) {
+            $this->imagecount++;
+            if ($this->gallery->perpage > 0) {
+                if ($this->imagecount > (($this->gallery->perpage * $this->page) + $this->gallery->perpage)) {
+                    // We've already found all the images to display on this page.
+                    unset($this->metadata[$filename]);
+                    unset($this->pagefiles[$filename]);
+                } else if ($this->imagecount <= ($this->gallery->perpage * $this->page)) {
+                    // We haven't gotten to the first image of this page yet.
+                    unset($this->metadata[$filename]);
+                    unset($this->pagefiles[$filename]);
+                }
+            }
         }
     }
 

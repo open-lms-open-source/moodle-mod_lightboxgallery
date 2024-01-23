@@ -68,6 +68,14 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         );
         $mform->addElement('select', 'captionpos', get_string('captionpos', 'lightboxgallery'), $captionposopts);
 
+        $options = [
+            \mod_lightboxgallery\gallery_page::SORTBY_FILENAME => get_string('sortbyfilename', 'lightboxgallery'),
+            \mod_lightboxgallery\gallery_page::SORTBY_CAPTION => get_string('sortbycaption', 'lightboxgallery'),
+        ];
+
+        $mform->addElement('select', 'sortby', get_string('sortby', 'lightboxgallery'), $options);
+        $mform->addHelpButton('sortby', 'sortby', 'lightboxgallery');
+
         $autoresize = $mform->createElement('select', 'autoresize', get_string('autoresize', 'lightboxgallery'),
                                 $this->get_autoresize_options());
         $autoresizegroup = array();
