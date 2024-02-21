@@ -114,7 +114,9 @@ class lightboxgallery_image {
     }
 
     public function create_thumbnail($offsetx = 0, $offsety = 0) {
-        if ($this->storedfile->get_mimetype() == 'image/svg+xml') {
+        if ($this->storedfile->get_mimetype() == 'image/svg+xml'
+            || $this->width === null || $this->height === null) {
+            // We can't resize SVG or files we don't know the dimensions of.
             return $this->storedfile;
         }
 
