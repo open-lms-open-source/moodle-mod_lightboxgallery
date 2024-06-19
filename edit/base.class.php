@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 class edit_base {
 
     public $imageobj;
-
+    public $cm;
     public $gallery;
     public $image;
     public $lbgimage;
