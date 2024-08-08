@@ -151,7 +151,7 @@ class lightboxgallery_image {
         $base = imagecreatefrompng($CFG->dirroot.'/mod/lightboxgallery/pix/index.png');
         $transparent = imagecolorat($base, 0, 0);
 
-        $shrunk = imagerotate($this->get_image_resized(48, 48, 0, 0), 351, $transparent, 0);
+        $shrunk = imagerotate($this->get_image_resized(48, 48, 0, 0), 351, $transparent);
 
         imagecolortransparent($base, $transparent);
 
