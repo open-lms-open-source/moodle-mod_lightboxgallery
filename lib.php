@@ -54,6 +54,8 @@ function lightboxgallery_supports($feature) {
             return true;
         case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_CONTENT;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
 
         default:
             return null;
