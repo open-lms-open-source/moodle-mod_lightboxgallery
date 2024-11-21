@@ -70,6 +70,7 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
 
         $options = [
             \mod_lightboxgallery\gallery_page::SORTBY_FILENAME => get_string('sortbyfilename', 'lightboxgallery'),
+            \mod_lightboxgallery\gallery_page::SORTBY_FILENAME_NATURAL => get_string('sortbyfilenamenatural', 'lightboxgallery'),
             \mod_lightboxgallery\gallery_page::SORTBY_CAPTION => get_string('sortbycaption', 'lightboxgallery'),
         ];
 

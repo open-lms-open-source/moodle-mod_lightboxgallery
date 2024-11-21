@@ -24,6 +24,7 @@ class gallery_page {
 
     const SORTBY_FILENAME = 0;
     const SORTBY_CAPTION = 1;
+    const SORTBY_FILENAME_NATURAL = 2;
 
     private $cm;
     private $editing;
@@ -117,6 +118,10 @@ class gallery_page {
                 $captionb = $captions[$filenameb] ?? $filenameb;
 
                 return $captiona <=> $captionb;
+            });
+        } else if ($this->gallery->sortby == self::SORTBY_FILENAME_NATURAL) {
+            uasort($this->pagefiles, function ($a, $b) {
+                return strnatcmp($a->get_filename(), $b->get_filename());
             });
         }
 

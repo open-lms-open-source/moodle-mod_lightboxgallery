@@ -144,6 +144,7 @@ $string['sortby'] = 'Sort by';
 $string['sortby_help'] = 'How to sort the order the images are displayed in.';
 $string['sortbycaption'] = 'Caption';
 $string['sortbyfilename'] = 'File name';
+$string['sortbyfilenamenatural'] = 'File name (natural order)';
 $string['svgzunsupported'] = 'Compressed SVG files (.svgz) are not currently supported.';
 $string['tagscurrent'] = 'Current tags';
 $string['tagsdisabled'] = 'Tagging editor is disabled';
