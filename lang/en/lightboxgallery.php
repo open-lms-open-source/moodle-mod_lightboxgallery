@@ -104,6 +104,7 @@ $string['lightboxgallery:edit'] = 'Edit a lightbox gallery';
 $string['lightboxgallery:submit'] = 'Submit a lightbox gallery';
 $string['lightboxgallery:viewcomments'] = 'View lightbox gallery comments';
 $string['makepublic'] = 'Make public';
+$string['makepublic_help'] = 'When public, the gallery can be viewed by all users (including guests) not enrolled in the course.';
 $string['metadata'] = 'Meta data';
 $string['modulename'] = 'Lightbox Gallery';
 $string['modulename_help'] = 'The Lightbox Gallery resource module enables participants to view a gallery of images.

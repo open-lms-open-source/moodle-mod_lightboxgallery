@@ -98,6 +98,7 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
 
         $mform->addElement('select', 'ispublic', get_string('makepublic', 'lightboxgallery'), $yesno);
         $mform->setType('ispublic', PARAM_INT);
+        $mform->addHelpButton('ispublic', 'makepublic', 'lightboxgallery');
 
         if (lightboxgallery_rss_enabled()) {
             $mform->addElement('select', 'rss', get_string('allowrss', 'lightboxgallery'), $yesno);
