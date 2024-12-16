@@ -58,7 +58,7 @@ $tabs = array();
 foreach ($edittypes as $type => $name) {
     $editurl = new moodle_url('/mod/lightboxgallery/imageedit.php',
                                 array('id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type));
-    $tabs[] = new tabObject($type, $editurl, $name);
+    $tabs[] = new tabobject($type, $editurl, $name);
 }
 
 if (!in_array($tab, array_keys($edittypes))) {
