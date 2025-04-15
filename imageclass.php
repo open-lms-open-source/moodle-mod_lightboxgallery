@@ -357,7 +357,7 @@ class lightboxgallery_image {
             $srcy = floor($cy - ($srch / 2)) + $offsety;
         }
 
-        imagecopybicubic($resized, $image, 0, 0, $srcx, $srcy, $width, $height, $srcw, $srch);
+        imagecopyresampled($resized, $image, 0, 0, $srcx, $srcy, $width, $height, $srcw, $srch);
 
         return $resized;
 
