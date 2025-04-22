@@ -79,7 +79,6 @@ class lightboxgallery_image {
             0,
             $this->storedfile->get_filepath(),
             $this->storedfile->get_filename().'.png');
-        $this->thumburl->param('mtime', $this->storedfile->get_timemodified());
 
         if ($this->storedfile->get_mimetype() == 'image/svg+xml') {
             $this->thumburl = $this->imageurl;
@@ -96,6 +95,9 @@ class lightboxgallery_image {
         // If we weren't given a thumbnail, double check if it exists before generating one.
         if (!$thumbnail && (!$this->thumbnail = $this->get_thumbnail())) {
             $this->thumbnail = $this->create_thumbnail();
+        }
+        if ($this->thumbnail) {
+            $this->thumburl->param('mtime', $this->thumbnail->get_timemodified());
         }
 
         $this->metadata = $metadata;
