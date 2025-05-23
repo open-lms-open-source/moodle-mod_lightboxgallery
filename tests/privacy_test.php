@@ -19,9 +19,11 @@
  *
  * @package    mod_lightboxgallery
  * @category   test
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_lightboxgallery;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -39,18 +41,30 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/lib.php');
  *
  * @package    mod_lightboxgallery
  * @category   test
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_lightboxgallery_privacy_test extends provider_testcase {
+final class privacy_test extends provider_testcase {
 
+    /**
+     * Set up the test.
+     *
+     * @return void
+     */
     public function setUp(): void {
         global $PAGE;
+        parent::setUp();
         $this->resetAfterTest();
         $PAGE->get_renderer('core');
     }
 
-    public function test_get_contexts_for_userid() {
+    /**
+     * Test get_contexts_for_userid.
+     *
+     * @covers \mod_lightboxgallery\privacy\provider::get_contexts_for_userid
+     * @return void
+     */
+    public function test_get_contexts_for_userid(): void {
         $dg = $this->getDataGenerator();
 
         $c1 = $dg->create_course();
@@ -73,18 +87,25 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
 
         $contextids = provider::get_contexts_for_userid($u1->id)->get_contextids();
         $this->assertCount(3, $contextids);
-        $this->assertTrue(in_array(context_module::instance($cm1a->cmid)->id, $contextids));
-        $this->assertTrue(in_array(context_module::instance($cm2a->cmid)->id, $contextids));
-        $this->assertTrue(in_array(context_module::instance($cm2b->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm1a->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm2a->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm2b->cmid)->id, $contextids));
 
         $contextids = provider::get_contexts_for_userid($u2->id)->get_contextids();
         $this->assertCount(3, $contextids);
-        $this->assertTrue(in_array(context_module::instance($cm1a->cmid)->id, $contextids));
-        $this->assertTrue(in_array(context_module::instance($cm1b->cmid)->id, $contextids));
-        $this->assertTrue(in_array(context_module::instance($cm1c->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm1a->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm1b->cmid)->id, $contextids));
+        $this->assertTrue(in_array(\context_module::instance($cm1c->cmid)->id, $contextids));
     }
 
-    public function test_delete_data_for_all_users_in_context() {
+    /**
+     * Test delete data for all users in context.
+     *
+     * @covers \mod_lightboxgallery\privacy\provider::delete_data_for_all_users_in_context
+     * @return void
+     * @throws \dml_exception
+     */
+    public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
         $dg = $this->getDataGenerator();
 
@@ -106,26 +127,33 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
 
         // Deleting the course does nothing.
-        provider::delete_data_for_all_users_in_context(context_course::instance($c1->id));
+        provider::delete_data_for_all_users_in_context(\context_course::instance($c1->id));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1a->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1c->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1a->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
 
-        provider::delete_data_for_all_users_in_context(context_module::instance($cm1c->cmid));
+        provider::delete_data_for_all_users_in_context(\context_module::instance($cm1c->cmid));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1a->id]));
         $this->assertFalse($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1c->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1a->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
 
-        provider::delete_data_for_all_users_in_context(context_module::instance($cm1a->cmid));
+        provider::delete_data_for_all_users_in_context(\context_module::instance($cm1a->cmid));
         $this->assertFalse($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1a->id]));
         $this->assertFalse($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1c->id]));
         $this->assertFalse($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1a->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
     }
 
-    public function test_delete_data_for_user() {
+    /**
+     * Test delete data for user.
+     *
+     * @covers \mod_lightboxgallery\privacy\provider::delete_data_for_user
+     * @return void
+     * @throws \dml_exception
+     */
+    public function test_delete_data_for_user(): void {
         global $DB;
         $dg = $this->getDataGenerator();
 
@@ -147,9 +175,9 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
 
         provider::delete_data_for_user(new approved_contextlist($u1, 'mod_lightboxgallery', [
-            context_course::instance($c1->id)->id,
-            context_module::instance($cm1a->cmid)->id,
-            context_module::instance($cm1b->cmid)->id,
+            \context_course::instance($c1->id)->id,
+            \context_module::instance($cm1a->cmid)->id,
+            \context_module::instance($cm1b->cmid)->id,
         ]));
         $this->assertFalse($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1a->id]));
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u1->id, 'gallery' => $cm1c->id]));
@@ -157,7 +185,13 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
         $this->assertTrue($DB->record_exists('lightboxgallery_comments', ['userid' => $u2->id, 'gallery' => $cm1b->id]));
     }
 
-    public function test_export_data_for_user() {
+    /**
+     * Test export data for user.
+     *
+     * @covers \mod_lightboxgallery\privacy\provider::export_user_data
+     * @return void
+     */
+    public function test_export_data_for_user(): void {
         $dg = $this->getDataGenerator();
 
         $c1 = $dg->create_course();
@@ -167,9 +201,9 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
 
-        $cm1actx = context_module::instance($cm1a->cmid);
-        $cm1bctx = context_module::instance($cm1b->cmid);
-        $cm1cctx = context_module::instance($cm1c->cmid);
+        $cm1actx = \context_module::instance($cm1a->cmid);
+        $cm1bctx = \context_module::instance($cm1b->cmid);
+        $cm1cctx = \context_module::instance($cm1c->cmid);
 
         $this->create_comment($cm1a->id, $u1->id, 'cm1a_u1');
         $this->create_comment($cm1a->id, $u2->id, 'cm1a_u2');
@@ -206,6 +240,15 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
         $this->assertEmpty($data);
     }
 
+    /**
+     * Assert that the comments we exported are the same as the ones in the database.
+     *
+     * @param array $comments
+     * @param \stdClass $user
+     * @param \stdClass $lbg
+     * @return void
+     * @throws \dml_exception
+     */
     protected function assert_exported_comments($comments, $user, $lbg) {
         global $DB;
 
@@ -239,7 +282,7 @@ class mod_lightboxgallery_privacy_test extends provider_testcase {
             'gallery' => $lightboxgalleryid,
             'userid' => $userid,
             'commenttext' => $commenttext,
-            'timemodified' => time()
+            'timemodified' => time(),
         ];
         $record->id = $DB->insert_record('lightboxgallery_comments', $record);
         return $record;

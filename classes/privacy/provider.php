@@ -33,8 +33,6 @@ use core_privacy\local\request\helper;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Implementation of the privacy subsystem plugin provider for the lightboxgallery activity module.
  *
@@ -54,7 +52,7 @@ class provider implements
      * @param collection $items a reference to the collection to use to store the metadata.
      * @return collection the updated collection of metadata items.
      */
-    public static function get_metadata(collection $items) : collection {
+    public static function get_metadata(collection $items): collection {
         $items->add_database_table(
             'lightboxgallery_comments',
             [
@@ -75,7 +73,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         // Fetch all lightboxgallery comments.
         $sql = "SELECT c.id
                 FROM {context} c
@@ -252,6 +250,13 @@ class provider implements
         $DB->delete_records_select('lightboxgallery_comments', $sql, $params);
     }
 
+    /**
+     * Get the lightboxgallery id from the context.
+     *
+     * @param \context_module $context
+     * @return int
+     * @throws \coding_exception
+     */
     protected static function get_lightboxgallery_id_from_context(\context_module $context) {
         $cm = get_coursemodule_from_id('lightboxgallery', $context->instanceid);
         return $cm ? (int) $cm->instance : 0;

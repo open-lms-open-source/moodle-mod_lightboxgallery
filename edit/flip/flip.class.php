@@ -14,17 +14,50 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * The flip plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+/**
+ * Flip vertical
+ */
 define('FLIP_VERTICAL', 1);
+/**
+ * Flip horizontal
+ */
 define('FLIP_HORIZONTAL', 2);
 
+/**
+ * The flip plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_flip extends edit_base {
 
+    /**
+     * Constructor
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     */
     public function __construct($gallery, $cm, $image, $tab) {
         parent::__construct($gallery, $cm, $image, $tab, true);
     }
 
+    /**
+     * Output the form.
+     *
+     * @return string|void
+     * @throws coding_exception
+     */
     public function output() {
         $result = get_string('selectflipmode', 'lightboxgallery').'<br /><br />'.
                   '<label for="'.FLIP_VERTICAL.'"><input type="radio" class="form-check-input me-1" name="mode" value="'.
@@ -37,6 +70,12 @@ class edit_flip extends edit_base {
         return $this->enclose_in_form($result);
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     * @throws coding_exception
+     */
     public function process_form() {
         $mode = required_param('mode', PARAM_INT);
 

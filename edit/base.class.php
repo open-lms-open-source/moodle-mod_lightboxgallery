@@ -14,27 +14,57 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Base class to be extended for edit plugins
  *
- * @package   mod_lighboxgallery
+ * @package   mod_lightboxgallery
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class edit_base {
 
+    /**
+     * @var lightboxgallery_image $imageobj The image object
+     */
     public $imageobj;
+    /**
+     * @var context_module $cm The context module
+     */
     public $cm;
+    /**
+     * @var stdClass
+     */
     public $gallery;
+    /**
+     * @var stdClass
+     */
     public $image;
+    /**
+     * @var lightboxgallery_image
+     */
     public $lbgimage;
+    /**
+     * @var stdClass
+     */
     public $tab;
+    /**
+     * @var bool|null
+     */
     public $showthumb;
+    /**
+     * @var \core\context\module|false
+     */
     public $context;
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     * @param bool|null $showthumb
+     */
     public function __construct($gallery, $cm, $image, $tab, $showthumb = true) {
         $this->gallery = $gallery;
         $this->cm = $cm;
@@ -48,10 +78,22 @@ class edit_base {
         $this->lbgimage = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
     }
 
+    /**
+     * Check if the form is being processed.
+     *
+     * @return mixed
+     * @throws coding_exception
+     */
     public function processing() {
         return optional_param('process', false, PARAM_BOOL);
     }
 
+    /**
+     * Enclose the form in a form tag.
+     *
+     * @param string $text The text to enclose in the form
+     * @return string
+     */
     public function enclose_in_form($text) {
         global $CFG, $USER;
 
@@ -64,10 +106,20 @@ class edit_base {
                '<input type="hidden" name="process" value="1" />'.$text.'</fieldset></form>';
     }
 
+    /**
+     * Output the form.
+     *
+     * @return void
+     */
     public function output() {
 
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     */
     public function process_form() {
 
     }

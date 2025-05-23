@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * English strings for the lightboxgallery module
  *
@@ -31,6 +30,9 @@ $string['addimage'] = 'Add images';
 $string['addimage_help'] = 'Browse for an image on your local machine to add to the current gallery.
 
 You can also select a zip archive containing multiple images, which will be extracted into the image directory after being uploaded.';
+$string['allowcomments'] = 'Allow comments';
+$string['allowrss'] = 'Allow RSS feeds';
+$string['allpluginsdisabled'] = 'Sorry, all the editing plugins are currently disabled.';
 $string['autoresize'] = 'Automatically resize';
 $string['autoresize_help'] = 'You can control if and how gallery images are resized. The following methods are available when configuring a gallery:
 
@@ -38,9 +40,6 @@ $string['autoresize_help'] = 'You can control if and how gallery images are resi
 * Upload: images will be resized to specified dimensions when they are uploaded through the \'Add image\' option.
 
 There is also an image resizing plugin included in the image editor, where you can manually resize images.';
-$string['allowcomments'] = 'Allow comments';
-$string['allowrss'] = 'Allow RSS feeds';
-$string['allpluginsdisabled'] = 'Sorry, all the editing plugins are currently disabled.';
 $string['backtogallery'] = 'Back to Gallery';
 $string['captionfull'] = 'Display full caption text?';
 $string['captionpos'] = 'Caption Position';
@@ -59,14 +58,13 @@ $string['configstrictfilenames'] = 'Use strict filenames';
 $string['configstrictfilenamesdesc'] = 'Force image editor to clean file names according to Moodle naming rules.';
 $string['currentsize'] = 'Current size';
 $string['dimensions'] = 'Dimensions';
-$string['dirup'] = 'Up';
 $string['dirdown'] = 'Down';
 $string['dirleft'] = 'Left';
 $string['dirright'] = 'Right';
+$string['dirup'] = 'Up';
 $string['displayinggallery'] = 'Showing gallery: {$a}';
-$string['editimage'] = 'Edit image';
-$string['edit_choose'] = 'Choose...';
 $string['edit_caption'] = 'Caption';
+$string['edit_choose'] = 'Choose...';
 $string['edit_crop'] = 'Crop';
 $string['edit_delete'] = 'Delete';
 $string['edit_flip'] = 'Flip';
@@ -75,6 +73,7 @@ $string['edit_resizescale'] = 'Scale';
 $string['edit_rotate'] = 'Rotate';
 $string['edit_tag'] = 'Tag';
 $string['edit_thumbnail'] = 'Thumbnail';
+$string['editimage'] = 'Edit image';
 $string['errornofile'] = 'The requested file was not found: {$a}';
 $string['errornoimages'] = 'No images were found in this gallery';
 $string['errornosearchresults'] = 'Your search query returned no images';
@@ -98,8 +97,8 @@ $string['imageuploaded'] = 'Uploaded image: {$a}';
 $string['invalidlightboxgalleryid'] = 'Invalid lightboxgallery ID';
 $string['lightboxgallery'] = 'Lightbox Gallery';
 $string['lightboxgallery:addcomment'] = 'Add comment to lightbox gallery';
-$string['lightboxgallery:addinstance'] = 'Add a new lightbox gallery';
 $string['lightboxgallery:addimage'] = 'Add image to lightbox gallery';
+$string['lightboxgallery:addinstance'] = 'Add a new lightbox gallery';
 $string['lightboxgallery:edit'] = 'Edit a lightbox gallery';
 $string['lightboxgallery:submit'] = 'Submit a lightbox gallery';
 $string['lightboxgallery:viewcomments'] = 'View lightbox gallery comments';
@@ -115,21 +114,21 @@ As a course teacher, you are able to create, edit and delete galleries. Small th
 Clicking on any of the thumbnails brings that image into focus, and allows you to scroll through the gallery at your leisure. Using the Lightbox scripts creates nice transition effects when loading and scrolling through the images.
 
 If enabled, users are able to leave comments on your gallery.';
+$string['modulenameadd'] = 'Lightbox gallery';
 $string['modulenameplural'] = 'Lightbox Galleries';
 $string['modulenameshort'] = 'Gallery';
-$string['modulenameadd'] = 'Lightbox gallery';
 $string['newgallerycomments'] = 'New gallery comments';
 $string['nocomments'] = 'No comments';
 $string['norssfeedavailable'] = 'Feed not available';
-$string['position_bottom'] = 'Bottom';
-$string['position_top'] = 'Top';
 $string['pluginadministration'] = 'Lightbox Gallery administration';
 $string['pluginname'] = 'Lightbox Gallery';
+$string['position_bottom'] = 'Bottom';
+$string['position_top'] = 'Top';
 $string['privacy:metadata:lightboxgallery_comments'] = 'Information about the user\'s comments on a given lightboxgallery activity';
 $string['privacy:metadata:lightboxgallery_comments:commenttext'] = 'Stores the text of the comment.';
 $string['privacy:metadata:lightboxgallery_comments:gallery'] = 'The ID of the lightboxgallery activity the user is providing a comment for.';
-$string['privacy:metadata:lightboxgallery_comments:userid'] = 'The user who made the comment.';
 $string['privacy:metadata:lightboxgallery_comments:timemodified'] = 'The timestamp indicating when the lightboxgallery comment was modified by the user.';
+$string['privacy:metadata:lightboxgallery_comments:userid'] = 'The user who made the comment.';
 $string['resizeto'] = 'Resize to';
 $string['rsssubscribe'] = 'Gallery RSS feed';
 $string['saveimage'] = 'Save {$a}';

@@ -17,7 +17,7 @@
 /**
  * A page for uploading new images
  *
- * @package   mod_lightworkgallery
+ * @package   mod_lightboxgallery
  * @copyright 2011 John Kelsh <john.kelsh@netspot.com.au>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ require_once(dirname(__FILE__).'/imageclass.php');
 $id = required_param('id', PARAM_INT);
 
 list($course, $cm) = get_course_and_cm_from_cmid($id, 'lightboxgallery');
-$gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance), '*', MUST_EXIST);
+$gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 
@@ -37,11 +37,11 @@ $context = context_module::instance($cm->id);
 require_capability('mod/lightboxgallery:addimage', $context);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 
-$mform = new mod_lightboxgallery_imageadd_form(null, array('id' => $cm->id, 'gallery' => $gallery));
+$mform = new mod_lightboxgallery_imageadd_form(null, ['id' => $cm->id, 'gallery' => $gallery]);
 
 if ($mform->is_cancelled()) {
     redirect($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id);
