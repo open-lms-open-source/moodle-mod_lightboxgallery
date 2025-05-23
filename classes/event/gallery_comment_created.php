@@ -24,8 +24,6 @@
 
 namespace mod_lightboxgallery\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_lightboxgallery image updated event class.
  *
@@ -38,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package    mod_lightboxgallery
  * @since      Moodle 2.7
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gallery_comment_created extends \core\event\base {
@@ -77,7 +75,7 @@ class gallery_comment_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        $url = new \moodle_url('/mod/lightboxgallery/view.php', array('id' => $this->contextinstanceid));
+        $url = new \moodle_url('/mod/lightboxgallery/view.php', ['id' => $this->contextinstanceid]);
         return $url;
     }
 
@@ -94,6 +92,11 @@ class gallery_comment_created extends \core\event\base {
         }
     }
 
+    /**
+     * Get objectid mapping.
+     *
+     * @return array[]
+     */
     public static function get_other_mapping() {
         return [
             'lightboxgalleryid' => ['db' => 'lightboxgallery', 'restore' => 'lightboxgallery'],

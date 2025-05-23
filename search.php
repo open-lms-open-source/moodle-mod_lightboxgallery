@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Search page for searching for images
  *
@@ -33,13 +32,13 @@ $g = optional_param('gallery', '0', PARAM_INT);
 $search = optional_param('search', '', PARAM_CLEAN);
 
 if ($g) {
-    $gallery = $DB->get_record('lightboxgallery', array('id' => $g), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $gallery->course), '*', MUST_EXIST);
+    $gallery = $DB->get_record('lightboxgallery', ['id' => $g], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $gallery->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $course->id, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
     require_login($course, true, $cm);
 } else {
-    $course = $DB->get_record('course', array('id' => $cid), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cid], '*', MUST_EXIST);
     $context = context_course::instance($cid);
     require_login($course, true);
 }
@@ -53,17 +52,17 @@ if (isset($gallery) && $gallery->ispublic) {
 
 $context = context_module::instance($cm->id);
 
-$params = array(
+$params = [
     'context' => $context,
-    'other' => array(
+    'other' => [
         'searchterm' => $search,
         'lightboxgalleryid' => $gallery->id,
-    ),
-);
+    ],
+];
 $event = \mod_lightboxgallery\event\gallery_searched::create($params);
 $event->trigger();
 
-$PAGE->set_url('/mod/lightboxgallery/search.php', array('id' => $cm->id, 'search' => $search));
+$PAGE->set_url('/mod/lightboxgallery/search.php', ['id' => $cm->id, 'search' => $search]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 $PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
@@ -71,7 +70,7 @@ $PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox', 'M.mod_lightb
 
 echo $OUTPUT->header();
 
-$options = array();
+$options = [];
 if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
     foreach ($instances as $instance) {
         $options[$instance->id] = $instance->name;
@@ -81,11 +80,11 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
 
     $table = new html_table;
     $table->width = '*';
-    $table->align = array('left', 'left', 'left', 'left');
-    $table->data[] = array(get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
+    $table->align = ['left', 'left', 'left', 'left'];
+    $table->data[] = [get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
                            '<input type="text" name="search" size="10" value="'.s($search, true).'" />' .
                            '<input type="hidden" name="id" value="'.$cid.'" />',
-                           '<input type="submit" value="'.get_string('search').'" />');
+                           '<input type="submit" value="'.get_string('search').'" />', ];
     echo html_writer::table($table);
     echo html_writer::end_tag('form');
 }
@@ -93,25 +92,25 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
 $fs = get_file_storage();
 
 if ($g) {
-    $options = array($g => $g);
+    $options = [$g => $g];
 }
 list($insql, $inparams) = $DB->get_in_or_equal(array_keys($options));
-$params = array_merge(array("%$search%"), $inparams);
+$params = array_merge(["%$search%"], $inparams);
 $sql = "SELECT *
         FROM {lightboxgallery_image_meta}
         WHERE ".$DB->sql_like('description', '?', false)." AND gallery $insql";
 if ($results = $DB->get_records_sql($sql, $params)) {
     echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix autoresize');
 
-    $hashes = array();
-    $galleryrecords = array();
+    $hashes = [];
+    $galleryrecords = [];
 
     foreach ($results as $result) {
         if (!isset($hashes[$result->image])) {
             $imgcm = get_coursemodule_from_instance("lightboxgallery", $result->gallery, $course->id, false, MUST_EXIST);
 
             if (!isset($galleryrecords[$result->gallery])) {
-                $imggallery = $DB->get_record('lightboxgallery', array('id' => $result->gallery), '*', MUST_EXIST);
+                $imggallery = $DB->get_record('lightboxgallery', ['id' => $result->gallery], '*', MUST_EXIST);
                 $galleryrecords[$result->gallery] = $imggallery;
             } else {
                 $imggallery = $galleryrecords[$result->gallery];

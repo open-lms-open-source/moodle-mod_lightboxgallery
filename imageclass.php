@@ -18,10 +18,25 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/gdlib.php');
 
+/**
+ *
+ */
 define('THUMBNAIL_WIDTH', 162);
+/**
+ *
+ */
 define('THUMBNAIL_HEIGHT', 132);
+/**
+ *
+ */
 define('LIGHTBOXGALLERY_POS_HID', 2);
+/**
+ *
+ */
 define('LIGHTBOXGALLERY_POS_TOP', 1);
+/**
+ *
+ */
 define('LIGHTBOXGALLERY_POS_BOT', 0);
 
 /**
@@ -33,15 +48,46 @@ define('LIGHTBOXGALLERY_POS_BOT', 0);
  */
 class lightboxgallery_image {
 
+    /**
+     * The course module object.
+     *
+     * @var course_module
+     */
     private $cm;
+
+    /**
+     * The course module ID.
+     *
+     * @var int
+     */
     private $cmid;
+
+    /**
+     * The course module context.
+     *
+     * @var \core\context\module|false
+     */
     private $context;
+
+    /**
+     * The gallery object.
+     *
+     * @var stdClass
+     */
     private $gallery;
+
+    /**
+     * The URL for the image.
+     *
+     * @var \core\url
+     */
     private $imageurl;
 
-    // A quick lookup cache of this images metadata. Mainly useful during initial display.
+    /**
+     * A quick lookup cache of this images metadata. Mainly useful during initial display.
+     * @var mixed|null
+     */
     private $metadata = null;
-
 
     /**
      * The filepool object.
@@ -49,13 +95,41 @@ class lightboxgallery_image {
      * @var stored_file
      */
     private $storedfile;
+
+    /**
+     * The tags for this image.
+     * @var array
+     */
     private $tags;
+    /**
+     * @var bool|mixed|stored_file
+     */
     private $thumbnail;
+    /**
+     * The URL for the thumbnail.
+     * @var \core\url
+     */
     private $thumburl;
 
+    /**
+     * @var mixed|null
+     */
     public $height = null;
+    /**
+     * @var mixed|null
+     */
     public $width = null;
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $storedfile
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass|null $metadata
+     * @param bool|null $thumbnail
+     * @param bool|null  $loadextrainfo
+     */
     public function __construct($storedfile, $gallery, $cm, $metadata = null, $thumbnail = false, $loadextrainfo = true) {
         global $CFG;
 
@@ -103,6 +177,13 @@ class lightboxgallery_image {
         $this->metadata = $metadata;
     }
 
+    /**
+     * Add a tag to the image.
+     *
+     * @param stdClass $tag
+     * @return bool|int
+     * @throws dml_exception
+     */
     public function add_tag($tag) {
         global $DB;
 
@@ -115,6 +196,15 @@ class lightboxgallery_image {
         return $DB->insert_record('lightboxgallery_image_meta', $imagemeta);
     }
 
+    /**
+     * Create a thumbnail of the image.
+     *
+     * @param int $offsetx
+     * @param int $offsety
+     * @return stored_file
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function create_thumbnail($offsetx = 0, $offsety = 0) {
         if ($this->storedfile->get_mimetype() == 'image/svg+xml'
             || $this->width === null || $this->height === null) {
@@ -122,13 +212,13 @@ class lightboxgallery_image {
             return $this->storedfile;
         }
 
-        $fileinfo = array(
+        $fileinfo = [
             'contextid' => $this->context->id,
             'component' => 'mod_lightboxgallery',
             'filearea' => 'gallery_thumbs',
             'itemid' => 0,
             'filepath' => $this->storedfile->get_filepath(),
-            'filename' => $this->storedfile->get_filename().'.png');
+            'filename' => $this->storedfile->get_filename().'.png', ];
 
         ob_start();
         imagepng($this->get_image_resized(THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH, $offsetx, $offsety));
@@ -139,16 +229,23 @@ class lightboxgallery_image {
         return $fs->create_file_from_string($fileinfo, $thumbnail);
     }
 
+    /**
+     * Create the index file.
+     *
+     * @return stored_file
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function create_index() {
         global $CFG;
 
-        $fileinfo = array(
+        $fileinfo = [
             'contextid' => $this->context->id,
             'component' => 'mod_lightboxgallery',
             'filearea' => 'gallery_index',
             'itemid' => 0,
             'filepath' => '/',
-            'filename' => 'index.png');
+            'filename' => 'index.png', ];
 
         $base = imagecreatefrompng($CFG->dirroot.'/mod/lightboxgallery/pix/index.png');
         $transparent = imagecolorat($base, 0, 0);
@@ -167,6 +264,13 @@ class lightboxgallery_image {
         return $fs->create_file_from_string($fileinfo, $index);
     }
 
+    /**
+     * Delete the file.
+     *
+     * @param bool|null $meta
+     * @return void
+     * @throws dml_exception
+     */
     public function delete_file($meta = true) {
         global $DB;
 
@@ -174,20 +278,32 @@ class lightboxgallery_image {
 
         // Delete all image_meta records for this file.
         if ($meta) {
-            $DB->delete_records('lightboxgallery_image_meta', array(
+            $DB->delete_records('lightboxgallery_image_meta', [
                 'gallery' => $this->cm->instance,
-                'image' => $this->storedfile->get_filename()));
+                'image' => $this->storedfile->get_filename(), ]);
         }
 
         $this->storedfile->delete();
     }
 
+    /**
+     * Delete a tag.
+     *
+     * @param stdClass $tag
+     * @return bool
+     * @throws dml_exception
+     */
     public function delete_tag($tag) {
         global $DB;
 
-        return $DB->delete_records('lightboxgallery_image_meta', array('id' => $tag));
+        return $DB->delete_records('lightboxgallery_image_meta', ['id' => $tag]);
     }
 
+    /**
+     * Delete the thumbnail file.
+     *
+     * @return void
+     */
     private function delete_thumbnail() {
         if (isset($this->thumbnail) && is_object($this->thumbnail)) {
             $this->thumbnail->delete();
@@ -195,15 +311,24 @@ class lightboxgallery_image {
         }
     }
 
+    /**
+     * Get the image flipped in a given direction.
+     *
+     * @param string $direction
+     * @return array|string|string[]|null
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function flip_image($direction) {
 
-        $fileinfo = array(
+        $fileinfo = [
             'contextid'     => $this->context->id,
             'component'     => 'mod_lightboxgallery',
             'filearea'      => 'gallery_images',
             'itemid'        => 0,
             'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename());
+            'filename'      => $this->storedfile->get_filename(), ];
 
         ob_start();
         $original = $this->storedfile->get_filename();
@@ -220,8 +345,13 @@ class lightboxgallery_image {
     /**
      * Get the list of editing options allowed for this image.
      * Not all editing types are supported for all image formats.
+     *
+     * @return string
+     * @throws coding_exception
      */
-    public function get_editing_options() {
+    private function get_editing_options() {
+        global $CFG;
+
         $options = [
             'caption',
             'delete',
@@ -243,6 +373,12 @@ class lightboxgallery_image {
         return $options;
     }
 
+    /**
+     * Get the form for the editing options.
+     *
+     * @return string
+     * @throws coding_exception
+     */
     private function get_editing_options_form() {
         global $CFG;
 
@@ -264,6 +400,12 @@ class lightboxgallery_image {
         return $html;
     }
 
+    /**
+     * Get the image caption.
+     *
+     * @return string
+     * @throws dml_exception
+     */
     public function get_image_caption() {
         global $DB;
         $caption = '';
@@ -277,13 +419,21 @@ class lightboxgallery_image {
         }
 
         if ($imagemeta = $DB->get_record('lightboxgallery_image_meta',
-                array('gallery' => $this->gallery->id, 'image' => $this->storedfile->get_filename(), 'metatype' => 'caption'))) {
+                ['gallery' => $this->gallery->id, 'image' => $this->storedfile->get_filename(), 'metatype' => 'caption'])) {
             $caption = $imagemeta->description;
         }
 
         return $caption;
     }
 
+    /**
+     * Get the image display HTML.
+     *
+     * @param bool $editing
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function get_image_display_html($editing = false) {
         if ($this->gallery->captionfull) {
             $caption = $this->get_image_caption();
@@ -298,7 +448,7 @@ class lightboxgallery_image {
             $caption = ''; // Hide by cleaning the content (looks better than cleaning the whole div).
         }
         $posclass = ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) ? 'top' : 'bottom';
-        $captiondiv = html_writer::tag('div', $caption, array('class' => "lightbox-gallery-image-caption $posclass"));
+        $captiondiv = html_writer::tag('div', $caption, ['class' => "lightbox-gallery-image-caption $posclass"]);
 
         $html = '<div class="lightbox-gallery-image-container">'.
                     '<div class="lightbox-gallery-image-wrapper">'.
@@ -310,7 +460,7 @@ class lightboxgallery_image {
                  $this->imageurl.'" rel="lightbox_gallery" title="'.$caption.
                  '" style="background-image: url(\''.$this->thumburl.
                  '\'); width: '.THUMBNAIL_WIDTH.'px; height: '.THUMBNAIL_HEIGHT.'px;"></a>';
-        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT or $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
+        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT || $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
             $html .= $captiondiv;
         }
         $html .= $this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.
@@ -324,6 +474,12 @@ class lightboxgallery_image {
 
     }
 
+    /**
+     * Get the image flipped in a given direction.
+     *
+     * @param string $direction
+     * @return false|GdImage|resource
+     */
     private function get_image_flipped($direction) {
         $image = imagecreatefromstring($this->storedfile->get_content());
         $flipped = imagecreatetruecolor($this->width, $this->height);
@@ -347,6 +503,15 @@ class lightboxgallery_image {
 
     }
 
+    /**
+     * Get the image resized to a given width and height.
+     *
+     * @param int $height
+     * @param int $width
+     * @param int $offsetx
+     * @param int $offsety
+     * @return false|GdImage|resource
+     */
     private function get_image_resized($height = THUMBNAIL_HEIGHT, $width = THUMBNAIL_WIDTH, $offsetx = 0, $offsety = 0) {
         raise_memory_limit(MEMORY_EXTRA);
         $image = imagecreatefromstring($this->storedfile->get_content());
@@ -378,6 +543,12 @@ class lightboxgallery_image {
 
     }
 
+    /**
+     * Get the image rotated by a given angle.
+     *
+     * @param int $angle
+     * @return false|GdImage|resource
+     */
     private function get_image_rotated($angle) {
         $image = imagecreatefromstring($this->storedfile->get_content());
         $rotated = imagerotate($image, $angle, 0);
@@ -385,10 +556,21 @@ class lightboxgallery_image {
         return $rotated;
     }
 
+    /**
+     * Get the image URL.
+     *
+     * @return \core\url
+     */
     public function get_image_url() {
         return $this->imageurl;
     }
 
+    /**
+     * Get the image tags.
+     *
+     * @return array
+     * @throws dml_exception
+     */
     public function get_tags() {
         global $DB;
 
@@ -411,6 +593,11 @@ class lightboxgallery_image {
         return $this->tags = $tags;
     }
 
+    /**
+     * Get the thumbnail file.
+     *
+     * @return bool|stored_file
+     */
     private function get_thumbnail() {
         $fs = get_file_storage();
 
@@ -422,10 +609,21 @@ class lightboxgallery_image {
         return false;
     }
 
+    /**
+     * Get the thumbnail URL.
+     *
+     * @return \core\url
+     */
     public function get_thumbnail_url() {
         return $this->thumburl;
     }
 
+    /**
+     * Output the image in the correct format based on the stored file's mimetype.
+     *
+     * @param stdClass $gdcall
+     * @return array|string|string[]|null
+     */
     protected function output_by_mimetype($gdcall) {
         if ($this->storedfile->get_mimetype() == 'image/png') {
             $imgfunc = 'imagepng';
@@ -440,14 +638,24 @@ class lightboxgallery_image {
         }
     }
 
+    /**
+     * Resize the image to a given width and height.
+     *
+     * @param int $width
+     * @param int $height
+     * @return array|string|string[]|null
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function resize_image($width, $height) {
-        $fileinfo = array(
+        $fileinfo = [
             'contextid'     => $this->context->id,
             'component'     => 'mod_lightboxgallery',
             'filearea'      => 'gallery_images',
             'itemid'        => 0,
             'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename());
+            'filename'      => $this->storedfile->get_filename(), ];
 
         ob_start();
         $original = $fileinfo['filename'];
@@ -467,14 +675,23 @@ class lightboxgallery_image {
         return $fileinfo['filename'];
     }
 
+    /**
+     * Rotate the image by a given angle.
+     *
+     * @param int $angle
+     * @return array|string|string[]|null
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function rotate_image($angle) {
-        $fileinfo = array(
+        $fileinfo = [
             'contextid'     => $this->context->id,
             'component'     => 'mod_lightboxgallery',
             'filearea'      => 'gallery_images',
             'itemid'        => 0,
             'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename());
+            'filename'      => $this->storedfile->get_filename(), ];
 
         ob_start();
         $original = $fileinfo['filename'];
@@ -490,6 +707,13 @@ class lightboxgallery_image {
         return $fileinfo['filename'];
     }
 
+    /**
+     * Set the image caption in the database.
+     *
+     * @param string $caption
+     * @return bool|int
+     * @throws dml_exception
+     */
     public function set_caption($caption) {
         global $DB;
 
@@ -499,8 +723,8 @@ class lightboxgallery_image {
         $imagemeta->metatype = 'caption';
         $imagemeta->description = $caption;
 
-        if ($meta = $DB->get_record('lightboxgallery_image_meta', array('gallery' => $this->cm->instance,
-                'image' => $this->storedfile->get_filename(), 'metatype' => 'caption'))) {
+        if ($meta = $DB->get_record('lightboxgallery_image_meta', ['gallery' => $this->cm->instance,
+                'image' => $this->storedfile->get_filename(), 'metatype' => 'caption', ])) {
             $imagemeta->id = $meta->id;
             return $DB->update_record('lightboxgallery_image_meta', $imagemeta);
         } else {
@@ -508,6 +732,14 @@ class lightboxgallery_image {
         }
     }
 
+    /**
+     * Update the image meta file name in the database.
+     *
+     * @param stdClass $old
+     * @param stdClass $new
+     * @return void
+     * @throws dml_exception
+     */
     public function update_meta_file($old, $new) {
         global $DB;
 
@@ -520,10 +752,21 @@ class lightboxgallery_image {
         $DB->execute($sql, [$new, $old, $this->gallery->id]);
     }
 
+    /**
+     * Copy the content of the stored file to a temporary location.
+     *
+     * @return bool|string
+     */
     public function copy_content_to_temp() {
         return $this->storedfile->copy_content_to_temp();
     }
 
+    /**
+     * Set the stored file.
+     *
+     * @param stdClass $storedfile
+     * @return void
+     */
     public function set_stored_file($storedfile) {
         $this->storedfile = $storedfile;
         $imageinfo = $this->storedfile->get_imageinfo();

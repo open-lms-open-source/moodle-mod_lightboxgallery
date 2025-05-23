@@ -14,16 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The tag import script.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(dirname(__FILE__).'/../../../../config.php');
 require_once(dirname(__FILE__).'/../../lib.php');
 
 $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
-if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
+if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $id])) {
     throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
 }
-if (!$course = $DB->get_record('course', array('id' => $gallery->course))) {
+if (!$course = $DB->get_record('course', ['id' => $gallery->course])) {
     throw new \moodle_exception('invalidcourseid');
 }
 if (!$cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id)) {
@@ -38,7 +46,7 @@ $galleryurl = $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id;
 require_capability('mod/lightboxgallery:edit', $context);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/edit/tag/import.php', array('id' => $id));
+$PAGE->set_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 echo $OUTPUT->header();
@@ -73,7 +81,7 @@ if ($confirm && confirm_sesskey()) {
                     $errorlevel = error_reporting(E_PARSE);
 
                     foreach ($iptc['2#025'] as $tag) {
-                        $tag = utf8_encode($tag);
+                        $tag = iconv('UTF-8', 'UTF-8//IGNORE', $tag);
                         $tag = clean_param($tag, PARAM_TAG);
                         $tag = trim(strip_tags($tag));
                         if (empty($tag)) {
@@ -81,12 +89,12 @@ if ($confirm && confirm_sesskey()) {
                         }
                         $select = "gallery = :gallery AND image = :image
                                    AND metatype = :metatype AND ".$DB->sql_compare_text('description', 100).' = :description';
-                        $params = array(
+                        $params = [
                             'gallery' => $gallery->id,
                             'image' => $storedfile->get_filename(),
                             'metatype' => 'tag',
                             'description' => $tag,
-                        );
+                        ];
                         if (!$DB->record_exists_select('lightboxgallery_image_meta', $select, $params)) {
                             $record = new stdClass();
                             $record->gallery = $gallery->id;
@@ -111,9 +119,9 @@ if ($confirm && confirm_sesskey()) {
     notice(get_string('tagsimportfinish', 'lightboxgallery', $a), $galleryurl);
 } else {
     $confirmurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php',
-        array('id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()));
+        ['id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()]);
     $cancelurl = new moodle_url('/mod/lightboxgallery/view.php',
-        array('id' => $cm->id, 'editing' => 1));
+        ['id' => $cm->id, 'editing' => 1]);
     echo $OUTPUT->confirm(get_string('tagsimportconfirm', 'lightboxgallery'), $confirmurl, $cancelurl);
 }
 

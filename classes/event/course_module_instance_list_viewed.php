@@ -23,7 +23,6 @@
  */
 
 namespace mod_lightboxgallery\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_lightboxgallery instance list viewed event class.

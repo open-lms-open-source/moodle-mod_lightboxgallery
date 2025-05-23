@@ -37,8 +37,8 @@ $tab = optional_param('tab', '', PARAM_TEXT);
 $page = optional_param('page', 0, PARAM_INT);
 
 $cm      = get_coursemodule_from_id('lightboxgallery', $id, 0, false, MUST_EXIST);
-$course  = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance), '*', MUST_EXIST);
+$course  = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course->id);
 
@@ -47,10 +47,10 @@ require_capability('mod/lightboxgallery:edit', $context);
 
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_url('/mod/lightboxgallery/imageedit.php', array('id' => $cm->id, 'image' => $image, 'tab' => $tab, 'page' => $page));
+$PAGE->set_url('/mod/lightboxgallery/imageedit.php', ['id' => $cm->id, 'image' => $image, 'tab' => $tab, 'page' => $page]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
-$buttonurl = new moodle_url('/mod/lightboxgallery/view.php', array('id' => $id, 'editing' => 1, 'page' => $page));
+$buttonurl = new moodle_url('/mod/lightboxgallery/view.php', ['id' => $id, 'editing' => 1, 'page' => $page]);
 $PAGE->set_button($OUTPUT->single_button($buttonurl, get_string('backtogallery', 'lightboxgallery')));
 
 $fs = get_file_storage();
@@ -61,10 +61,10 @@ $imageclass = new lightboxgallery_image($storedfile, $gallery, $cm);
 
 $edittypes = lightboxgallery_edit_types(false, $imageclass);
 
-$tabs = array();
+$tabs = [];
 foreach ($edittypes as $type => $name) {
     $editurl = new moodle_url('/mod/lightboxgallery/imageedit.php',
-                                array('id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type));
+                                ['id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type]);
     $tabs[] = new tabobject($type, $editurl, $name);
 }
 
@@ -82,13 +82,13 @@ $editclass = 'edit_'.$tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
 if ($editinstance->processing() && confirm_sesskey()) {
-    $params = array(
+    $params = [
         'context' => $context,
-        'other' => array(
+        'other' => [
             'imagename' => $image,
-            'tab' => $tab
-        ),
-    );
+            'tab' => $tab,
+        ],
+    ];
     $event = \mod_lightboxgallery\event\image_updated::create($params);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
@@ -103,21 +103,22 @@ $table = new html_table();
 $table->width = '*';
 
 if ($editinstance->showthumb) {
-    $table->attributes = array('style' => 'margin-left:auto;margin-right:auto;');
-    $table->align = array('center', 'center');
-    $table->size = array('*', '*');
-    $table->data[] = array('<img src="'.$imageclass->get_thumbnail_url().
-                            '" alt="" /><br /><span title="'.$imageclass->get_image_caption().'">'.
-                            $imageclass->get_image_caption().'</span>', $editinstance->output($imageclass->get_image_caption()));
+    $table->attributes = ['style' => 'margin-left:auto;margin-right:auto;'];
+    $table->align = ['center', 'center'];
+    $table->size = ['*', '*'];
+    $table->data[] = ['<img src="'.$image->get_thumbnail_url().
+                            '" alt="" /><br /><span title="'.$image->get_image_caption().'">'.
+                            $image->get_image_caption().'</span>', $editinstance->output($image->get_image_caption()), ];
 } else {
-    $table->align = array('center');
-    $table->size = array('*');
-    $table->data[] = array($editinstance->output($imageclass->get_image_caption()));
+    $table->align = ['center'];
+    $table->size = ['*'];
+    $table->data[] = [$editinstance->output($image->get_image_caption())];
+    $table->data[] = [$editinstance->output($imageclass->get_image_caption())];
 }
 
 echo $OUTPUT->header();
 
-print_tabs(array($tabs), $tab);
+print_tabs([$tabs], $tab);
 
 echo html_writer::table($table);
 

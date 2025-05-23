@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Allows users to add comments to a lightboxgallery
+ *
+ * @package    mod_lightboxgallery
+ * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/comment_form.php');
@@ -22,19 +31,19 @@ $id      = required_param('id', PARAM_INT);
 $delete  = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
-if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $id))) {
+if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $id])) {
     throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
 }
 list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 
-if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', array('gallery' => $gallery->id, 'id' => $delete))) {
+if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', ['gallery' => $gallery->id, 'id' => $delete])) {
     throw new \moodle_exception('Invalid comment ID');
 }
 
 require_login($course, true, $cm);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $id));
+$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 
@@ -44,14 +53,14 @@ $galleryurl = $CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id;
 
 if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
     if ($confirm && confirm_sesskey()) {
-        $DB->delete_records('lightboxgallery_comments', array('id' => $comment->id));
+        $DB->delete_records('lightboxgallery_comments', ['id' => $comment->id]);
         redirect($galleryurl);
     } else {
         echo $OUTPUT->header();
         lightboxgallery_print_comment($comment, $context);
         echo('<br />');
-        $paramsyes = array('id' => $gallery->id, 'delete' => $comment->id, 'sesskey' => sesskey(), 'confirm' => 1);
-        $paramsno = array('id' => $cm->id);
+        $paramsyes = ['id' => $gallery->id, 'delete' => $comment->id, 'sesskey' => sesskey(), 'confirm' => 1];
+        $paramsno = ['id' => $cm->id];
         echo $OUTPUT->confirm(get_string('commentdelete', 'lightboxgallery'),
                               new moodle_url('/mod/lightboxgallery/comment.php', $paramsyes),
                               new moodle_url('/mod/lightboxgallery/view.php', $paramsno));
@@ -77,12 +86,12 @@ if ($mform->is_cancelled()) {
     $newcomment->commenttext = $formadata->comment['text'];
     $newcomment->timemodified = time();
     if ($DB->insert_record('lightboxgallery_comments', $newcomment)) {
-        $params = array(
+        $params = [
             'context' => $context,
-            'other' => array(
+            'other' => [
                 'lightboxgalleryid' => $gallery->id,
-            ),
-        );
+            ],
+        ];
         $event = \mod_lightboxgallery\event\gallery_comment_created::create($params);
         $event->trigger();
 

@@ -1,3 +1,5 @@
+[![Moodle Plugin CI](https://github.com/open-lms-open-source/moodle-mod_lightboxgallery/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/open-lms-open-source/moodle-mod_lightboxgallery/actions/workflows/moodle-plugin-ci.yml)
+
 # Lightbox gallery activity for Moodle™ 3.10+
 
 This resource allows you to create 'Lightbox' enabled image galleries within your Moodle™ course. The
