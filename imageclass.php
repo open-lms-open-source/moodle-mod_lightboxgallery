@@ -242,7 +242,8 @@ class lightboxgallery_image {
                     '<input type="hidden" name="id" value="'.$this->cmid.'" />'.
                     '<input type="hidden" name="image" value="'.$this->storedfile->get_filename().'" />'.
                     '<input type="hidden" name="page" value="0" />'.
-                    '<select name="tab" class="lightbox-edit-select" onchange="submit();">'.
+                    '<select name="tab" class="lightbox-edit-select custom-select mb-1" style="width: '.THUMBNAIL_WIDTH.'px;" '.
+                    'onchange="submit();">'.
                         '<option disabled selected>'.get_string('edit_choose', 'lightboxgallery').'</option>';
         foreach ($options as $option) {
             $html .= '<option value="'.$option.'">'.get_string('edit_'.$option, 'lightboxgallery').'</option>';
