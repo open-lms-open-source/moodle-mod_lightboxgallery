@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * mod_lightboxgallery data generator class.
  *
@@ -35,7 +33,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_lightboxgallery_generator extends testing_module_generator {
 
-    public function create_instance($record = null, array $options = null) {
+    /**
+     * Create a new instance of the module.
+     *
+     * @param stdClass|null $record
+     * @param array|null $options
+     * @return stdClass
+     * @throws coding_exception
+     */
+    public function create_instance($record = null, ?array $options = null) {
         return parent::create_instance($record, (array)$options);
     }
 }

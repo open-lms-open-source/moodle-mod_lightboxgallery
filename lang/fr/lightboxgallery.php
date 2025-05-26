@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * English strings for the lightboxgallery module
  *
@@ -31,6 +30,9 @@ $string['addimage'] = 'Ajouter des images';
 $string['addimage_help'] = 'Naviguez vers une image sur votre machine locale pour l\'ajouter à la gallerie en cours.
 
 Vous pouvez également sélectionner une archive zip contenant de multiples images. Celles-ci seront extraites dans le dossier image une fois le chargement terminé.';
+$string['allowcomments'] = 'Autoriser les commentaires';
+$string['allowrss'] = 'Autoriser les flux RSS';
+$string['allpluginsdisabled'] = 'Désolé, tous les plugins d\'édition sont actuellement désactivés.';
 $string['autoresize'] = 'Redimensionnement automatique';
 $string['autoresize_help'] = 'Vous pouvez contrôler si et quand les galleries d\'images sont redimensionnées. Les méthodes suivantes sont disponibles lors de la configuration d\'une gallerie.
 
@@ -38,9 +40,6 @@ $string['autoresize_help'] = 'Vous pouvez contrôler si et quand les galleries d
 * Upload: les images seront redimensionnées aux dimensions spécifiées lors de leur chargement à travers l\'option \'Ajouter des images\'.
 
 Il existe également un plugin de redimensionnement inclus dans l\'éditeur d\'images que vous pouvez utiliser pour redimensionner les images manuellement.';
-$string['allowcomments'] = 'Autoriser les commentaires';
-$string['allowrss'] = 'Autoriser les flux RSS';
-$string['allpluginsdisabled'] = 'Désolé, tous les plugins d\'édition sont actuellement désactivés.';
 $string['backtogallery'] = 'Retour à la gallerie';
 $string['captionfull'] = 'Afficher l\'intégralité du sous-titre?';
 $string['captionpos'] = 'Position du sous-titre';
@@ -59,14 +58,13 @@ $string['configstrictfilenames'] = 'Utiliser des noms de fichier stricts';
 $string['configstrictfilenamesdesc'] = 'Forcer l\'éditeur d\'images à nettoyer les noms de fichiers suivant les règles de nomenclature Moodle.';
 $string['currentsize'] = 'Taille actuelle';
 $string['dimensions'] = 'Dimensions';
-$string['dirup'] = 'Haut';
 $string['dirdown'] = 'Bas';
 $string['dirleft'] = 'Gauche';
 $string['dirright'] = 'Droite';
+$string['dirup'] = 'Haut';
 $string['displayinggallery'] = 'Gallerie d\'affichage: {$a}';
-$string['editimage'] = 'Editer l\'image';
-$string['edit_choose'] = 'Choix...';
 $string['edit_caption'] = 'Sous-titre';
+$string['edit_choose'] = 'Choix...';
 $string['edit_crop'] = 'Tronquer';
 $string['edit_delete'] = 'Effacer';
 $string['edit_flip'] = 'Mirroir';
@@ -75,6 +73,7 @@ $string['edit_resizescale'] = 'Taille';
 $string['edit_rotate'] = 'Rotation';
 $string['edit_tag'] = 'Etiquette';
 $string['edit_thumbnail'] = 'Miniature';
+$string['editimage'] = 'Editer l\'image';
 $string['errornofile'] = 'Le fichier requis n\'a pu être trouvé: {$a}';
 $string['errornoimages'] = 'Aucune image n\'a été trouvée dans cette gallerie';
 $string['errornosearchresults'] = 'Votre requête n\'a retourné aucune image';
@@ -94,8 +93,8 @@ $string['imageuploaded'] = 'Image uploadée: {$a}';
 $string['invalidquizid'] = 'Lightboxgallery ID invalide';
 $string['lightboxgallery'] = 'Gallerie Lightbox';
 $string['lightboxgallery:addcomment'] = 'Ajouter un commentaire à la gallerie lightbox';
-$string['lightboxgallery:addinstance'] = 'Ajouter une nouvelle gallerie lightbox';
 $string['lightboxgallery:addimage'] = 'Ajouter une image à la gallerie lightbox';
+$string['lightboxgallery:addinstance'] = 'Ajouter une nouvelle gallerie lightbox';
 $string['lightboxgallery:edit'] = 'Editer une gallerie lightbox';
 $string['lightboxgallery:submit'] = 'Publier une gallerie lightbox';
 $string['lightboxgallery:viewcomments'] = 'Voir les commentaires de la gallerie lightbox';
@@ -110,15 +109,15 @@ En tant qu\'enseignant, vous avez la possibilité de créer, éditer et effacer 
 Un clic sur l\'une de ces miniatures donnera le focus à l\'image sélectionnée et permettra de faire défiler la gallerie à votre guise. Utiliser les scripts Lightbox permet d\'obtenir de jolis effets de transition au chargement et au défilement des images.
 
 Si activé, les utilisateurs seront capable de laisser des commentaires sur votre gallerie.';
+$string['modulenameadd'] = 'Gallerie Lightbox';
 $string['modulenameplural'] = 'Galleries Lightbox';
 $string['modulenameshort'] = 'Gallerie';
-$string['modulenameadd'] = 'Gallerie Lightbox';
 $string['newgallerycomments'] = 'Nouveau commentaire de gallerie';
 $string['norssfeedavailable'] = 'Flux inaccessible';
-$string['position_bottom'] = 'Bas';
-$string['position_top'] = 'Haut';
 $string['pluginadministration'] = 'Administration de la gallerie Lightbox';
 $string['pluginname'] = 'Lightbox Gallery';
+$string['position_bottom'] = 'Bas';
+$string['position_top'] = 'Haut';
 $string['resizeto'] = 'Redimmensionner à';
 $string['rsssubscribe'] = 'Flux RSS de la gallerie';
 $string['saveimage'] = 'Enregistrer {$a}';

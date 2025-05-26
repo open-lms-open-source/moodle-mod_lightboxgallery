@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * This file defines all the restore steps that will be used by the lightboxgallery
+ *
+ * @package mod_lightboxgallery
  * @subpackage backup-moodle2
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the restore steps that will be used by the restore_lightboxgallery_activity_task
@@ -32,9 +32,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class restore_lightboxgallery_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define (add) particular settings this activity can have
+     *
+     * @return mixed
+     * @throws base_step_exception
+     */
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
         $lightboxgallery = new restore_path_element('lightboxgallery', '/activity/lightboxgallery');
@@ -52,6 +58,14 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process the lightboxgallery activity.
+     *
+     * @param array $data
+     * @return void
+     * @throws base_step_exception
+     * @throws dml_exception
+     */
     protected function process_lightboxgallery($data) {
         global $DB;
 
@@ -64,6 +78,13 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process the lightboxgallery comments.
+     *
+     * @param array $data
+     * @return void
+     * @throws dml_exception
+     */
     protected function process_lightboxgallery_comment($data) {
         global $DB;
 
@@ -78,16 +99,30 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $DB->insert_record('lightboxgallery_comments', $data);
     }
 
+    /**
+     * Process the image meta data.
+     *
+     * @param array $data
+     * @return void
+     * @throws dml_exception
+     */
     protected function process_lightboxgallery_image_meta($data) {
         global $DB;
 
         $data = (object)$data;
 
         $data->gallery = $this->get_new_parentid('lightboxgallery');
+        // phpcs:disable moodle.Commenting.TodoComment
         // TODO: image var to match image.
         $DB->insert_record('lightboxgallery_image_meta', $data);
     }
 
+    /**
+     * This function is executed after all the restore steps
+     * are executed.
+     *
+     * @return void
+     */
     protected function after_execute() {
         $this->add_related_files('mod_lightboxgallery', 'gallery_images', null);
         $this->add_related_files('mod_lightboxgallery', 'gallery_thumbs', null);

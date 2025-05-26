@@ -14,14 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * The delete plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_delete extends edit_base {
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     */
     public function __construct($gallery, $cm, $image, $tab) {
         parent::__construct($gallery, $cm, $image, $tab, true);
     }
 
+    /**
+     * Output the form.
+     *
+     * @return string|void
+     * @throws coding_exception
+     */
     public function output() {
         global $page;
         $result = get_string('deletecheck', '', $this->image).'<br /><br />';
@@ -30,6 +49,13 @@ class edit_delete extends edit_base {
         return $this->enclose_in_form($result);
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public function process_form() {
         global $CFG, $page;
         $this->lbgimage->delete_file();

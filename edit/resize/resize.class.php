@@ -14,14 +14,37 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * The resize plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_resize extends edit_base {
 
+    /**
+     * @var lang_string|string
+     */
     private $strresize;
+    /**
+     * @var lang_string|string
+     */
     private $strscale;
+    /**
+     * @var string[]
+     */
     private $resizeoptions;
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     * @throws coding_exception
+     */
     public function __construct($gallery, $cm, $image, $tab) {
         parent::__construct($gallery, $cm, $image, $tab, true);
         $this->strresize = get_string('edit_resize', 'lightboxgallery');
@@ -29,6 +52,12 @@ class edit_resize extends edit_base {
         $this->resizeoptions = lightboxgallery_resize_options();
     }
 
+    /**
+     * Output the form.
+     *
+     * @return string|void
+     * @throws coding_exception
+     */
     public function output() {
         $fs = get_file_storage();
         $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
@@ -57,6 +86,15 @@ class edit_resize extends edit_base {
         return $this->enclose_in_form($currentsize . $sizeselect . $scaleselect);
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
     public function process_form() {
         $button = required_param('button', PARAM_TEXT);
 

@@ -24,8 +24,6 @@
 
 namespace mod_lightboxgallery\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_lightboxgallery image updated event class.
  *
@@ -39,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package    mod_lightboxgallery
  * @since      Moodle 2.7
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class image_updated extends \core\event\base {
@@ -78,15 +76,20 @@ class image_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        $params = array(
+        $params = [
             'id' => $this->contextinstanceid,
             'image' => $this->other['imagename'],
             'tab' => $this->other['tab'],
-        );
+        ];
         $url = new \moodle_url('/mod/lightboxgallery/imageedit.php', $params);
         return $url;
     }
 
+    /**
+     * Get objectid mapping
+     *
+     * @return array
+     */
     public static function get_other_mapping() {
         return [];
     }

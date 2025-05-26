@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Internal library of functions for module lightboxgallery
  *
@@ -46,9 +45,8 @@ define('AUTO_RESIZE_BOTH', 3);
  * @param array $files A list of stored_file objects.
  * @param context $context
  * @param cm_info $cm
- * @param $gallery
+ * @param stdClass $gallery
  * @param int $resize
- * @access public
  * @return void
  */
 function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0) {
@@ -56,7 +54,7 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
 
     $fs = get_file_storage();
 
-    $images = array();
+    $images = [];
     foreach ($files as $storedfile) {
         if ($storedfile->get_mimetype() == 'application/zip') {
             // Unpack.
@@ -73,14 +71,14 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
     foreach ($images as $storedfile) {
         if ($storedfile->is_valid_image()) {
             $filename = $storedfile->get_filename();
-            $fileinfo = array(
+            $fileinfo = [
                 'contextid'     => $context->id,
                 'component'     => 'mod_lightboxgallery',
                 'filearea'      => 'gallery_images',
                 'itemid'        => 0,
                 'filepath'      => '/',
-                'filename'      => $filename
-            );
+                'filename'      => $filename,
+            ];
             if (!$fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $filename)) {
                 $storedfile = $fs->create_file_from_storedfile($fileinfo, $storedfile);
                 $image = new lightboxgallery_image($storedfile, $gallery, $cm);
@@ -98,11 +96,17 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
     $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
 }
 
+/**
+ * Set default configuration values for the lightboxgallery module.
+ *
+ * @return void
+ * @throws dml_exception
+ */
 function lightboxgallery_config_defaults() {
-    $defaults = array(
+    $defaults = [
         'disabledplugins' => '',
         'enablerssfeeds' => 0,
-    );
+    ];
 
     $localcfg = get_config('lightboxgallery');
 
@@ -113,11 +117,20 @@ function lightboxgallery_config_defaults() {
     }
 }
 
+/**
+ * Get the list of editing plugins.
+ *
+ * @param bool|null $showall
+ * @return array
+ * @throws coding_exception
+ * @throws dml_exception
+ */
 function lightboxgallery_edit_types($showall = false) {
-    $result = array();
+    $result = [];
 
     $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 
+    // phpcs:disable moodle.Commenting.TodoComment
     // TODO: Remove this once crop functionality is working.
     $disabledplugins[] = 'crop';
 
@@ -132,6 +145,17 @@ function lightboxgallery_edit_types($showall = false) {
     return $result;
 }
 
+/**
+ * Print the tags for a gallery.
+ *
+ * @param string $heading
+ * @param array $tags
+ * @param int $courseid
+ * @param int $galleryid
+ * @return void
+ * @throws \core\exception\moodle_exception
+ * @throws coding_exception
+ */
 function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     global $OUTPUT;
 
@@ -147,11 +171,11 @@ function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
          '</form>'.
          $heading.': ';
 
-    $tagarray = array();
+    $tagarray = [];
     foreach ($tags as $tag) {
-        $tagparams = array('id' => $courseid, 'gallery' => $galleryid, 'search' => stripslashes($tag->description));
+        $tagparams = ['id' => $courseid, 'gallery' => $galleryid, 'search' => stripslashes($tag->description)];
         $tagurl = new moodle_url('/mod/lightboxgallery/search.php', $tagparams);
-        $tagarray[] = html_writer::link($tagurl, s($tag->description), array('class' => 'taglink'));
+        $tagarray[] = html_writer::link($tagurl, s($tag->description), ['class' => 'taglink']);
     }
 
     echo implode(', ', $tagarray);
@@ -159,10 +183,26 @@ function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     echo $OUTPUT->box_end();
 }
 
+/**
+ * Get the list of resize options.
+ *
+ * @return string[]
+ */
 function lightboxgallery_resize_options() {
-    return array(1 => '1280x1024', 2 => '1024x768', 3 => '800x600', 4 => '640x480');
+    return [1 => '1280x1024', 2 => '1024x768', 3 => '800x600', 4 => '640x480'];
 }
 
+/**
+ * Get the list of thumbnail sizes.
+ *
+ * @param int $courseid
+ * @param stdClass $gallery
+ * @param stdClass|null $newimage
+ * @return string
+ * @throws coding_exception
+ * @throws file_exception
+ * @throws stored_file_creation_exception
+ */
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
     global $CFG;
 
@@ -181,7 +221,7 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     if (is_object($storedfile) && is_null($newimage)) {
         // Grab the index.
         $index = $storedfile;
-    } else if (!is_null($newimage) or $files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images')) {
+    } else if (!is_null($newimage) || $files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images')) {
         // Get first image and create an index for that.
         if (is_null($newimage)) {
             $file = array_shift($files);
@@ -200,7 +240,7 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
             'filearea'  => 'gallery_index',
             'itemid'    => 0,
             'filepath'  => '/',
-            'filename'  => 'index.png'
+            'filename'  => 'index.png',
         ];
         $index = $fs->create_file_from_pathname($fileinfo, $CFG->dirroot . '/mod/lightboxgallery/pix/index.png');
     }
@@ -215,14 +255,26 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
  * File browsing support class
  */
 class lightboxgallery_content_file_info extends file_info_stored {
+
+    /**
+     * Get the parent file.
+     *
+     * @return file_info|null
+     */
     public function get_parent() {
-        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+        if ($this->lf->get_filepath() === '/' && $this->lf->get_filename() === '.') {
             return $this->browser->get_file_info($this->context);
         }
         return parent::get_parent();
     }
+
+    /**
+     * Get the name of the file.
+     *
+     * @return string
+     */
     public function get_visible_name() {
-        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+        if ($this->lf->get_filepath() === '/' && $this->lf->get_filename() === '.') {
             return $this->topvisiblename;
         }
         return parent::get_visible_name();

@@ -24,8 +24,6 @@
 
 namespace mod_lightboxgallery\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_lightboxgallery gallery searched event class.
  *
@@ -80,7 +78,7 @@ class gallery_searched extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/lightboxgallery/search.php',
-            array('id' => $this->courseid, 'gallery' => $this->other['lightboxgalleryid'], 'search' => $this->other['searchterm']));
+            ['id' => $this->courseid, 'gallery' => $this->other['lightboxgalleryid'], 'search' => $this->other['searchterm']]);
     }
 
     /**
@@ -100,6 +98,11 @@ class gallery_searched extends \core\event\base {
         }
     }
 
+    /**
+     * Get objectid mapping.
+     *
+     * @return array
+     */
     public static function get_other_mapping() {
         return [];
     }
