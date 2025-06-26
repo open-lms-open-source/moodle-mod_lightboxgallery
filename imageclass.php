@@ -217,9 +217,11 @@ class lightboxgallery_image {
         return $fileinfo['filename'];
     }
 
-    private function get_editing_options() {
-        global $CFG;
-
+    /**
+     * Get the list of editing options allowed for this image.
+     * Not all editing types are supported for all image formats.
+     */
+    public function get_editing_options() {
         $options = [
             'caption',
             'delete',
@@ -237,6 +239,14 @@ class lightboxgallery_image {
                 'tag',
             ];
         }
+
+        return $options;
+    }
+
+    private function get_editing_options_form() {
+        global $CFG;
+
+        $options = $this->get_editing_options();
 
         $html = '<form action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php" method="post"/>'.
                     '<input type="hidden" name="id" value="'.$this->cmid.'" />'.
@@ -305,7 +315,7 @@ class lightboxgallery_image {
         }
         $html .= $this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">'.$timemodified.
                  '<br/>'.$filesize.'KB '.$this->width.'x'.$this->height.'px</div>' : '';
-        $html .= ($editing ? $this->get_editing_options() : '');
+        $html .= ($editing ? $this->get_editing_options_form() : '');
         $html .= '</div>'.
                     '</div>'.
                 '</div>';

@@ -53,7 +53,13 @@ $PAGE->set_heading($course->shortname);
 $buttonurl = new moodle_url('/mod/lightboxgallery/view.php', array('id' => $id, 'editing' => 1, 'page' => $page));
 $PAGE->set_button($OUTPUT->single_button($buttonurl, get_string('backtogallery', 'lightboxgallery')));
 
-$edittypes = lightboxgallery_edit_types();
+$fs = get_file_storage();
+if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
+    throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
+}
+$imageclass = new lightboxgallery_image($storedfile, $gallery, $cm);
+
+$edittypes = lightboxgallery_edit_types(false, $imageclass);
 
 $tabs = array();
 foreach ($edittypes as $type => $name) {
@@ -75,11 +81,6 @@ require($CFG->dirroot.'/mod/lightboxgallery/edit/'.$tab.'/'.$tab.'.class.php');
 $editclass = 'edit_'.$tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
-$fs = get_file_storage();
-if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
-    throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
-}
-
 if ($editinstance->processing() && confirm_sesskey()) {
     $params = array(
         'context' => $context,
@@ -98,8 +99,6 @@ if ($editinstance->processing() && confirm_sesskey()) {
     redirect($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php?id='.$cm->id.'&image='.$editinstance->image.'&tab='.$tab);
 }
 
-$image = new lightboxgallery_image($storedfile, $gallery, $cm);
-
 $table = new html_table();
 $table->width = '*';
 
@@ -107,13 +106,13 @@ if ($editinstance->showthumb) {
     $table->attributes = array('style' => 'margin-left:auto;margin-right:auto;');
     $table->align = array('center', 'center');
     $table->size = array('*', '*');
-    $table->data[] = array('<img src="'.$image->get_thumbnail_url().
-                            '" alt="" /><br /><span title="'.$image->get_image_caption().'">'.
-                            $image->get_image_caption().'</span>', $editinstance->output($image->get_image_caption()));
+    $table->data[] = array('<img src="'.$imageclass->get_thumbnail_url().
+                            '" alt="" /><br /><span title="'.$imageclass->get_image_caption().'">'.
+                            $imageclass->get_image_caption().'</span>', $editinstance->output($imageclass->get_image_caption()));
 } else {
     $table->align = array('center');
     $table->size = array('*');
-    $table->data[] = array($editinstance->output($image->get_image_caption()));
+    $table->data[] = array($editinstance->output($imageclass->get_image_caption()));
 }
 
 echo $OUTPUT->header();
