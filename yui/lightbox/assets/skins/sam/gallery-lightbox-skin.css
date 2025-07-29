@@ -47,8 +47,8 @@
 }
 #prevLink { left: 0; float: left; }
 #nextLink { right: 0; float: right; }
-#prevLink:hover, #prevLink:visited:hover { background: url(prevlabel.gif) left 15% no-repeat; }
-#nextLink:hover, #nextLink:visited:hover { background: url(nextlabel.gif) right 15% no-repeat; }
+#prevLink:hover, #prevLink:visited:hover { background: url(prevlabel.svg) left 15% no-repeat; }
+#nextLink:hover, #nextLink:visited:hover { background: url(nextlabel.svg) right 15% no-repeat; }
 
 #imageDataContainer {
 	font: 10px Verdana, Helvetica, sans-serif;
@@ -60,13 +60,13 @@
 }
 
 #imageData { padding:0 10px; color: #666; }
-#imageData #imageDetails { width: 70%; float: left; text-align: left; }	
+#imageData #imageDetails { width: 70%; float: left; text-align: left; }
 #imageData #caption { font-weight: bold; }
-#imageData #numberDisplay { display: block; clear: left; padding-bottom: 1.0em; }			
+#imageData #numberDisplay { display: block; clear: left; padding-bottom: 1.0em; }
 #imageData #bottomNavClose {
 	width: 66px;
 	height:22px;
-	background: url(closelabel.gif) no-repeat;
+	background: url(closelabel.svg) no-repeat;
 	float: right;
 	padding-bottom: 0.7em;
 	outline: none;
