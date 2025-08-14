@@ -19,13 +19,11 @@
  *
  * @package    mod_lightboxgallery
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_lightboxgallery\event;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_lightboxgallery viewed event class.
@@ -39,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package    mod_lightboxgallery
  * @since      Moodle 2.7
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
@@ -61,14 +59,14 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lightboxgallery/view.php', array('l' => $this->objectid));
+        return new \moodle_url('/mod/lightboxgallery/view.php', ['l' => $this->objectid]);
     }
 
     /**
      * Get objectid mapping
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'lightboxgallery', 'restore' => 'lightboxgallery');
+        return ['db' => 'lightboxgallery', 'restore' => 'lightboxgallery'];
     }
 
 }

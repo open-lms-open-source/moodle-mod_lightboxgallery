@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * This file keeps track of upgrades to the lightboxgallery module
  *
@@ -30,16 +29,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * xmldb_lightboxgallery_upgrade
  *
  * @param int $oldversion
  * @return bool
  */
-
-function xmldb_lightboxgallery_upgrade($oldversion=0) {
+function xmldb_lightboxgallery_upgrade($oldversion = 0) {
 
     global $DB;
 
@@ -79,10 +75,10 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
             $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
             $table->addField($field);
 
-            $key = new xmldb_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $key = new xmldb_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->addKey($key);
 
-            $table->add_index('gallery', XMLDB_INDEX_NOTUNIQUE, array('gallery'));
+            $table->add_index('gallery', XMLDB_INDEX_NOTUNIQUE, ['gallery']);
 
             $dbman->create_table($table);
         }
@@ -114,10 +110,10 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
             $field = new xmldb_field('caption', XMLDB_TYPE_TEXT, 'small', null, XMLDB_NOTNULL, null, null);
             $table->addField($field);
 
-            $key = new xmldb_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $key = new xmldb_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->addKey($key);
 
-            $table->add_index('gallery', XMLDB_INDEX_NOTUNIQUE, array('gallery'));
+            $table->add_index('gallery', XMLDB_INDEX_NOTUNIQUE, ['gallery']);
 
             $dbman->create_table($table);
         }
@@ -128,7 +124,7 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
         $table = new xmldb_table('lightboxgallery');
 
         // Insert public, rss, autoresize, resize fields into lightboxgallery.
-        $newfields = array('public', 'rss', 'autoresize', 'resize');
+        $newfields = ['public', 'rss', 'autoresize', 'resize'];
         $previousfield = 'comments';
         foreach ($newfields as $newfield) {
             $field = new xmldb_field($newfield, XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', $previousfield);
@@ -155,7 +151,7 @@ function xmldb_lightboxgallery_upgrade($oldversion=0) {
         }
 
         $field = new xmldb_field('metatype',
-                                 XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, array('caption', 'tag'), 'caption', 'image');
+                                 XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, ['caption', 'tag'], 'caption', 'image');
         if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

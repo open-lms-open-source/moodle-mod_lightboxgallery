@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * German strings for the lightboxgallery module
  * German strings translated by Ralf Krause, moodleSCHULE e.V.
@@ -32,6 +31,9 @@ $string['addimage'] = 'Bilder hinzufügen';
 $string['addimage_help'] = 'Wählen Sie ein Bild auf Ihrem Computer aus, das Sie zur aktuellen Galerie hinzufügen möchten.
 
 Sie können mehrere Bilder gemeinsam in ein ZIP-Archiv packen und dann hochladen. Die Bilder werden automatisch im Galerieverzeichnis ausgepackt.';
+$string['allowcomments'] = 'Kommentare';
+$string['allowrss'] = 'RSS Feeds';
+$string['allpluginsdisabled'] = 'Alle Bearbeitungswerkzeuge sind deaktiviert.';
 $string['autoresize'] = 'Größe automatisch';
 $string['autoresize_help'] = 'Sie können bestimmen, ob und wie Bilder in ihrer Größe verändert werden. Folgende Optionen sind möglich:
 
@@ -39,9 +41,6 @@ $string['autoresize_help'] = 'Sie können bestimmen, ob und wie Bilder in ihrer 
 * Hochladen: Bilder werden beim Hochladen über die Option \'Bilder hinzufügen\' auf die angegebene Größe angepasst und dann gespeichert.
 
 Zusätzlich ist eine Option zur manuellen Größenänderung in der Bildbearbeitung vorhanden.';
-$string['allowcomments'] = 'Kommentare';
-$string['allowrss'] = 'RSS Feeds';
-$string['allpluginsdisabled'] = 'Alle Bearbeitungswerkzeuge sind deaktiviert.';
 $string['backtogallery'] = 'Zurück zur Galerie';
 $string['captionfull'] = 'Titeltext zeigen';
 $string['captionpos'] = 'Titelposition';
@@ -60,14 +59,13 @@ $string['configstrictfilenames'] = 'Strenge Dateinamen verwenden';
 $string['configstrictfilenamesdesc'] = 'Force image editor to clean file names according to Moodle naming rules.';
 $string['currentsize'] = 'Aktuelle Größe';
 $string['dimensions'] = 'Größe';
-$string['dirup'] = 'Hoch';
 $string['dirdown'] = 'Runter';
 $string['dirleft'] = 'Links';
 $string['dirright'] = 'Rechts';
+$string['dirup'] = 'Hoch';
 $string['displayinggallery'] = 'Bilder der Galerie: {$a}';
-$string['editimage'] = 'Bild bearbeiten';
-$string['edit_choose'] = 'Auswahl...';
 $string['edit_caption'] = 'Titel';
+$string['edit_choose'] = 'Auswahl...';
 $string['edit_crop'] = 'Beschneiden';
 $string['edit_delete'] = 'Löschen';
 $string['edit_flip'] = 'Spiegeln';
@@ -76,6 +74,7 @@ $string['edit_resizescale'] = 'Darstellung';
 $string['edit_rotate'] = 'Drehen';
 $string['edit_tag'] = 'Schlagworte';
 $string['edit_thumbnail'] = 'Vorschau';
+$string['editimage'] = 'Bild bearbeiten';
 $string['errornofile'] = 'Das angeforderte Bild wurde nicht gefunden: {$a}';
 $string['errornoimages'] = 'Keine Bilder in der Galerie gefunden';
 $string['errornosearchresults'] = 'Bei der Suche wurden keine Bilder gefunden';
@@ -107,15 +106,15 @@ $string['modulename_help'] = 'Das Modul \'Lightbox Galerie\' erlaubt die Präsen
 Trainer/innen können eine Lightbox Galerie innerhalb ihres Kurses angelegen, bearbeiten und löschen. Bilder können einzeln und als ZIP-Datei hochgeladen werden. Beim Hinzufügen werden automatisch Miniaturbilder erzeugt und in einer Vorschau verwendet. Mit einem Klick auf ein Minaturbild in der Vorschau erscheint dieses Bild in vergrößerter Darstellung. Von hieraus ist es möglich, innerhalb der Galerie bildweise vorwärts und rückwärts zu blättern. Die Lightbox Skripte zeigen schöne Überblendeffekte beim Öffnen und Blättern.
 
 Nutzer/innen können Kommentare in der Galerie schreiben, wenn die entsprechende Option aktiviert ist.';
+$string['modulenameadd'] = 'Lightbox Galerie';
 $string['modulenameplural'] = 'Lightbox Galerien';
 $string['modulenameshort'] = 'Galerie';
-$string['modulenameadd'] = 'Lightbox Galerie';
 $string['newgallerycomments'] = 'Neue Kommentare';
 $string['norssfeedavailable'] = 'Kein RSS Feed verfügbar';
-$string['position_bottom'] = 'Unten';
-$string['position_top'] = 'Oben';
 $string['pluginadministration'] = 'Lightbox Administration';
 $string['pluginname'] = 'Lightbox Galerie';
+$string['position_bottom'] = 'Unten';
+$string['position_top'] = 'Oben';
 $string['resizeto'] = 'Größe ändern auf';
 $string['rsssubscribe'] = 'Galerie RSS Feed';
 $string['saveimage'] = '{$a} sichern';

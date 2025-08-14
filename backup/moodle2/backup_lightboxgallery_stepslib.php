@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * This file defines all the restore steps that will be used by the lightboxgallery
+ *
+ * @package mod_lightboxgallery
  * @subpackage backup-moodle2
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the backup steps that will be used by the backup_lightboxgallery_activity_task
@@ -32,27 +32,34 @@ defined('MOODLE_INTERNAL') || die();
  */
 class backup_lightboxgallery_activity_structure_step extends backup_activity_structure_step {
 
+    /**
+     * Define the backup structure for this activity
+     *
+     * @return backup_nested_element
+     * @throws base_element_struct_exception
+     * @throws base_step_exception
+     */
     protected function define_structure() {
 
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $lightboxgallery = new backup_nested_element('lightboxgallery', array('id'), array(
+        $lightboxgallery = new backup_nested_element('lightboxgallery', ['id'], [
             'course', 'name', 'perpage', 'comments', 'extinfo',
             'timemodified', 'ispublic', 'rss', 'autoresize', 'resize', 'perrow',
-            'captionfull', 'captionpos', 'intro', 'introformat'
-        ));
+            'captionfull', 'captionpos', 'intro', 'introformat',
+        ]);
 
         $comments = new backup_nested_element('usercomments');
-        $comment = new backup_nested_element('comment', array('id'), array(
-            'gallery', 'userid', 'commenttext', 'timemodified'
-        ));
+        $comment = new backup_nested_element('comment', ['id'], [
+            'gallery', 'userid', 'commenttext', 'timemodified',
+        ]);
 
         $imagemetas = new backup_nested_element('image_metas');
-        $imagemeta = new backup_nested_element('image_meta', array('id'), array(
-            'gallery', 'image', 'description', 'metatype'
-        ));
+        $imagemeta = new backup_nested_element('image_meta', ['id'], [
+            'gallery', 'image', 'description', 'metatype',
+        ]);
 
         // Build the tree.
 
@@ -62,12 +69,12 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
         $imagemetas->add_child($imagemeta);
 
         // Define sources.
-        $lightboxgallery->set_source_table('lightboxgallery', array('id' => backup::VAR_ACTIVITYID));
-        $imagemeta->set_source_table('lightboxgallery_image_meta', array('gallery' => backup::VAR_PARENTID));
+        $lightboxgallery->set_source_table('lightboxgallery', ['id' => backup::VAR_ACTIVITYID]);
+        $imagemeta->set_source_table('lightboxgallery_image_meta', ['gallery' => backup::VAR_PARENTID]);
 
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
-            $comment->set_source_table('lightboxgallery_comments', array('gallery' => backup::VAR_PARENTID));
+            $comment->set_source_table('lightboxgallery_comments', ['gallery' => backup::VAR_PARENTID]);
         }
 
         // Define file annotations.

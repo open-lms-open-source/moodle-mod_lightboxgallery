@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Form for adding comments on a gallery
  *
@@ -27,8 +26,17 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * Form for adding comments on a gallery
+ */
 class mod_lightboxgallery_comment_form extends moodleform {
 
+    /**
+     * Form definition
+     *
+     * @return void
+     * @throws coding_exception
+     */
     public function definition() {
 
         $mform =& $this->_form;
@@ -36,7 +44,7 @@ class mod_lightboxgallery_comment_form extends moodleform {
 
         $straddcomment = get_string('addcomment', 'lightboxgallery');
 
-        $mform->addElement('editor', 'comment', $straddcomment, array('cols' => 85, 'rows' => 18));
+        $mform->addElement('editor', 'comment', $straddcomment, ['cols' => 85, 'rows' => 18]);
         $mform->addRule('comment', get_string('required'), 'required', null, 'client');
         $mform->setType('comment', PARAM_RAW);
 

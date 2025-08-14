@@ -24,8 +24,6 @@
 
 namespace mod_lightboxgallery\search;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Search area for mod_lightboxgallery activities.
  *

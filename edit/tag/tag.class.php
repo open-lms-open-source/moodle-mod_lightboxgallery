@@ -14,14 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * The tag plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_tag extends edit_base {
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     */
     public function __construct($gallery, $cm, $image, $tab) {
         parent::__construct($gallery, $cm, $image, $tab, true);
     }
 
+    /**
+     * Output the form.
+     *
+     * @return string
+     * @throws \core\exception\moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function output() {
         global $OUTPUT;
 
@@ -55,7 +76,7 @@ class edit_tag extends edit_base {
             }
         }
 
-        $iptcaddurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php', array('id' => $this->gallery->id));
+        $iptcaddurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $this->gallery->id]);
         $iptcform .= $OUTPUT->single_button($iptcaddurl, get_string('tagsimport', 'lightboxgallery'));
 
         if ($tags = $this->lbgimage->get_tags()) {
@@ -72,13 +93,20 @@ class edit_tag extends edit_base {
         return $manualform . $iptcform . $deleteform;
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function process_form() {
         $tag = optional_param('tag', '', PARAM_TAG);
 
         if ($tag) {
             $this->lbgimage->add_tag($tag);
         } else if (optional_param('delete', 0, PARAM_INT)) {
-            if ($deletes = optional_param_array('deletetags', array(), PARAM_RAW)) {
+            if ($deletes = optional_param_array('deletetags', [], PARAM_RAW)) {
                 foreach ($deletes as $delete) {
                     $this->lbgimage->delete_tag(clean_param($delete, PARAM_INT));
                 }

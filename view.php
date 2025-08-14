@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Prints a particular instance of lightboxgallery
  *
@@ -40,11 +39,11 @@ $search  = optional_param('search', '', PARAM_TEXT);
 
 if ($id) {
     list($course, $cm) = get_course_and_cm_from_cmid($id, 'lightboxgallery');
-    if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $cm->instance))) {
+    if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance])) {
         throw new \moodle_exception('invalidcoursemodule');
     }
 } else {
-    if (!$gallery = $DB->get_record('lightboxgallery', array('id' => $l))) {
+    if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $l])) {
         throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
     }
     list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
@@ -66,16 +65,16 @@ if ($editing) {
     require_capability('mod/lightboxgallery:edit', $context);
 }
 
-if (empty($cm->visible) and !has_capability('moodle/course:viewhiddenactivities', $context)) {
+if (empty($cm->visible) && !has_capability('moodle/course:viewhiddenactivities', $context)) {
     notice(get_string("activityiscurrentlyhidden"));
 }
 
 lightboxgallery_config_defaults();
 
-$params = array(
+$params = [
     'context' => $context,
-    'objectid' => $gallery->id
-);
+    'objectid' => $gallery->id,
+];
 $event = \mod_lightboxgallery\event\course_module_viewed::create($params);
 $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('course', $course);
@@ -87,7 +86,7 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
@@ -142,20 +141,20 @@ if (!$editing && $showtags) {
           GROUP BY $desccompare
           ORDER BY COUNT($desccompare) DESC,
                    $desccompare ASC";
-    if ($tags = $DB->get_records_sql($sql, array(), 0, 10)) {
+    if ($tags = $DB->get_records_sql($sql, [], 0, 10)) {
         lightboxgallery_print_tags(get_string('tagspopular', 'lightboxgallery'), $tags, $course->id, $gallery->id);
     }
 }
 
-$options = array();
+$options = [];
 
 if (has_capability('mod/lightboxgallery:addimage', $context)) {
-    $opturl = new moodle_url('/mod/lightboxgallery/imageadd.php', array('id' => $cm->id));
+    $opturl = new moodle_url('/mod/lightboxgallery/imageadd.php', ['id' => $cm->id]);
     $options[] = html_writer::link($opturl, get_string('addimage', 'lightboxgallery'), ['class' => 'btn btn-primary']);
 }
 
 if ($gallery->comments && has_capability('mod/lightboxgallery:addcomment', $context)) {
-    $opturl = new moodle_url('/mod/lightboxgallery/comment.php', array('id' => $gallery->id));
+    $opturl = new moodle_url('/mod/lightboxgallery/comment.php', ['id' => $gallery->id]);
     $options[] = html_writer::link($opturl, get_string('addcomment', 'lightboxgallery'));
 }
 
@@ -164,7 +163,7 @@ if (count($options) > 0) {
 }
 
 if (!$editing && $gallery->comments && has_capability('mod/lightboxgallery:viewcomments', $context)) {
-    if ($comments = $DB->get_records('lightboxgallery_comments', array('gallery' => $gallery->id), 'timemodified ASC')) {
+    if ($comments = $DB->get_records('lightboxgallery_comments', ['gallery' => $gallery->id], 'timemodified ASC')) {
         foreach ($comments as $comment) {
             lightboxgallery_print_comment($comment, $context);
         }

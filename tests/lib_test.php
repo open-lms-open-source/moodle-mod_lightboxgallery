@@ -18,11 +18,12 @@
  * Unit tests for (some of) mod/lightboxgallery/lib.php.
  *
  * @package    mod_lightboxgallery
- * @author     Adam Olley <adam.olley@openlms.net>
+ * @copyright  Adam Olley <adam.olley@openlms.net>
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_lightboxgallery;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,13 +37,25 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class mod_lightboxgallery_lib_test extends advanced_testcase {
-    public function test_lightboxgallery_resize_text() {
+final class lib_test extends \advanced_testcase {
+    /**
+     * Test lightboxgallery_get_edit_types.
+     *
+     * @covers \lightboxgallery_resize_text
+     * @return void
+     */
+    public function test_lightboxgallery_resize_text(): void {
         $this->assertEquals('test123', lightboxgallery_resize_text('test123', 10));
         $this->assertEquals('test123456...', lightboxgallery_resize_text('test1234567', 10));
     }
 
-    public function test_lightboxgallery_edit_types() {
+    /**
+     * Test lightboxgallery_get_edit_types.
+     *
+     * @covers \lightboxgallery_edit_types
+     * @return void
+     */
+    public function test_lightboxgallery_edit_types(): void {
         $this->resetAfterTest();
 
         $types = ['caption', 'crop', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'];

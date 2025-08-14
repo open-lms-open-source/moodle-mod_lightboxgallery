@@ -18,12 +18,33 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/gdlib.php');
 
+/**
+ * The crop plugin class.
+ *
+ * @package   mod_lightboxgallery
+ * @copyright 2010 John Kelsh
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_crop extends edit_base {
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $gallery
+     * @param context_module $cm
+     * @param stdClass $image
+     * @param stdClass $tab
+     */
     public function __construct($gallery, $cm, $image, $tab) {
         parent::__construct($gallery, $cm, $image, $tab, true, false);
     }
 
+    /**
+     * Output the form.
+     *
+     * @return string|void
+     * @throws coding_exception
+     */
     public function output() {
 
         $result = '<script type="text/javascript" charset="utf-8">
@@ -66,6 +87,12 @@ class edit_crop extends edit_base {
         return $this->enclose_in_form($result);
     }
 
+    /**
+     * Process the form submission.
+     *
+     * @return void
+     * @throws coding_exception
+     */
     public function process_form() {
         $x1 = required_param('x1', PARAM_INT);
         $y1 = required_param('y1', PARAM_INT);
