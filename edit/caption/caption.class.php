@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_caption extends edit_base {
-
     /**
      * Constructor.
      *
@@ -43,8 +42,8 @@ class edit_caption extends edit_base {
      * @throws coding_exception
      */
     public function output($captiontext = '') {
-        $result = '<textarea name="caption" class="form-control" cols="24" rows="4">'.$captiontext.'</textarea><br /><br />'.
-                  '<input type="submit" class="btn btn-secondary"  value="'.get_string('update').'" />';
+        $result = '<textarea name="caption" class="form-control" cols="24" rows="4">' . $captiontext . '</textarea><br /><br />' .
+                  '<input type="submit" class="btn btn-secondary"  value="' . get_string('update') . '" />';
         return $this->enclose_in_form($result);
     }
 
@@ -59,5 +58,4 @@ class edit_caption extends edit_base {
         $caption = required_param('caption', PARAM_NOTAGS);
         $this->lbgimage->set_caption($caption);
     }
-
 }

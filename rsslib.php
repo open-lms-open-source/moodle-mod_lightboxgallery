@@ -61,7 +61,7 @@ function lightboxgallery_rss_get_feed($context, $args) {
     $gallery = $DB->get_record('lightboxgallery', ['id' => $galleryid], '*', MUST_EXIST);
 
     $captions = [];
-    if ($cobjs = $DB->get_records('lightboxgallery_image_meta',  ['metatype' => 'caption', 'gallery' => $gallery->id])) {
+    if ($cobjs = $DB->get_records('lightboxgallery_image_meta', ['metatype' => 'caption', 'gallery' => $gallery->id])) {
         foreach ($cobjs as $cobj) {
             $captions[$cobj->image] = $cobj->description;
         }
@@ -78,6 +78,7 @@ function lightboxgallery_rss_get_feed($context, $args) {
         if ($filename == '.') {
             continue;
         }
+
         $description = isset($captions[$filename]) ? $captions[$filename] : $filename;
         $image = new lightboxgallery_image($file, $gallery, $cm);
         $item = new stdClass();
@@ -90,11 +91,15 @@ function lightboxgallery_rss_get_feed($context, $args) {
 
         $articles .= rss_full_tag('media:description', 3, false, $description);
         $articles .= rss_full_tag('media:thumbnail', 3, false, '', ['url' => $image->get_thumbnail_url()]);
-        $articles .= rss_full_tag('media:content', 3, false, '',
-                        ['url' => $image->get_image_url(), 'type' => $file->get_mimetype()]);
+        $articles .= rss_full_tag(
+            'media:content',
+            3,
+            false,
+            '',
+            ['url' => $image->get_image_url(), 'type' => $file->get_mimetype()]
+        );
 
         $articles .= rss_end_tag('item', 2, true);
-
     }
 
     // Get the cache file info.
@@ -108,17 +113,20 @@ function lightboxgallery_rss_get_feed($context, $args) {
     }
 
     // First all rss feeds common headers.
-    $header = lightboxgallery_rss_header(format_string($gallery->name, true),
-                                  $CFG->wwwroot."/mod/lightboxgallery/view.php?id=".$cm->id,
-                                  format_string($gallery->intro, true));
+    $header = lightboxgallery_rss_header(
+        format_string($gallery->name, true),
+        $CFG->wwwroot . "/mod/lightboxgallery/view.php?id=" . $cm->id,
+        format_string($gallery->intro, true)
+    );
 
     // Now all rss feeds common footers.
     if (!empty($header) && !empty($articles)) {
         $footer = rss_standard_footer();
     }
+
     // Now, if everything is ok, concatenate it.
     if (!empty($header) && !empty($articles) && !empty($footer)) {
-        $rss = $header.$articles.$footer;
+        $rss = $header . $articles . $footer;
 
         // Save the XML contents to file.
         $status = rss_save_file('mod_lightboxgallery', $filename, $rss);
@@ -150,7 +158,6 @@ function lightboxgallery_rss_feeds() {
         if ($galleries = $DB->get_records('lightboxgallery')) {
             foreach ($galleries as $gallery) {
                 if ($gallery->rss && $status) {
-
                     $filename = rss_file_name('lightboxgallery', $gallery);
 
                     if (file_exists($filename)) {
@@ -165,6 +172,7 @@ function lightboxgallery_rss_feeds() {
                         if (file_exists($filename)) {
                             @unlink($filename);
                         }
+
                         continue;
                     }
 
@@ -187,7 +195,6 @@ function lightboxgallery_rss_feeds() {
                             }
                         }
                     }
-
                 }
             }
         }
@@ -203,7 +210,7 @@ function lightboxgallery_rss_feeds() {
  * @param int $time
  * @return string
  */
-function lightboxgallery_rss_get_sql($glossary, $time=0) {
+function lightboxgallery_rss_get_sql($glossary, $time = 0) {
     // Do we only want new items?
     if ($time) {
         $time = "AND e.timecreated > $time";
@@ -234,21 +241,22 @@ function lightboxgallery_rss_header($title = null, $link = null, $description = 
     $site = get_site();
 
     if ($status) {
-
         // Calculate title, link and description.
         if (empty($title)) {
             $title = format_string($site->fullname);
         }
+
         if (empty($link)) {
             $link = $CFG->wwwroot;
         }
+
         if (empty($description)) {
             $description = $site->summary;
         }
 
         // XML headers.
         $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss\"".
+        $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss\"" .
                     "xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
 
         // Open the channel.
@@ -262,8 +270,9 @@ function lightboxgallery_rss_header($title = null, $link = null, $description = 
         if (!empty($USER->lang)) {
             $result .= rss_full_tag('language', 2, false, substr($USER->lang, 0, 2));
         }
+
         $today = getdate();
-        $result .= rss_full_tag('copyright', 2, false, '&#169; '. $today['year'] .' '. format_string($site->fullname));
+        $result .= rss_full_tag('copyright', 2, false, '&#169; ' . $today['year'] . ' ' . format_string($site->fullname));
 
         // Write image info.
         $rsspix = $OUTPUT->image_url('i/rsssitelogo');

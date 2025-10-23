@@ -24,15 +24,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 /* Disabled Plugins */
 
 $options = lightboxgallery_edit_types(true);
 
-$disableplugins = new admin_setting_configmulticheckbox('disabledplugins',
+$disableplugins = new admin_setting_configmulticheckbox(
+    'disabledplugins',
     new lang_string('configdisabledplugins', 'lightboxgallery'),
-    new lang_string('configdisabledpluginsdesc', 'lightboxgallery'), [], $options);
+    new lang_string('configdisabledpluginsdesc', 'lightboxgallery'),
+    [],
+    $options
+);
 $disableplugins->plugin = 'lightboxgallery';
 $settings->add($disableplugins);
 
@@ -44,8 +48,11 @@ if (empty($CFG->enablerssfeeds)) {
     $description .= ' (' . get_string('configenablerssfeedsdisabled2', 'admin') . ')';
 }
 
-$enablerss = new admin_setting_configcheckbox('enablerssfeeds',
+$enablerss = new admin_setting_configcheckbox(
+    'enablerssfeeds',
     new lang_string('configenablerssfeeds', 'lightboxgallery'),
-    $description, 0);
+    $description,
+    0
+);
 $enablerss->plugin = 'lightboxgallery';
 $settings->add($enablerss);

@@ -24,13 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Form for adding comments on a gallery
  */
 class mod_lightboxgallery_comment_form extends moodleform {
-
     /**
      * Form definition
      *
@@ -53,6 +52,5 @@ class mod_lightboxgallery_comment_form extends moodleform {
         $mform->setType('id', PARAM_INT);
 
         $this->add_action_buttons(true, $straddcomment);
-
     }
 }
