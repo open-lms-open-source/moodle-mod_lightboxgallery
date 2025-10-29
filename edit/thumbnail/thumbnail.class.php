@@ -23,8 +23,14 @@ class edit_thumbnail extends edit_base {
     }
 
     public function output() {
+        global $OUTPUT;
+
+        $url = new moodle_url('/mod/lightboxgallery/index.php', ['id' => $this->gallery->course]);
+        $helpbutton = $OUTPUT->help_icon('setasindex', 'lightboxgallery', true, $url);
         $result = '<input type="submit" class="btn btn-secondary" name="index" value="' .
-            get_string('setasindex', 'lightboxgallery') . '" /><br /><br />' .
+            get_string('setasindex', 'lightboxgallery') . '" />'.$helpbutton;
+
+        $result .= '<br /><br />' .
             get_string('selectthumbpos', 'lightboxgallery') . '<br /><br />';
 
         if ($this->lbgimage->width < $this->lbgimage->height) {

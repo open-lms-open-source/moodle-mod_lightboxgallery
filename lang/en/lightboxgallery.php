@@ -139,6 +139,7 @@ $string['selectflipmode'] = 'Select flip mode';
 $string['selectrotation'] = 'Select rotation angle';
 $string['selectthumbpos'] = 'Thumbnail offset (from centre)';
 $string['setasindex'] = 'Set as index image';
+$string['setasindex_help'] = 'Selecting this sets this image as the primary image shown on the <a href="{$a}">list of lightbox galleries</a> in this course.';
 $string['showall'] = 'Show all';
 $string['sortby'] = 'Sort by';
 $string['sortby_help'] = 'How to sort the order the images are displayed in.';

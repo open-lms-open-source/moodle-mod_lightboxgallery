@@ -207,8 +207,15 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
         ];
         $index = $fs->create_file_from_pathname($fileinfo, $CFG->dirroot . '/mod/lightboxgallery/pix/index.png');
     }
-    $path = $CFG->wwwroot.'/pluginfile.php/'.$context->id.'/mod_lightboxgallery/gallery_index/'.
-                $index->get_itemid().$index->get_filepath().$index->get_filename();
+
+    $path = moodle_url::make_pluginfile_url($context->id,
+        'mod_lightboxgallery',
+        'gallery_index',
+        $index->get_itemid(),
+        $index->get_filepath(),
+        $index->get_filename(),
+    );
+    $path->param('mtime', $index->get_timemodified());
 
     return '<img src="' . $path . '" alt="" ' . (! empty($imageid) ? 'id="' . $imageid . '"' : '' )  . ' />';
 }
