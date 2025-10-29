@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use core\output\tabobject;
-
 /**
  * Image editing page
  *
@@ -24,10 +22,12 @@ use core\output\tabobject;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/edit/base.class.php');
-require_once(dirname(__FILE__).'/imageclass.php');
+use core\output\tabobject;
+
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(__FILE__) . '/edit/base.class.php');
+require_once(dirname(__FILE__) . '/imageclass.php');
 
 global $DB;
 
@@ -57,14 +57,17 @@ $fs = get_file_storage();
 if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
     throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
 }
+
 $imageclass = new lightboxgallery_image($storedfile, $gallery, $cm);
 
 $edittypes = lightboxgallery_edit_types(false, $imageclass);
 
 $tabs = [];
 foreach ($edittypes as $type => $name) {
-    $editurl = new moodle_url('/mod/lightboxgallery/imageedit.php',
-                                ['id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type]);
+    $editurl = new moodle_url(
+        '/mod/lightboxgallery/imageedit.php',
+        ['id' => $cm->id, 'image' => $image, 'page' => $page, 'tab' => $type]
+    );
     $tabs[] = new tabobject($type, $editurl, $name);
 }
 
@@ -77,8 +80,8 @@ if (!in_array($tab, array_keys($edittypes))) {
     }
 }
 
-require($CFG->dirroot.'/mod/lightboxgallery/edit/'.$tab.'/'.$tab.'.class.php');
-$editclass = 'edit_'.$tab;
+require($CFG->dirroot . '/mod/lightboxgallery/edit/' . $tab . '/' . $tab . '.class.php');
+$editclass = 'edit_' . $tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
 if ($editinstance->processing() && confirm_sesskey()) {
@@ -96,7 +99,8 @@ if ($editinstance->processing() && confirm_sesskey()) {
     $event->trigger();
 
     $editinstance->process_form();
-    redirect($CFG->wwwroot.'/mod/lightboxgallery/imageedit.php?id='.$cm->id.'&image='.$editinstance->image.'&tab='.$tab);
+    redirect($CFG->wwwroot . '/mod/lightboxgallery/imageedit.php?id=' . $cm->id . '&image=' . $editinstance->image . '&tab=' .
+        $tab);
 }
 
 $table = new html_table();
@@ -106,9 +110,9 @@ if ($editinstance->showthumb) {
     $table->attributes = ['style' => 'margin-left:auto;margin-right:auto;'];
     $table->align = ['center', 'center'];
     $table->size = ['*', '*'];
-    $table->data[] = ['<img src="'.$image->get_thumbnail_url().
-                            '" alt="" /><br /><span title="'.$image->get_image_caption().'">'.
-                            $image->get_image_caption().'</span>', $editinstance->output($image->get_image_caption()), ];
+    $table->data[] = ['<img src="' . $image->get_thumbnail_url() .
+                            '" alt="" /><br /><span title="' . $image->get_image_caption() . '">' .
+                            $image->get_image_caption() . '</span>', $editinstance->output($image->get_image_caption()), ];
 } else {
     $table->align = ['center'];
     $table->size = ['*'];

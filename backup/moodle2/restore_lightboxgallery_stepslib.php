@@ -31,7 +31,6 @@
  * Structure step to restore one lightboxgallery activity
  */
 class restore_lightboxgallery_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define (add) particular settings this activity can have
      *
@@ -96,6 +95,7 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         if (isset($data->comment)) {
             $data->commenttext = $data->comment;
         }
+
         $DB->insert_record('lightboxgallery_comments', $data);
     }
 

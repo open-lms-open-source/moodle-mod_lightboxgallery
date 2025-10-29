@@ -82,6 +82,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
 
             $dbman->create_table($table);
         }
+
         upgrade_mod_savepoint(true, 2007111400, 'lightboxgallery');
     }
 
@@ -117,6 +118,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
 
             $dbman->create_table($table);
         }
+
         upgrade_mod_savepoint(true, 2007121700, 'lightboxgallery');
     }
 
@@ -150,8 +152,16 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
             $dbman->rename_field($table, $field, 'description');
         }
 
-        $field = new xmldb_field('metatype',
-                                 XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, ['caption', 'tag'], 'caption', 'image');
+        $field = new xmldb_field(
+            'metatype',
+            XMLDB_TYPE_CHAR,
+            '20',
+            null,
+            XMLDB_NOTNULL,
+            ['caption', 'tag'],
+            'caption',
+            'image'
+        );
         if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -169,6 +179,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'ispublic');
         }
+
         upgrade_mod_savepoint(true, 2009051200, 'lightboxgallery');
     }
 
@@ -188,6 +199,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
                 if (!$cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $gallery->course, false)) {
                     continue;
                 }
+
                 $context = context_module::instance($cm->id);
                 $coursecontext = context_course::instance($gallery->course);
 
@@ -195,15 +207,19 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
                 $fs = get_file_storage();
                 if ($storedfiles = $fs->get_area_files($coursecontext->id, 'course', 'legacy')) {
                     foreach ($storedfiles as $file) {
-                        $path = '/'.$gallery->folder;
+                        $path = '/' . $gallery->folder;
                         if ($gallery->folder != '') {
                             $path .= '/';
                         }
-                        if (substr($file->get_mimetype(), 0, 6) != 'image/' ||
+
+                        if (
+                            substr($file->get_mimetype(), 0, 6) != 'image/' ||
                             substr($file->get_filepath(), -8, 8) == '/_thumb/' ||
-                            $file->get_filepath() != $path) {
+                            $file->get_filepath() != $path
+                        ) {
                             continue;
                         }
+
                         // Insert as lightbox file.
                         $settings = new stdClass();
                         $settings->contextid = $context->id;
@@ -215,6 +231,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
                 }
             }
         }
+
         upgrade_mod_savepoint(true, 2011040800, 'lightboxgallery');
     }
 

@@ -23,9 +23,9 @@
  */
 
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/comment_form.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(__FILE__) . '/comment_form.php');
 
 $id      = required_param('id', PARAM_INT);
 $delete  = optional_param('delete', 0, PARAM_INT);
@@ -34,7 +34,8 @@ $confirm = optional_param('confirm', 0, PARAM_INT);
 if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $id])) {
     throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
 }
-list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
+
+[$course, $cm] = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 
 if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', ['gallery' => $gallery->id, 'id' => $delete])) {
     throw new \moodle_exception('Invalid comment ID');
@@ -49,7 +50,7 @@ $PAGE->set_heading($course->shortname);
 
 $context = context_module::instance($cm->id);
 
-$galleryurl = $CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id;
+$galleryurl = $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id;
 
 if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
     if ($confirm && confirm_sesskey()) {
@@ -61,9 +62,11 @@ if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
         echo('<br />');
         $paramsyes = ['id' => $gallery->id, 'delete' => $comment->id, 'sesskey' => sesskey(), 'confirm' => 1];
         $paramsno = ['id' => $cm->id];
-        echo $OUTPUT->confirm(get_string('commentdelete', 'lightboxgallery'),
-                              new moodle_url('/mod/lightboxgallery/comment.php', $paramsyes),
-                              new moodle_url('/mod/lightboxgallery/view.php', $paramsno));
+        echo $OUTPUT->confirm(
+            get_string('commentdelete', 'lightboxgallery'),
+            new moodle_url('/mod/lightboxgallery/comment.php', $paramsyes),
+            new moodle_url('/mod/lightboxgallery/view.php', $paramsno)
+        );
         echo $OUTPUT->footer();
         die();
     }
@@ -80,7 +83,7 @@ $mform = new mod_lightboxgallery_comment_form(null, $gallery);
 if ($mform->is_cancelled()) {
     redirect($galleryurl);
 } else if ($formadata = $mform->get_data()) {
-    $newcomment = new stdClass;
+    $newcomment = new stdClass();
     $newcomment->gallery = $gallery->id;
     $newcomment->userid = $USER->id;
     $newcomment->commenttext = $formadata->comment['text'];

@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_base {
-
     /**
      * @var lightboxgallery_image $imageobj The image object
      */
@@ -97,13 +96,13 @@ class edit_base {
     public function enclose_in_form($text) {
         global $CFG, $USER;
 
-        return '<form action="'.$CFG->wwwroot.'/mod/lightboxgallery/imageedit.php" method="post">'.
-               '<fieldset class="invisiblefieldset">'.
-               '<input type="hidden" name="sesskey" value="'.$USER->sesskey.'" />'.
-               '<input type="hidden" name="id" value="'.$this->cm->id.'" />'.
-               '<input type="hidden" name="image" value="'.$this->image.'" />'.
-               '<input type="hidden" name="tab" value="'.$this->tab.'" />'.
-               '<input type="hidden" name="process" value="1" />'.$text.'</fieldset></form>';
+        return '<form action="' . $CFG->wwwroot . '/mod/lightboxgallery/imageedit.php" method="post">' .
+               '<fieldset class="invisiblefieldset">' .
+               '<input type="hidden" name="sesskey" value="' . $USER->sesskey . '" />' .
+               '<input type="hidden" name="id" value="' . $this->cm->id . '" />' .
+               '<input type="hidden" name="image" value="' . $this->image . '" />' .
+               '<input type="hidden" name="tab" value="' . $this->tab . '" />' .
+               '<input type="hidden" name="process" value="1" />' . $text . '</fieldset></form>';
     }
 
     /**
@@ -112,7 +111,6 @@ class edit_base {
      * @return void
      */
     public function output() {
-
     }
 
     /**
@@ -121,7 +119,5 @@ class edit_base {
      * @return void
      */
     public function process_form() {
-
     }
-
 }

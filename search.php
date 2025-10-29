@@ -22,10 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/imageclass.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/imageclass.php');
 
-require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 $cid = required_param('id', PARAM_INT);
 $g = optional_param('gallery', '0', PARAM_INT);
@@ -78,13 +78,13 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
 
     echo('<form action="search.php">');
 
-    $table = new html_table;
+    $table = new html_table();
     $table->width = '*';
     $table->align = ['left', 'left', 'left', 'left'];
     $table->data[] = [get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
-                           '<input type="text" name="search" size="10" value="'.s($search, true).'" />' .
-                           '<input type="hidden" name="id" value="'.$cid.'" />',
-                           '<input type="submit" value="'.get_string('search').'" />', ];
+                           '<input type="text" name="search" size="10" value="' . s($search, true) . '" />' .
+                           '<input type="hidden" name="id" value="' . $cid . '" />',
+                           '<input type="submit" value="' . get_string('search') . '" />', ];
     echo html_writer::table($table);
     echo html_writer::end_tag('form');
 }
@@ -94,11 +94,12 @@ $fs = get_file_storage();
 if ($g) {
     $options = [$g => $g];
 }
-list($insql, $inparams) = $DB->get_in_or_equal(array_keys($options));
+
+[$insql, $inparams] = $DB->get_in_or_equal(array_keys($options));
 $params = array_merge(["%$search%"], $inparams);
 $sql = "SELECT *
         FROM {lightboxgallery_image_meta}
-        WHERE ".$DB->sql_like('description', '?', false)." AND gallery $insql";
+        WHERE " . $DB->sql_like('description', '?', false) . " AND gallery $insql";
 if ($results = $DB->get_records_sql($sql, $params)) {
     echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix autoresize');
 
@@ -115,6 +116,7 @@ if ($results = $DB->get_records_sql($sql, $params)) {
             } else {
                 $imggallery = $galleryrecords[$result->gallery];
             }
+
             $imgcontext = context_module::instance($imgcm->id);
 
             if ($storedfile = $fs->get_file($imgcontext->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $result->image)) {

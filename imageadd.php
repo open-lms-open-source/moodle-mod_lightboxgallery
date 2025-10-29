@@ -22,13 +22,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/imageadd_form.php');
-require_once(dirname(__FILE__).'/imageclass.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/imageadd_form.php');
+require_once(dirname(__FILE__) . '/imageclass.php');
 
 $id = required_param('id', PARAM_INT);
 
-list($course, $cm) = get_course_and_cm_from_cmid($id, 'lightboxgallery');
+[$course, $cm] = get_course_and_cm_from_cmid($id, 'lightboxgallery');
 $gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
@@ -44,13 +44,20 @@ $PAGE->set_heading($course->shortname);
 $mform = new mod_lightboxgallery_imageadd_form(null, ['id' => $cm->id, 'gallery' => $gallery]);
 
 if ($mform->is_cancelled()) {
-    redirect($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id);
-
+    redirect($CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id);
 } else if (($formdata = $mform->get_data()) && confirm_sesskey()) {
     $fs = get_file_storage();
     $draftid = file_get_submitted_draft_itemid('image');
-    if (!$files = $fs->get_area_files(
-        context_user::instance($USER->id)->id, 'user', 'draft', $draftid, 'id DESC', false)) {
+    if (
+        !$files = $fs->get_area_files(
+            context_user::instance($USER->id)->id,
+            'user',
+            'draft',
+            $draftid,
+            'id DESC',
+            false
+        )
+    ) {
         redirect($PAGE->url);
     }
 
@@ -63,7 +70,7 @@ if ($mform->is_cancelled()) {
     }
 
     lightboxgallery_add_images($files, $context, $cm, $gallery, $resize);
-    redirect($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id);
+    redirect($CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id);
 }
 
 echo $OUTPUT->header();

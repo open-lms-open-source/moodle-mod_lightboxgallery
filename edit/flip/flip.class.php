@@ -39,7 +39,6 @@ define('FLIP_HORIZONTAL', 2);
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_flip extends edit_base {
-
     /**
      * Constructor
      *
@@ -59,13 +58,13 @@ class edit_flip extends edit_base {
      * @throws coding_exception
      */
     public function output() {
-        $result = get_string('selectflipmode', 'lightboxgallery').'<br /><br />'.
-                  '<label for="'.FLIP_VERTICAL.'"><input type="radio" class="form-check-input me-1" name="mode" value="'.
-                  FLIP_VERTICAL.'" /> Vertical</label><br />'.
-                  '<label for="'.FLIP_HORIZONTAL.'"><input type="radio" class="form-check-input me-1" name="mode" value="'.
-                  FLIP_HORIZONTAL.'" /> Horizontal</label>'.
-                  '<br /><br /><input type="submit" class="btn btn-secondary" value="'.
-                  get_string('edit_flip', 'lightboxgallery').'" />';
+        $result = get_string('selectflipmode', 'lightboxgallery') . '<br /><br />' .
+                  '<label for="' . FLIP_VERTICAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
+                  FLIP_VERTICAL . '" /> Vertical</label><br />' .
+                  '<label for="' . FLIP_HORIZONTAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
+                  FLIP_HORIZONTAL . '" /> Horizontal</label>' .
+                  '<br /><br /><input type="submit" class="btn btn-secondary" value="' .
+                  get_string('edit_flip', 'lightboxgallery') . '" />';
 
         return $this->enclose_in_form($result);
     }
@@ -83,7 +82,7 @@ class edit_flip extends edit_base {
         if ($mode & FLIP_HORIZONTAL) {
             $flip = 'horizontal';
         }
+
         $this->image = $this->lbgimage->flip_image($flip);
     }
-
 }
