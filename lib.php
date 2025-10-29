@@ -484,7 +484,7 @@ function lightboxgallery_print_comment($comment, $context) {
          '</td><td class="content" align="left">'.
          format_text($comment->commenttext, FORMAT_MOODLE).
          '<div class="commands">'.
-         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link($deleteurl, get_string('delete')) : '').
+         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link($deleteurl, get_string('delete'), ['class' => 'btn btn-link']) : '').
          '</div>'.
          '</td></tr></table>';
 }

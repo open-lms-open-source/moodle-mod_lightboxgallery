@@ -155,12 +155,12 @@ if (has_capability('mod/lightboxgallery:addimage', $context)) {
 }
 
 if ($gallery->comments && has_capability('mod/lightboxgallery:addcomment', $context)) {
-    $opturl = new moodle_url('/mod/lightboxgallery/comment.php', array('id' => $gallery->id));
-    $options[] = html_writer::link($opturl, get_string('addcomment', 'lightboxgallery'));
+    $opturl = new moodle_url('/mod/lightboxgallery/comment.php', ['id' => $gallery->id]);
+    $options[] = html_writer::link($opturl, get_string('addcomment', 'lightboxgallery'), ['class' => 'btn btn-primary']);
 }
 
 if (count($options) > 0) {
-    echo $OUTPUT->box(implode(' | ', $options), 'center');
+    echo $OUTPUT->box(implode(' ', $options), 'center');
 }
 
 if (!$editing && $gallery->comments && has_capability('mod/lightboxgallery:viewcomments', $context)) {
