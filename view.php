@@ -22,13 +22,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
-require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/rsslib.php');
-require_once(dirname(__FILE__).'/imageclass.php');
+require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/rsslib.php');
+require_once(dirname(__FILE__) . '/imageclass.php');
 
 global $DB;
 
@@ -38,7 +38,7 @@ $page = optional_param('page', 0, PARAM_INT);
 $search  = optional_param('search', '', PARAM_TEXT);
 
 if ($id) {
-    list($course, $cm) = get_course_and_cm_from_cmid($id, 'lightboxgallery');
+    [$course, $cm] = get_course_and_cm_from_cmid($id, 'lightboxgallery');
     if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance])) {
         throw new \moodle_exception('invalidcoursemodule');
     }
@@ -46,7 +46,7 @@ if ($id) {
     if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $l])) {
         throw new \moodle_exception('invalidlightboxgalleryid', 'lightboxgallery');
     }
-    list($course, $cm) = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
+    [$course, $cm] = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 }
 
 
@@ -98,7 +98,7 @@ $heading = get_string('displayinggallery', 'lightboxgallery', $gallery->name);
 if ($allowrssfeed) {
     rss_add_http_header($context, 'mod_lightboxgallery', $gallery->id, $gallery->name);
     $strrsssub = get_string('rsssubscribe', 'lightboxgallery');
-    $heading .= ' '.rss_get_link($context->id, $userid, 'mod_lightboxgallery', $gallery->id, $strrsssub);
+    $heading .= ' ' . rss_get_link($context->id, $userid, 'mod_lightboxgallery', $gallery->id, $strrsssub);
 }
 
 echo $OUTPUT->header();
@@ -108,7 +108,7 @@ if ($gallery->autoresize == AUTO_RESIZE_SCREEN || $gallery->autoresize == AUTO_R
 } else {
     $resizecss = '';
 }
-echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix'.$resizecss);
+echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix' . $resizecss);
 
 $fs = get_file_storage();
 $storedfiles = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');

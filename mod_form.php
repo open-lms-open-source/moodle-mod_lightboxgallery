@@ -27,14 +27,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/locallib.php');
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 /**
  * Form definition class
  */
 class mod_lightboxgallery_mod_form extends moodleform_mod {
-
     /**
      * Form definition.
      *
@@ -85,19 +84,35 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $mform->addElement('select', 'sortby', get_string('sortby', 'lightboxgallery'), $options);
         $mform->addHelpButton('sortby', 'sortby', 'lightboxgallery');
 
-        $autoresize = $mform->createElement('select', 'autoresize', get_string('autoresize', 'lightboxgallery'),
-                                $this->get_autoresize_options());
+        $autoresize = $mform->createElement(
+            'select',
+            'autoresize',
+            get_string('autoresize', 'lightboxgallery'),
+            $this->get_autoresize_options()
+        );
         $autoresizegroup = [];
-        $autoresizegroup[] = $mform->createElement('select', 'autoresize', get_string('autoresize', 'lightboxgallery'),
-                                $this->get_autoresize_options());
+        $autoresizegroup[] = $mform->createElement(
+            'select',
+            'autoresize',
+            get_string('autoresize', 'lightboxgallery'),
+            $this->get_autoresize_options()
+        );
         $autoresizegroup[] = $mform->createElement('checkbox', 'autoresizedisabled', null, get_string('disable'));
         $mform->addGroup($autoresizegroup, 'autoresizegroup', get_string('autoresize', 'lightboxgallery'), ' ', false);
         $mform->setType('autoresize', PARAM_INT);
         $mform->disabledIf('autoresizegroup', 'autoresizedisabled', 'checked');
         $mform->addHelpButton('autoresizegroup', 'autoresize', 'lightboxgallery');
 
-        $mform->addElement('select', 'resize', sprintf('%s (%s)', get_string('edit_resize', 'lightboxgallery'),
-                            core_text::strtolower(get_string('upload'))), lightboxgallery_resize_options());
+        $mform->addElement(
+            'select',
+            'resize',
+            sprintf(
+                '%s (%s)',
+                get_string('edit_resize', 'lightboxgallery'),
+                core_text::strtolower(get_string('upload'))
+            ),
+            lightboxgallery_resize_options()
+        );
         $mform->setType('resize', PARAM_INT);
         $mform->disabledIf('resize', 'autoresize', 'eq', 1);
         $mform->disabledIf('resize', 'autoresizedisabled', 'checked');
@@ -113,8 +128,12 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
             $mform->addElement('select', 'rss', get_string('allowrss', 'lightboxgallery'), $yesno);
             $mform->setType('rss', PARAM_INT);
         } else {
-            $mform->addElement('static', 'rssdisabled', get_string('allowrss', 'lightboxgallery'),
-                                get_string('rssglobaldisabled', 'admin'));
+            $mform->addElement(
+                'static',
+                'rssdisabled',
+                get_string('allowrss', 'lightboxgallery'),
+                get_string('rssglobaldisabled', 'admin')
+            );
         }
 
         $mform->addElement('select', 'extinfo', get_string('extendedinfo', 'lightboxgallery'), $yesno);
@@ -128,7 +147,6 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements($features);
 
         $this->add_action_buttons();
-
     }
 
     /**
@@ -174,4 +192,3 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
                      AUTO_RESIZE_BOTH   => $screen . ' &amp; ' . $upload, ];
     }
 }
-

@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_resize extends edit_base {
-
     /**
      * @var lang_string|string
      */
@@ -63,7 +62,7 @@ class edit_resize extends edit_base {
         $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
         $image = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
 
-        $currentsize = sprintf('%s: %dx%d', get_string('currentsize', 'lightboxgallery'), $image->width, $image->height).
+        $currentsize = sprintf('%s: %dx%d', get_string('currentsize', 'lightboxgallery'), $image->width, $image->height) .
                        '<br /><br />';
 
         $sizeselect = '<div class="input-group"><select name="size" class="form-select">';
@@ -73,13 +72,13 @@ class edit_resize extends edit_base {
         $sizeselect .= '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
                        $this->strresize . '" /></div><br /><br />';
 
-        $scaleselect = '<div class="input-group"><select name="scale" class="form-select">'.
-                       '  <option value="200">200&#37;</option>'.
-                       '  <option value="150">150&#37;</option>'.
-                       '  <option value="125">125&#37;</option>'.
-                       '  <option value="75">75&#37;</option>'.
-                       '  <option value="50">50&#37;</option>'.
-                       '  <option value="25">25&#37;</option>'.
+        $scaleselect = '<div class="input-group"><select name="scale" class="form-select">' .
+                       '  <option value="200">200&#37;</option>' .
+                       '  <option value="150">150&#37;</option>' .
+                       '  <option value="125">125&#37;</option>' .
+                       '  <option value="75">75&#37;</option>' .
+                       '  <option value="50">50&#37;</option>' .
+                       '  <option value="25">25&#37;</option>' .
                        '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
                        $this->strscale . '" /></div>';
 
@@ -101,16 +100,15 @@ class edit_resize extends edit_base {
         switch ($button) {
             case $this->strresize:
                 $size = required_param('size', PARAM_INT);
-                list($width, $height) = explode('x', $this->resizeoptions[$size]);
-            break;
+                [$width, $height] = explode('x', $this->resizeoptions[$size]);
+                break;
             case $this->strscale:
                 $scale = required_param('scale', PARAM_INT);
                 $width = $this->lbgimage->width * ($scale / 100);
                 $height = $this->lbgimage->height * ($scale / 100);
-            break;
+                break;
         }
 
         $this->image = $this->lbgimage->resize_image($width, $height);
     }
-
 }

@@ -22,8 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__).'/../../../../config.php');
-require_once(dirname(__FILE__).'/../../lib.php');
+require_once(dirname(__FILE__) . '/../../../../config.php');
+require_once(dirname(__FILE__) . '/../../lib.php');
 
 $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
@@ -88,7 +88,7 @@ if ($confirm && confirm_sesskey()) {
                             continue;
                         }
                         $select = "gallery = :gallery AND image = :image
-                                   AND metatype = :metatype AND ".$DB->sql_compare_text('description', 100).' = :description';
+                                   AND metatype = :metatype AND " . $DB->sql_compare_text('description', 100) . ' = :description';
                         $params = [
                             'gallery' => $gallery->id,
                             'image' => $storedfile->get_filename(),
@@ -118,10 +118,14 @@ if ($confirm && confirm_sesskey()) {
 
     notice(get_string('tagsimportfinish', 'lightboxgallery', $a), $galleryurl);
 } else {
-    $confirmurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php',
-        ['id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()]);
-    $cancelurl = new moodle_url('/mod/lightboxgallery/view.php',
-        ['id' => $cm->id, 'editing' => 1]);
+    $confirmurl = new moodle_url(
+        '/mod/lightboxgallery/edit/tag/import.php',
+        ['id' => $gallery->id, 'confirm' => 1, 'sesskey' => sesskey()]
+    );
+    $cancelurl = new moodle_url(
+        '/mod/lightboxgallery/view.php',
+        ['id' => $cm->id, 'editing' => 1]
+    );
     echo $OUTPUT->confirm(get_string('tagsimportconfirm', 'lightboxgallery'), $confirmurl, $cancelurl);
 }
 

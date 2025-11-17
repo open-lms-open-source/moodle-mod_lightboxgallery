@@ -16,7 +16,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/gdlib.php');
+require_once($CFG->libdir . '/gdlib.php');
 
 /**
  * The crop plugin class.
@@ -26,7 +26,6 @@ require_once($CFG->libdir.'/gdlib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_crop extends edit_base {
-
     /**
      * Constructor.
      *
@@ -53,8 +52,8 @@ class edit_crop extends edit_base {
                             $( \'y1\' ).value = coords.y1;
                             $( \'x2\' ).value = coords.x2;
                             $( \'y2\' ).value = coords.y2;
-                            $( \'cropInfo\' ).innerHTML = \''.get_string('from').': \' + coords.x1 + \'x\' + coords.y1 + \', '.
-                            get_string('size').': \' + dimensions.width + \'x\' + dimensions.height;
+                            $( \'cropInfo\' ).innerHTML = \'' . get_string('from') . ': \' + coords.x1 + \'x\' + coords.y1 + \', ' .
+                            get_string('size') . ': \' + dimensions.width + \'x\' + dimensions.height;
                         }
                         Event.observe(
                             window,
@@ -75,13 +74,13 @@ class edit_crop extends edit_base {
                     <input type="hidden" name="y2" id="y2" value="0" />
                     <table>
                       <tr>
-                        <td>'.'TODO:imgurl'.'</td>
+                        <td>' . 'TODO:imgurl' . '</td>
                       </tr>
                       <tr>
                         <td><span id="cropInfo">&nbsp;</span></td>
                       </tr>
                       <tr>
-                        <td><input type="submit" value="'.get_string('savechanges').'" /></td>
+                        <td><input type="submit" value="' . get_string('savechanges') . '" /></td>
                       </tr>
                     </table>';
         return $this->enclose_in_form($result);
@@ -108,5 +107,4 @@ class edit_crop extends edit_base {
             $this->imageobj->save_image($cropped);
         }
     }
-
 }

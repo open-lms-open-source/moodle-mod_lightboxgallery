@@ -26,13 +26,12 @@ namespace mod_lightboxgallery;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/../imageclass.php');
+require_once(dirname(__FILE__) . '/../imageclass.php');
 
 /**
  * This class is used to display a page of images in the gallery.
  */
 class gallery_page {
-
     /**
      * Sort by filename.
      */
@@ -115,8 +114,14 @@ class gallery_page {
     public function display_images() {
         $html = '';
         foreach ($this->pagefiles as $filename => $file) {
-            $image = new \lightboxgallery_image($file, $this->gallery, $this->cm,
-                $this->metadata[$filename], $this->pagethumbs[$filename], $this->gallery->extinfo);
+            $image = new \lightboxgallery_image(
+                $file,
+                $this->gallery,
+                $this->cm,
+                $this->metadata[$filename],
+                $this->pagethumbs[$filename],
+                $this->gallery->extinfo
+            );
             $html .= $image->get_image_display_html($this->editing);
         }
         return $html;
@@ -155,7 +160,7 @@ class gallery_page {
             return;
         }
 
-        list ($insql, $params) = $DB->get_in_or_equal($filenames, SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal($filenames, SQL_PARAMS_NAMED);
         $params['gallery'] = $this->gallery->id;
         $select = "gallery = :gallery AND image $insql";
         $metadata = $DB->get_records_select('lightboxgallery_image_meta', $select, $params);

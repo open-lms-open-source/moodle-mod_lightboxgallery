@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_tag extends edit_base {
-
     /**
      * Constructor.
      *
@@ -48,8 +47,8 @@ class edit_tag extends edit_base {
 
         $stradd = get_string('add');
 
-        $manualform = '<div class="input-group mb-3"><input type="text" class="form-control" name="tag" />'.
-                      '<input type="submit" class="btn btn-secondary" value="'.$stradd.'" /></div>';
+        $manualform = '<div class="input-group mb-3"><input type="text" class="form-control" name="tag" />' .
+                      '<input type="submit" class="btn btn-secondary" value="' . $stradd . '" /></div>';
         $manualform = $this->enclose_in_form($manualform);
 
         $iptcform = '';
@@ -67,11 +66,11 @@ class edit_tag extends edit_base {
                     $tag = core_text::strtolower($tag);
                     $exists = ($tags && in_array($tag, array_values($tags)));
                     $tag = htmlentities($tag);
-                    $iptcform .= '<label ' . ($exists ? 'class="tag-exists"' : '').
+                    $iptcform .= '<label ' . ($exists ? 'class="tag-exists"' : '') .
                         '><input type="checkbox" name="iptctags[]" value="' . $tag . '" />' . $tag . '</label><br />';
                 }
                 $iptcform .= '<input type="submit" class="btn btn-secondary" value="' . $stradd . '" />';
-                $iptcform = '<span class="tag-head"> ' . get_string('tagsiptc', 'lightboxgallery').
+                $iptcform = '<span class="tag-head"> ' . get_string('tagsiptc', 'lightboxgallery') .
                     '</span>' . $this->enclose_in_form($iptcform);
             }
         }
@@ -82,12 +81,12 @@ class edit_tag extends edit_base {
         if ($tags = $this->lbgimage->get_tags()) {
             $deleteform = '<input type="hidden" name="delete" value="1" />';
             foreach ($tags as $tag) {
-                $deleteform .= '<label><input type="checkbox" name="deletetags[]" value="'.$tag->id.'" /> '.
-                               htmlentities($tag->description).'</label><br />';
+                $deleteform .= '<label><input type="checkbox" name="deletetags[]" value="' . $tag->id . '" /> ' .
+                               htmlentities($tag->description) . '</label><br />';
             }
             $deleteform .= '<input type="submit" class="btn btn-secondary" value="' . get_string('remove') . '" />';
             $deleteform = '<span class="tag-head"> ' . get_string('tagscurrent', 'lightboxgallery') . '</span>'
-                          .$this->enclose_in_form($deleteform);
+                          . $this->enclose_in_form($deleteform);
         }
 
         return $manualform . $iptcform . $deleteform;
@@ -113,5 +112,4 @@ class edit_tag extends edit_base {
             }
         }
     }
-
 }
