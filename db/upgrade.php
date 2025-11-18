@@ -150,8 +150,16 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
             $dbman->rename_field($table, $field, 'description');
         }
 
-        $field = new xmldb_field('metatype',
-                                 XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, ['caption', 'tag'], 'caption', 'image');
+        $field = new xmldb_field(
+            'metatype',
+            XMLDB_TYPE_CHAR,
+            '20',
+            null,
+            XMLDB_NOTNULL,
+            ['caption', 'tag'],
+            'caption',
+            'image'
+        );
         if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -195,13 +203,15 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
                 $fs = get_file_storage();
                 if ($storedfiles = $fs->get_area_files($coursecontext->id, 'course', 'legacy')) {
                     foreach ($storedfiles as $file) {
-                        $path = '/'.$gallery->folder;
+                        $path = '/' . $gallery->folder;
                         if ($gallery->folder != '') {
                             $path .= '/';
                         }
-                        if (substr($file->get_mimetype(), 0, 6) != 'image/' ||
+                        if (
+                            substr($file->get_mimetype(), 0, 6) != 'image/' ||
                             substr($file->get_filepath(), -8, 8) == '/_thumb/' ||
-                            $file->get_filepath() != $path) {
+                            $file->get_filepath() != $path
+                        ) {
                             continue;
                         }
                         // Insert as lightbox file.

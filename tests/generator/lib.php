@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_lightboxgallery_generator extends testing_module_generator {
-
     /**
      * Create a new instance of the module.
      *

@@ -40,7 +40,6 @@ namespace mod_lightboxgallery\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gallery_searched extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -58,7 +57,7 @@ class gallery_searched extends \core\event\base {
      */
     public function get_description() {
         $searchterm = s($this->other['searchterm']);
-        return "The user with id '$this->userid' has searched the lightboxgallery with id '{$this->other['lightboxgalleryid']}'".
+        return "The user with id '$this->userid' has searched the lightboxgallery with id '{$this->other['lightboxgalleryid']}'" .
             " for lightboxgallery images containing \"{$searchterm}\".";
     }
 
@@ -77,8 +76,10 @@ class gallery_searched extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/lightboxgallery/search.php',
-            ['id' => $this->courseid, 'gallery' => $this->other['lightboxgalleryid'], 'search' => $this->other['searchterm']]);
+        return new \moodle_url(
+            '/mod/lightboxgallery/search.php',
+            ['id' => $this->courseid, 'gallery' => $this->other['lightboxgalleryid'], 'search' => $this->other['searchterm']]
+        );
     }
 
     /**
@@ -106,6 +107,4 @@ class gallery_searched extends \core\event\base {
     public static function get_other_mapping() {
         return [];
     }
-
 }
-

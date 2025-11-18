@@ -41,7 +41,6 @@ namespace mod_lightboxgallery\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
-
     /**
      * Init method.
      *
@@ -68,5 +67,4 @@ class course_module_viewed extends \core\event\course_module_viewed {
     public static function get_objectid_mapping() {
         return ['db' => 'lightboxgallery', 'restore' => 'lightboxgallery'];
     }
-
 }

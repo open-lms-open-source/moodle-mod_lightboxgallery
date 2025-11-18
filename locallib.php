@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__) . '/lib.php');
 require_once("$CFG->libdir/filelib.php");
 
 define('THUMB_WIDTH', 150);
@@ -50,7 +50,7 @@ define('AUTO_RESIZE_BOTH', 3);
  * @return void
  */
 function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0) {
-    require_once(dirname(__FILE__).'/imageclass.php');
+    require_once(dirname(__FILE__) . '/imageclass.php');
 
     $fs = get_file_storage();
 
@@ -85,7 +85,7 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
 
                 if ($resize > 0) {
                     $resizeoptions = lightboxgallery_resize_options();
-                    list($width, $height) = explode('x', $resizeoptions[$resize]);
+                    [$width, $height] = explode('x', $resizeoptions[$resize]);
                     $image->resize_image($width, $height);
                 }
 
@@ -165,15 +165,15 @@ function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
 
     echo $OUTPUT->box_start();
 
-    echo '<form action="search.php" style="float: right; margin-left: 4px;">'.
-         ' <fieldset class="invisiblefieldset">'.
-         '  <input type="hidden" name="id" value="'.$courseid.'" />'.
-         '  <input type="hidden" name="gallery" value="'.$galleryid.'" />'.
-         '  <input type="text" name="search" size="8" />'.
-         '  <input type="submit" class="btn btn-secondary" value="'.get_string('search').'" />'.
-         ' </fieldset>'.
-         '</form>'.
-         $heading.': ';
+    echo '<form action="search.php" style="float: right; margin-left: 4px;">' .
+         ' <fieldset class="invisiblefieldset">' .
+         '  <input type="hidden" name="id" value="' . $courseid . '" />' .
+         '  <input type="hidden" name="gallery" value="' . $galleryid . '" />' .
+         '  <input type="text" name="search" size="8" />' .
+         '  <input type="submit" class="btn btn-secondary" value="' . get_string('search') . '" />' .
+         ' </fieldset>' .
+         '</form>' .
+         $heading . ': ';
 
     $tagarray = [];
     foreach ($tags as $tag) {
@@ -210,7 +210,7 @@ function lightboxgallery_resize_options() {
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
     global $CFG;
 
-    require_once(dirname(__FILE__).'/imageclass.php');
+    require_once(dirname(__FILE__) . '/imageclass.php');
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $courseid);
     $context = context_module::instance($cm->id);
 
@@ -249,7 +249,8 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
         $index = $fs->create_file_from_pathname($fileinfo, $CFG->dirroot . '/mod/lightboxgallery/pix/index.png');
     }
 
-    $path = moodle_url::make_pluginfile_url($context->id,
+    $path = moodle_url::make_pluginfile_url(
+        $context->id,
         'mod_lightboxgallery',
         'gallery_index',
         $index->get_itemid(),
@@ -266,7 +267,6 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
  * File browsing support class
  */
 class lightboxgallery_content_file_info extends file_info_stored {
-
     /**
      * Get the parent file.
      *

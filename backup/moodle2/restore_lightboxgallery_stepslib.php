@@ -31,7 +31,6 @@
  * Structure step to restore one lightboxgallery activity
  */
 class restore_lightboxgallery_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define (add) particular settings this activity can have
      *

@@ -30,8 +30,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/filelib.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 /**
  * This function returns if the module supports a feature
@@ -40,7 +40,7 @@ require_once(dirname(__FILE__).'/locallib.php');
  * @return bool|int|string|null
  */
 function lightboxgallery_supports($feature) {
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_RESOURCE;
         case FEATURE_GROUPS:
@@ -90,8 +90,12 @@ function lightboxgallery_add_instance($gallery) {
     $gallery->id = $DB->insert_record('lightboxgallery', $gallery);
 
     $completiontimeexpected = !empty($gallery->completionexpected) ? $gallery->completionexpected : null;
-    \core_completion\api::update_completion_date_event($gallery->coursemodule, 'lightboxgallery', $gallery->id,
-        $completiontimeexpected);
+    \core_completion\api::update_completion_date_event(
+        $gallery->coursemodule,
+        'lightboxgallery',
+        $gallery->id,
+        $completiontimeexpected
+    );
 
     return $gallery->id;
 }
@@ -117,8 +121,12 @@ function lightboxgallery_update_instance($gallery) {
     lightboxgallery_set_sizing($gallery);
 
     $completiontimeexpected = !empty($gallery->completionexpected) ? $gallery->completionexpected : null;
-    \core_completion\api::update_completion_date_event($gallery->coursemodule, 'lightboxgallery', $gallery->id,
-        $completiontimeexpected);
+    \core_completion\api::update_completion_date_event(
+        $gallery->coursemodule,
+        'lightboxgallery',
+        $gallery->id,
+        $completiontimeexpected
+    );
 
     return $DB->update_record('lightboxgallery', $gallery);
 }
@@ -162,7 +170,7 @@ function lightboxgallery_delete_instance($id) {
     $fs->delete_area_files($context->id, 'mod_lightboxgallery');
 
     // Delete all the records and fields.
-    $DB->delete_records('lightboxgallery_comments', ['gallery' => $gallery->id] );
+    $DB->delete_records('lightboxgallery_comments', ['gallery' => $gallery->id]);
     $DB->delete_records('lightboxgallery_image_meta', ['gallery' => $gallery->id]);
 
     // Delete the instance itself.
@@ -227,7 +235,7 @@ function lightboxgallery_get_extra_capabilities() {
  * @throws dml_exception
  * @throws moodle_exception
  */
-function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
     global $DB, $COURSE;
 
     if ($COURSE->id == $courseid) {
@@ -280,7 +288,6 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
             }
 
             $activities[$index++] = $activity;
-
         }
     }
     return true;
@@ -301,19 +308,21 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
     global $CFG, $OUTPUT;
 
     $userviewurl = new moodle_url('/user/view.php', ['id' => $activity->user->id, 'course' => $courseid]);
-    echo '<table border="0" cellpadding="3" cellspacing="0">'.
-         '<tr><td class="userpicture" valign="top">'.$OUTPUT->user_picture($activity->user, ['courseid' => $courseid]).
-         '</td><td>'.
-         '<div class="title">'.
-         ($detail ? '<img src="'.$CFG->modpixpath.'/'.$activity->type.'/icon.gif" class="icon" alt="'.s($activity->name).'" />' : ''
-         ).
-         '<a href="'.$CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$activity->cmid.'#c'.$activity->content->id.'">'.
-         $activity->content->comment.'</a>'.
-         '</div>'.
-         '<div class="user"> '.
-         html_writer::link($userviewurl, fullname($activity->user, $viewfullnames)).
-         ' - '.userdate($activity->timestamp).
-         '</div>'.
+    echo '<table border="0" cellpadding="3" cellspacing="0">' .
+         '<tr><td class="userpicture" valign="top">' . $OUTPUT->user_picture($activity->user, ['courseid' => $courseid]) .
+         '</td><td>' .
+         '<div class="title">' .
+         ($detail ? '<img src="' . $CFG->modpixpath . '/' . $activity->type . '/icon.gif" class="icon" alt="' . s($activity->name) .
+             '" />' : ''
+         ) .
+         '<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $activity->cmid . '#c' . $activity->content->id .
+         '">' .
+         $activity->content->comment . '</a>' .
+         '</div>' .
+         '<div class="user"> ' .
+         html_writer::link($userviewurl, fullname($activity->user, $viewfullnames)) .
+         ' - ' . userdate($activity->timestamp) .
+         '</div>' .
          '</td></tr></table>';
 
     return true;
@@ -344,28 +353,28 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
     $params = [$timestart, $course->id];
 
     if ($comments = $DB->get_records_sql($sql, $params)) {
-        echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery').':', 3);
+        echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 3);
 
         echo '<ul class="unlist">';
 
         foreach ($comments as $comment) {
             $display = lightboxgallery_resize_text(trim(strip_tags($comment->commenttext)), MAX_COMMENT_PREVIEW);
 
-            $output = '<li>'.
-                 ' <div class="head">'.
-                 '  <div class="date">'.userdate($comment->timemodified, get_string('strftimerecent')).'</div>'.
-                 '  <div class="name">'.fullname($comment, $viewfullnames).' - '.format_string($comment->name).'</div>'.
-                 ' </div>'.
-                 ' <div class="info">'.
-                 '  "<a href="'.$CFG->wwwroot.'/mod/lightboxgallery/view.php?l='.$comment->gallery.'#c'.$comment->id.'">'.
-                 $display.'</a>"'.
-                 ' </div>'.
+            $output = '<li>' .
+                 ' <div class="head">' .
+                 '  <div class="date">' . userdate($comment->timemodified, get_string('strftimerecent')) . '</div>' .
+                 '  <div class="name">' . fullname($comment, $viewfullnames) . ' - ' . format_string($comment->name) . '</div>' .
+                 ' </div>' .
+                 ' <div class="info">' .
+                 '  "<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?l=' . $comment->gallery . '#c' . $comment->id .
+                 '">' .
+                 $display . '</a>"' .
+                 ' </div>' .
                  '</li>';
             echo $output;
         }
 
         echo '</ul>';
-
     }
 
     return true;
@@ -422,7 +431,7 @@ function lightboxgallery_get_post_actions() {
 function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $CFG, $DB;
 
-    require_once($CFG->libdir.'/filelib.php');
+    require_once($CFG->libdir . '/filelib.php');
 
     $gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance]);
     if (!$gallery->ispublic) {
@@ -430,7 +439,7 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
     }
 
     $relativepath = implode('/', $args);
-    $fullpath = '/'.$context->id.'/mod_lightboxgallery/'.$filearea.'/'.$relativepath;
+    $fullpath = '/' . $context->id . '/mod_lightboxgallery/' . $filearea . '/' . $relativepath;
 
     $fs = get_file_storage();
     if ((!$file = $fs->get_file_by_hash(sha1($fullpath))) || ($file->is_directory())) {
@@ -440,7 +449,6 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
     send_stored_file($file, null, 0, true); // Download MUST be forced - security!
 
     return;
-
 }
 
 
@@ -489,10 +497,19 @@ function lightboxgallery_get_file_info($browser, $areas, $course, $cm, $context,
         }
 
         require_once("$CFG->dirroot/mod/lightboxgallery/locallib.php");
-        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+        $urlbase = $CFG->wwwroot . '/pluginfile.php';
 
-        return new lightboxgallery_content_file_info($browser, $context, $storedfile, $urlbase, $areas[$filearea],
-                                                        true, true, false, false);
+        return new lightboxgallery_content_file_info(
+            $browser,
+            $context,
+            $storedfile,
+            $urlbase,
+            $areas[$filearea],
+            true,
+            true,
+            false,
+            false
+        );
     }
 
     return null;
@@ -523,20 +540,24 @@ function lightboxgallery_print_comment($comment, $context) {
 
     $deleteurl = new moodle_url('/mod/lightboxgallery/comment.php', ['id' => $comment->gallery, 'delete' => $comment->id]);
 
-    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">'.
-         '<tr class="header"><td class="picture left">'.$OUTPUT->user_picture($user, ['courseid' => $COURSE->id]).'</td>'.
-         '<td class="topic starter" align="left"><a name="c'.$comment->id.'"></a><div class="author">'.
-         '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$COURSE->id.'">'.
-         fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</a> - '.userdate($comment->timemodified).
-         '</div></td></tr>'.
-         '<tr><td class="left side">'.
+    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">' .
+         '<tr class="header"><td class="picture left">' . $OUTPUT->user_picture($user, ['courseid' => $COURSE->id]) . '</td>' .
+         '<td class="topic starter" align="left"><a name="c' . $comment->id . '"></a><div class="author">' .
+         '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $user->id . '&amp;course=' . $COURSE->id . '">' .
+         fullname($user, has_capability('moodle/site:viewfullnames', $context)) . '</a> - ' . userdate($comment->timemodified) .
+         '</div></td></tr>' .
+         '<tr><td class="left side">' .
         // phpcs:disable moodle.Commenting.TodoComment
         // TODO: user_group picture?
-         '</td><td class="content" align="left">'.
-         format_text($comment->commenttext, FORMAT_MOODLE).
-         '<div class="commands">'.
-         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link($deleteurl, get_string('delete'), ['class' => 'btn btn-link']) : '').
-         '</div>'.
+         '</td><td class="content" align="left">' .
+         format_text($comment->commenttext, FORMAT_MOODLE) .
+         '<div class="commands">' .
+         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link(
+             $deleteurl,
+             get_string('delete'),
+             ['class' => 'btn btn-link']
+         ) : '') .
+         '</div>' .
          '</td></tr></table>';
 }
 
@@ -561,9 +582,11 @@ function lightboxgallery_rss_enabled() {
  * @param int $userid
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_lightboxgallery_core_calendar_provide_event_action(calendar_event $event,
-                                                            \core_calendar\action_factory $factory,
-                                                            int $userid = 0) {
+function mod_lightboxgallery_core_calendar_provide_event_action(
+    calendar_event $event,
+    \core_calendar\action_factory $factory,
+    int $userid = 0
+) {
     global $USER;
 
     if (!$userid) {
@@ -581,10 +604,9 @@ function mod_lightboxgallery_core_calendar_provide_event_action(calendar_event $
     }
 
     return $factory->create_instance(
-            get_string('view'),
-            new \moodle_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]),
-            1,
-            true
+        get_string('view'),
+        new \moodle_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]),
+        1,
+        true
     );
 }
-

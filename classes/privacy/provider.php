@@ -39,13 +39,9 @@ use core_privacy\local\request\writer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-        // This plugin stores personal data.
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\core_userlist_provider,
-
-        // This plugin is a core_user_data_provider.
-        \core_privacy\local\request\plugin\provider {
-
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Return the fields which contain personal data.
      *
@@ -108,7 +104,7 @@ class provider implements
 
         $user = $contextlist->get_user();
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT cm.id AS cmid,
                        lbgc.commenttext,
@@ -243,7 +239,7 @@ class provider implements
         }
 
         // Prepare the SQL we'll need below.
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $sql = "gallery = :instanceid AND userid {$insql}";
         $params = array_merge($inparams, ['instanceid' => $instanceid]);
 

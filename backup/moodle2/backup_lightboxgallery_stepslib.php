@@ -31,7 +31,6 @@
  * Define the complete lightboxgallery structure for backup, with file and id annotations
  */
 class backup_lightboxgallery_activity_structure_step extends backup_activity_structure_step {
-
     /**
      * Define the backup structure for this activity
      *
