@@ -42,7 +42,7 @@ class edit_rotate extends edit_base {
      */
     public function output() {
         $result = get_string('selectrotation', 'lightboxgallery') . '<br /><br />' .
-                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="-90" ' .
+                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="-90" required ' .
                   '/>-90&#176;</label>' .
                   '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="180" ' .
                   '/>180&#176;</label>' .
