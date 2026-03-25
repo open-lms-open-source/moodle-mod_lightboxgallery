@@ -474,7 +474,7 @@ class lightboxgallery_image {
             $html .= $captiondiv;
         }
         $html .= '<a class="lightbox-gallery-image-thumbnail" href="' .
-                 $this->imageurl . '" rel="lightbox_gallery" title="' . $caption .
+                 $this->imageurl . '" rel="lightbox_gallery" title="' . s($caption) .
                  '" style="background-image: url(\'' . $this->thumburl .
                  '\'); width: ' . THUMBNAIL_WIDTH . 'px; height: ' . THUMBNAIL_HEIGHT . 'px;"></a>';
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT || $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {

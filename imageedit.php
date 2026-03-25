@@ -112,7 +112,7 @@ if ($editinstance->showthumb) {
     $table->size = ['*', '*'];
     $table->data[] = [
         '<img src="' . $imageclass->get_thumbnail_url() .
-        '" alt="" /><br /><span title="' . $imageclass->get_image_caption() . '">' .
+        '" alt="" /><br /><span title="' . s($imageclass->get_image_caption()) . '">' .
         $imageclass->get_image_caption() . '</span>', $editinstance->output($imageclass->get_image_caption()),
     ];
 } else {
