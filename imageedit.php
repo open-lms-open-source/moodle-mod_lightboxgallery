@@ -112,14 +112,16 @@ if ($editinstance->showthumb) {
     $table->size = ['*', '*'];
     $table->data[] = [
         '<img src="' . $imageclass->get_thumbnail_url() .
-        '" alt="" /><br /><span title="' . s($imageclass->get_image_caption()) . '">' .
-        $imageclass->get_image_caption() . '</span>', $editinstance->output($imageclass->get_image_caption()),
+        '" alt="' . $imageclass->get_image_caption(true) .
+        '" title="' . $imageclass->get_image_caption(true) . '" /><br />' .
+        '<span title="' . $imageclass->get_image_caption(true) . '">' .
+        $imageclass->get_image_caption(true) . '</span>', $editinstance->output($imageclass->get_image_caption(false)),
     ];
 } else {
     $table->align = ['center'];
     $table->size = ['*'];
-    $table->data[] = [$editinstance->output($image->get_image_caption())];
-    $table->data[] = [$editinstance->output($imageclass->get_image_caption())];
+    $table->data[] = [$editinstance->output($image->get_image_caption(true))];
+    $table->data[] = [$editinstance->output($imageclass->get_image_caption(false))];
 }
 
 echo $OUTPUT->header();

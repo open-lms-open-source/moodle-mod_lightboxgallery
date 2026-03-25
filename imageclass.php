@@ -412,17 +412,26 @@ class lightboxgallery_image {
     /**
      * Get the image caption.
      *
+     * @param bool $filtered Whether the result should be filtered.
      * @return string
      * @throws dml_exception
      */
-    public function get_image_caption() {
+    public function get_image_caption($filtered = false) {
         global $DB;
         $caption = '';
 
         if ($this->metadata !== null) {
             foreach ($this->metadata as $metarecord) {
                 if ($metarecord->metatype == 'caption') {
-                    return $metarecord->description;
+                    if ($filtered) {
+                        return format_string(
+                            $metarecord->description,
+                            false,
+                            ['context' => $this->context->id],
+                        );
+                    } else {
+                        $caption = $metarecord->description;
+                    }
                 }
             }
         }
@@ -437,7 +446,15 @@ class lightboxgallery_image {
                 ]
             )
         ) {
-            $caption = $imagemeta->description;
+            if ($filtered) {
+                $caption = format_string(
+                    $imagemeta->description,
+                    false,
+                    ['context' => $this->context->id],
+                );
+            } else {
+                $caption = $imagemeta->description;
+            }
         }
 
         return $caption;
@@ -453,9 +470,9 @@ class lightboxgallery_image {
      */
     public function get_image_display_html($editing = false) {
         if ($this->gallery->captionfull) {
-            $caption = $this->get_image_caption();
+            $caption = $this->get_image_caption(true);
         } else {
-            $caption = lightboxgallery_resize_text($this->get_image_caption(), MAX_IMAGE_LABEL);
+            $caption = lightboxgallery_resize_text($this->get_image_caption(true), MAX_IMAGE_LABEL);
         }
         $timemodified = userdate($this->storedfile->get_timemodified(), get_string('strftimedatetimeshort', 'langconfig'));
         $filesize = round($this->storedfile->get_filesize() / 100) / 10;

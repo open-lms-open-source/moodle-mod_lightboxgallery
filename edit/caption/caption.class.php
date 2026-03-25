@@ -55,7 +55,7 @@ class edit_caption extends edit_base {
      * @throws dml_exception
      */
     public function process_form() {
-        $caption = required_param('caption', PARAM_NOTAGS);
+        $caption = required_param('caption', PARAM_RAW);
         $this->lbgimage->set_caption($caption);
     }
 }
