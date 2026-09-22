@@ -110,10 +110,11 @@ if ($editinstance->showthumb) {
     $table->attributes = ['style' => 'margin-left:auto;margin-right:auto;'];
     $table->align = ['center', 'center'];
     $table->size = ['*', '*'];
+    $thumbnailurl = $imageclass->get_thumbnail_url();
+    $caption = s($imageclass->get_image_caption());
     $table->data[] = [
-        '<img src="' . $imageclass->get_thumbnail_url() .
-        '" alt="" /><br /><span title="' . s($imageclass->get_image_caption()) . '">' .
-        $imageclass->get_image_caption() . '</span>', $editinstance->output($imageclass->get_image_caption()),
+        "<img src=\"{$thumbnailurl}\" alt=\"\" /><br /><span title=\"{$caption}\">{$caption}</span>",
+        $editinstance->output($imageclass->get_image_caption()),
     ];
 } else {
     $table->align = ['center'];

@@ -111,6 +111,7 @@ class restore_lightboxgallery_activity_structure_step extends restore_activity_s
         $data = (object)$data;
 
         $data->gallery = $this->get_new_parentid('lightboxgallery');
+        $data->description = clean_param($data->description, PARAM_NOTAGS);
         // phpcs:disable moodle.Commenting.TodoComment
         // TODO: image var to match image.
         $DB->insert_record('lightboxgallery_image_meta', $data);
