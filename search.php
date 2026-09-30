@@ -23,57 +23,63 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/imageclass.php');
 
 require_once($CFG->libdir . '/filelib.php');
 
+// How many matching images to show on each page of results.
+define('LIGHTBOXGALLERY_SEARCH_PERPAGE', 50);
+
 $cid = required_param('id', PARAM_INT);
-$g = optional_param('gallery', '0', PARAM_INT);
-$search = optional_param('search', '', PARAM_CLEAN);
+$g = optional_param('gallery', 0, PARAM_INT);
+$search = trim(optional_param('search', '', PARAM_CLEAN));
+$page = optional_param('page', 0, PARAM_INT);
 
 if ($g) {
     $gallery = $DB->get_record('lightboxgallery', ['id' => $g], '*', MUST_EXIST);
     $course = $DB->get_record('course', ['id' => $gallery->course], '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $course->id, false, MUST_EXIST);
-    $context = context_module::instance($cm->id);
+    $cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id, false, MUST_EXIST);
     require_login($course, true, $cm);
+    $context = context_module::instance($cm->id);
+    $title = $gallery->name;
 } else {
     $course = $DB->get_record('course', ['id' => $cid], '*', MUST_EXIST);
-    $context = context_course::instance($cid);
     require_login($course, true);
+    $context = context_course::instance($course->id);
+    $title = get_string('modulenameplural', 'lightboxgallery');
 }
 
-
-if (isset($gallery) && $gallery->ispublic) {
-    $userid = (isloggedin() ? $USER->id : 0);
-} else {
-    $userid = $USER->id;
+// The galleries in this course that the user can see, keyed by instance id.
+$cms = [];
+foreach (get_fast_modinfo($course)->get_instances_of('lightboxgallery') as $instanceid => $instancecm) {
+    if ($instancecm->uservisible) {
+        $cms[$instanceid] = $instancecm;
+    }
 }
 
-$context = context_module::instance($cm->id);
-
-$params = [
+$event = \mod_lightboxgallery\event\gallery_searched::create([
     'context' => $context,
     'other' => [
         'searchterm' => $search,
-        'lightboxgalleryid' => $gallery->id,
+        'lightboxgalleryid' => $g,
     ],
-];
-$event = \mod_lightboxgallery\event\gallery_searched::create($params);
+]);
 $event->trigger();
 
-$PAGE->set_url('/mod/lightboxgallery/search.php', ['id' => $cm->id, 'search' => $search]);
-$PAGE->set_title($gallery->name);
+$pageurl = new moodle_url('/mod/lightboxgallery/search.php', ['id' => $course->id, 'gallery' => $g, 'search' => $search]);
+$PAGE->set_url($pageurl, ['page' => $page]);
+$PAGE->set_title($title);
 $PAGE->set_heading($course->shortname);
 $PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
 $PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox', 'M.mod_lightboxgallery.init');
 
 echo $OUTPUT->header();
 
-$options = [];
-if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
-    foreach ($instances as $instance) {
-        $options[$instance->id] = $instance->name;
+if ($cms) {
+    $options = [];
+    foreach ($cms as $instanceid => $instancecm) {
+        $options[$instanceid] = $instancecm->get_formatted_name();
     }
 
     echo('<form action="search.php">');
@@ -83,51 +89,52 @@ if ($instances = get_all_instances_in_course('lightboxgallery', $course)) {
     $table->align = ['left', 'left', 'left', 'left'];
     $table->data[] = [get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
                            '<input type="text" name="search" size="10" value="' . s($search, true) . '" />' .
-                           '<input type="hidden" name="id" value="' . $cid . '" />',
+                           '<input type="hidden" name="id" value="' . $course->id . '" />',
                            '<input type="submit" value="' . get_string('search') . '" />', ];
     echo html_writer::table($table);
     echo html_writer::end_tag('form');
 }
 
-$fs = get_file_storage();
-
-if ($g) {
-    $options = [$g => $g];
+$galleryids = $g ? array_intersect([$g], array_keys($cms)) : array_keys($cms);
+if ($search === '' || !$galleryids) {
+    echo $OUTPUT->footer();
+    die();
 }
-[$insql, $inparams] = $DB->get_in_or_equal(array_keys($options));
-$params = array_merge(["%$search%"], $inparams);
-$sql = "SELECT *
-        FROM {lightboxgallery_image_meta}
-        WHERE " . $DB->sql_like('description', '?', false) . " AND gallery $insql";
-if ($results = $DB->get_records_sql($sql, $params)) {
-    echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix autoresize');
 
-    $hashes = [];
-    $galleryrecords = [];
+[$total, $pageresults] = lightboxgallery_search_images($galleryids, $search, $page * LIGHTBOXGALLERY_SEARCH_PERPAGE,
+    LIGHTBOXGALLERY_SEARCH_PERPAGE);
 
-    foreach ($results as $result) {
-        if (!isset($hashes[$result->image])) {
-            $imgcm = get_coursemodule_from_instance("lightboxgallery", $result->gallery, $course->id, false, MUST_EXIST);
-
-            if (!isset($galleryrecords[$result->gallery])) {
-                $imggallery = $DB->get_record('lightboxgallery', ['id' => $result->gallery], '*', MUST_EXIST);
-                $galleryrecords[$result->gallery] = $imggallery;
-            } else {
-                $imggallery = $galleryrecords[$result->gallery];
-            }
-            $imgcontext = context_module::instance($imgcm->id);
-
-            if ($storedfile = $fs->get_file($imgcontext->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $result->image)) {
-                $image = new lightboxgallery_image($storedfile, $imggallery, $imgcm);
-                echo $image->get_image_display_html();
-                $hashes[$result->image] = 1;
-            }
-        }
-    }
-
-    echo $OUTPUT->box_end();
-} else {
+if (!$pageresults) {
     echo $OUTPUT->box(get_string('errornosearchresults', 'lightboxgallery'));
+    echo $OUTPUT->footer();
+    die();
 }
+
+// Load the galleries and the captions and tags for this page's images in one go.
+$pagegalleryids = array_unique(array_column($pageresults, 'gallery'));
+$galleryrecords = $DB->get_records_list('lightboxgallery', 'id', $pagegalleryids);
+[$gallerysql, $galleryparams] = $DB->get_in_or_equal($pagegalleryids, SQL_PARAMS_NAMED, 'g');
+[$imagesql, $imageparams] = $DB->get_in_or_equal(array_unique(array_column($pageresults, 'image')), SQL_PARAMS_NAMED, 'i');
+$metadata = [];
+$metarecords = $DB->get_records_select('lightboxgallery_image_meta', "gallery $gallerysql AND image $imagesql",
+    $galleryparams + $imageparams);
+foreach ($metarecords as $metarecord) {
+    $metadata[$metarecord->gallery][$metarecord->image][] = $metarecord;
+}
+
+$fs = get_file_storage();
+echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix autoresize');
+foreach ($pageresults as $result) {
+    $imgcm = $cms[$result->gallery];
+    $storedfile = $fs->get_file($imgcm->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $result->image);
+    if ($storedfile) {
+        $image = new lightboxgallery_image($storedfile, $galleryrecords[$result->gallery], $imgcm,
+            $metadata[$result->gallery][$result->image] ?? []);
+        echo $image->get_image_display_html();
+    }
+}
+echo $OUTPUT->box_end();
+
+echo $OUTPUT->paging_bar($total, $page, LIGHTBOXGALLERY_SEARCH_PERPAGE, $pageurl);
 
 echo $OUTPUT->footer();

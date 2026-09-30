@@ -264,6 +264,43 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
 
 
 /**
+ * Find images whose captions or tags contain a search term.
+ *
+ * Each image is returned once, however many of its captions or tags match. Access to the
+ * galleries must already have been checked.
+ *
+ * @param int[] $galleryids The galleries to search.
+ * @param string $search The text to look for, matched literally and ignoring case.
+ * @param int $offset How many matches to skip, for paging.
+ * @param int $limit The most matches to return.
+ * @return array [int $total, stdClass[] $matches], where each match has gallery and image properties,
+ *     ordered by gallery then image.
+ */
+function lightboxgallery_search_images(array $galleryids, string $search, int $offset, int $limit): array {
+    global $DB;
+
+    if (!$galleryids || $search === '') {
+        return [0, []];
+    }
+
+    [$insql, $inparams] = $DB->get_in_or_equal($galleryids, SQL_PARAMS_NAMED);
+    $params = ['search' => '%' . $DB->sql_like_escape($search) . '%'] + $inparams;
+    $matches = "SELECT DISTINCT gallery, image
+                  FROM {lightboxgallery_image_meta}
+                 WHERE " . $DB->sql_like('description', ':search', false) . " AND gallery $insql";
+
+    $total = $DB->count_records_sql("SELECT COUNT(1) FROM ($matches) matches", $params);
+    $results = [];
+    $recordset = $DB->get_recordset_sql("$matches ORDER BY gallery, image", $params, $offset, $limit);
+    foreach ($recordset as $record) {
+        $results[] = $record;
+    }
+    $recordset->close();
+
+    return [$total, $results];
+}
+
+/**
  * Find the first image in a gallery that an index picture can be made from.
  *
  * @param context_module $context The gallery's context.

@@ -31,7 +31,7 @@ namespace mod_lightboxgallery\event;
  *      Extra information about the event.
  *
  *      - string searchterm: The searchterm used on lightboxgallery search.
- *      - int lightboxgalleryid: The lbg instance id.
+ *      - int lightboxgalleryid: The lbg instance id, or 0 for a search of every gallery in the course.
  * }
  *
  * @package    mod_lightboxgallery
@@ -57,6 +57,10 @@ class gallery_searched extends \core\event\base {
      */
     public function get_description() {
         $searchterm = s($this->other['searchterm']);
+        if (empty($this->other['lightboxgalleryid'])) {
+            return "The user with id '$this->userid' has searched the lightboxgalleries in the course with id " .
+                "'$this->courseid' for lightboxgallery images containing \"{$searchterm}\".";
+        }
         return "The user with id '$this->userid' has searched the lightboxgallery with id '{$this->other['lightboxgalleryid']}'" .
             " for lightboxgallery images containing \"{$searchterm}\".";
     }
@@ -94,8 +98,8 @@ class gallery_searched extends \core\event\base {
             throw new \coding_exception('The \'searchterm\' value must be set in other.');
         }
 
-        if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+        if ($this->contextlevel != CONTEXT_MODULE && $this->contextlevel != CONTEXT_COURSE) {
+            throw new \coding_exception('Context level must be CONTEXT_MODULE or CONTEXT_COURSE.');
         }
     }
 
