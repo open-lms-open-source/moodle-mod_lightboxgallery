@@ -69,8 +69,6 @@ if (empty($cm->visible) && !has_capability('moodle/course:viewhiddenactivities',
     notice(get_string("activityiscurrentlyhidden"));
 }
 
-lightboxgallery_config_defaults();
-
 $params = [
     'context' => $context,
     'objectid' => $gallery->id,

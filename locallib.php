@@ -100,27 +100,6 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
 }
 
 /**
- * Set default configuration values for the lightboxgallery module.
- *
- * @return void
- * @throws dml_exception
- */
-function lightboxgallery_config_defaults() {
-    $defaults = [
-        'disabledplugins' => '',
-        'enablerssfeeds' => 0,
-    ];
-
-    $localcfg = get_config('lightboxgallery');
-
-    foreach ($defaults as $name => $value) {
-        if (! isset($localcfg->$name)) {
-            set_config($name, $value, 'lightboxgallery');
-        }
-    }
-}
-
-/**
  * Get the list of editing plugins.
  *
  * @param bool|null $showall

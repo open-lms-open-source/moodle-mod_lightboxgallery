@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
  */
 #[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_resize_text')]
 #[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_edit_types')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_rss_enabled')]
 final class lib_test extends \advanced_testcase {
     /**
      * Test lightboxgallery_get_edit_types.
@@ -79,5 +80,25 @@ final class lib_test extends \advanced_testcase {
         set_config('disabledplugins', 'delete,flip', 'lightboxgallery');
         $actual = array_keys(lightboxgallery_edit_types());
         $this->assertEquals($types, $actual);
+    }
+
+    /**
+     * The settings' defaults are stored at install, and the plugin copes if they're missing.
+     */
+    public function test_settings_defaults(): void {
+        global $CFG;
+        $this->resetAfterTest();
+
+        // Installing applies the defaults from settings.php.
+        $this->assertSame('', get_config('lightboxgallery', 'disabledplugins'));
+        $this->assertSame('0', get_config('lightboxgallery', 'enablerssfeeds'));
+
+        // With both missing, no editing tool is disabled and RSS stays off.
+        unset_config('disabledplugins', 'lightboxgallery');
+        unset_config('enablerssfeeds', 'lightboxgallery');
+        $CFG->enablerssfeeds = 1;
+        $this->assertEquals(['caption', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'],
+            array_keys(lightboxgallery_edit_types()));
+        $this->assertFalse((bool) lightboxgallery_rss_enabled());
     }
 }
