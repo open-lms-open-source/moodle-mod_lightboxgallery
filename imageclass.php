@@ -292,16 +292,23 @@ class lightboxgallery_image {
     }
 
     /**
-     * Delete a tag.
+     * Delete a tag from this image.
      *
-     * @param stdClass $tag
+     * The tag must belong to this image in this gallery; any other id is ignored.
+     *
+     * @param int $tagid The lightboxgallery_image_meta id of the tag.
      * @return bool
      * @throws dml_exception
      */
-    public function delete_tag($tag) {
+    public function delete_tag($tagid) {
         global $DB;
 
-        return $DB->delete_records('lightboxgallery_image_meta', ['id' => $tag]);
+        return $DB->delete_records('lightboxgallery_image_meta', [
+            'id' => $tagid,
+            'gallery' => $this->gallery->id,
+            'image' => $this->storedfile->get_filename(),
+            'metatype' => 'tag',
+        ]);
     }
 
     /**
@@ -602,7 +609,7 @@ class lightboxgallery_image {
         } else {
             $tags = $DB->get_records(
                 'lightboxgallery_image_meta',
-                ['image' => $this->storedfile->get_filename(), 'metatype' => 'tag']
+                ['gallery' => $this->gallery->id, 'image' => $this->storedfile->get_filename(), 'metatype' => 'tag']
             );
         }
 
