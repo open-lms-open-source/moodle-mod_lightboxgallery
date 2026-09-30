@@ -39,7 +39,7 @@ if (!$cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $cour
     throw new \moodle_exception('invalidcoursemodule');
 }
 
-require_login($course->id);
+require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 $galleryurl = $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id;

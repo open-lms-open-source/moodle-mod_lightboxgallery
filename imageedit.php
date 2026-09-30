@@ -40,7 +40,7 @@ $cm      = get_coursemodule_from_id('lightboxgallery', $id, 0, false, MUST_EXIST
 $course  = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance], '*', MUST_EXIST);
 
-require_login($course->id);
+require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 require_capability('mod/lightboxgallery:edit', $context);
@@ -80,7 +80,7 @@ if (!in_array($tab, array_keys($edittypes))) {
     }
 }
 
-require($CFG->dirroot . '/mod/lightboxgallery/edit/' . $tab . '/' . $tab . '.class.php');
+require_once($CFG->dirroot . '/mod/lightboxgallery/edit/' . $tab . '/' . $tab . '.class.php');
 $editclass = 'edit_' . $tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab);
 
