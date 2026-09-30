@@ -489,24 +489,11 @@ class lightboxgallery_image {
      */
     private function get_image_flipped($direction) {
         $image = imagecreatefromstring($this->storedfile->get_content());
-        $flipped = imagecreatetruecolor($this->width, $this->height);
-        $w = $this->width;
-        $h = $this->height;
-        if ($direction == 'vertical') {
-            for ($x = 0; $x < $w; $x++) {
-                for ($y = 0; $y < $h; $y++) {
-                    imagecopy($flipped, $image, $x, $h - $y - 1, $x, $y, 1, 1);
-                }
-            }
-        } else {
-            for ($x = 0; $x < $w; $x++) {
-                for ($y = 0; $y < $h; $y++) {
-                    imagecopy($flipped, $image, $w - $x - 1, $y, $x, $y, 1, 1);
-                }
-            }
-        }
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        imageflip($image, $direction == 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 
-        return $flipped;
+        return $image;
     }
 
     /**

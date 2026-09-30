@@ -198,6 +198,37 @@ final class image_edit_test extends \advanced_testcase {
     }
 
     /**
+     * Data provider for test_flip_direction_and_transparency.
+     *
+     * @return array
+     */
+    public static function flip_provider(): array {
+        // The transparent pixel starts in the top-left corner of the 40x20 image.
+        return [
+            'horizontal' => ['horizontal', 39, 0],
+            'vertical' => ['vertical', 0, 19],
+        ];
+    }
+
+    /**
+     * Flipping mirrors the image the right way and keeps PNG transparency.
+     *
+     * @param string $direction
+     * @param int $x Where the transparent pixel should end up.
+     * @param int $y
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('flip_provider')]
+    public function test_flip_direction_and_transparency(string $direction, int $x, int $y): void {
+        $image = $this->add_image('mirror.png', 'png');
+
+        $image->flip_image($direction);
+
+        $gd = imagecreatefromstring($this->get_image_file('mirror.png')->get_content());
+        $this->assertEquals(127, (imagecolorat($gd, $x, $y) >> 24) & 0x7F);
+        $this->assertEquals(0, (imagecolorat($gd, 0, 0) >> 24) & 0x7F);
+    }
+
+    /**
      * Rotating a PNG keeps its transparency.
      */
     public function test_rotate_keeps_png_transparency(): void {
