@@ -35,6 +35,7 @@ global $DB;
 $id = optional_param('id', 0, PARAM_INT);
 $l = optional_param('l', 0, PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
+$cpage = optional_param('cpage', 0, PARAM_INT);
 $search  = optional_param('search', '', PARAM_TEXT);
 
 if ($id) {
@@ -158,11 +159,12 @@ if (count($options) > 0) {
 }
 
 if (!$editing && lightboxgallery_can_view_comments($gallery, $course, $context)) {
-    if ($comments = $DB->get_records('lightboxgallery_comments', ['gallery' => $gallery->id], 'timemodified ASC')) {
-        foreach ($comments as $comment) {
-            lightboxgallery_print_comment($comment, $context);
-        }
+    [$commentcount, $comments] = lightboxgallery_get_comments($gallery->id, $cpage, LIGHTBOXGALLERY_COMMENTS_PERPAGE);
+    foreach ($comments as $comment) {
+        lightboxgallery_print_comment($comment, $context, $comment->user);
     }
+    $commentsurl = new moodle_url('/mod/lightboxgallery/view.php', ['id' => $cm->id, 'page' => $page]);
+    echo $OUTPUT->paging_bar($commentcount, $cpage, LIGHTBOXGALLERY_COMMENTS_PERPAGE, $commentsurl, 'cpage');
 }
 
 echo $OUTPUT->footer();

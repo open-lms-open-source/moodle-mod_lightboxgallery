@@ -34,6 +34,8 @@ define('THUMB_WIDTH', 150);
 define('THUMB_HEIGHT', 150);
 define('MAX_IMAGE_LABEL', 13);
 define('MAX_COMMENT_PREVIEW', 20);
+// How many comments to show on each page of a gallery.
+define('LIGHTBOXGALLERY_COMMENTS_PERPAGE', 25);
 
 define('AUTO_RESIZE_SCREEN', 1);
 define('AUTO_RESIZE_UPLOAD', 2);

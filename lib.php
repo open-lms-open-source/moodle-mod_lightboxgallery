@@ -205,7 +205,7 @@ function lightboxgallery_user_complete($course, $user, $mod, $resource) {
         $cm = get_coursemodule_from_id('lightboxgallery', $mod->id);
         $context = context_module::instance($cm->id);
         foreach ($comments as $comment) {
-            lightboxgallery_print_comment($comment, $context);
+            lightboxgallery_print_comment($comment, $context, $user);
         }
     } else {
         print_string('nocomments', 'lightboxgallery');
@@ -279,6 +279,7 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
             $activity->content = new stdClass();
             $activity->content->id      = $comment->id;
             $activity->content->comment = $display;
+            $activity->content->url     = lightboxgallery_comment_url($comment, $cm->id);
 
             $activity->user = new stdClass();
             $activity->user->id = $comment->userid;
@@ -318,8 +319,7 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
          ($detail ? '<img src="' . $CFG->modpixpath . '/' . $activity->type . '/icon.gif" class="icon" alt="' . s($activity->name) .
              '" />' : ''
          ) .
-         '<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $activity->cmid . '#c' . $activity->content->id .
-         '">' .
+         '<a href="' . $activity->content->url . '">' .
          s($activity->content->comment) . '</a>' .
          '</div>' .
          '<div class="user"> ' .
@@ -347,9 +347,11 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
     global $DB, $CFG, $OUTPUT;
 
     $galleryids = [];
+    $cmids = [];
     foreach (get_fast_modinfo($course)->get_instances_of('lightboxgallery') as $cm) {
         if ($cm->uservisible && has_capability('mod/lightboxgallery:viewcomments', $cm->context)) {
             $galleryids[] = $cm->instance;
+            $cmids[$cm->instance] = $cm->id;
         }
     }
     if (!$galleryids) {
@@ -383,8 +385,7 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
              '  <div class="name">' . fullname($comment, $viewfullnames) . ' - ' . format_string($comment->name) . '</div>' .
              ' </div>' .
              ' <div class="info">' .
-             '  "<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?l=' . $comment->gallery . '#c' . $comment->id .
-             '">' .
+             '  "<a href="' . lightboxgallery_comment_url($comment, $cmids[$comment->gallery]) . '">' .
              $display . '</a>"' .
              ' </div>' .
              '</li>';
@@ -601,17 +602,75 @@ function lightboxgallery_comment_preview($commenttext) {
 }
 
 /**
+ * Get one page of a gallery's comments, oldest first, with their authors.
+ *
+ * @param int $galleryid
+ * @param int $page
+ * @param int $perpage
+ * @return array [int $total, stdClass[] $comments], where each comment has its author in ->user.
+ */
+function lightboxgallery_get_comments(int $galleryid, int $page, int $perpage): array {
+    global $DB;
+
+    $total = $DB->count_records('lightboxgallery_comments', ['gallery' => $galleryid]);
+    $userfields = \core_user\fields::for_userpic()->get_sql('u', false, 'author', '', false)->selects;
+    $records = $DB->get_records_sql("SELECT c.*, $userfields
+                                       FROM {lightboxgallery_comments} c
+                                       JOIN {user} u ON u.id = c.userid
+                                      WHERE c.gallery = :gallery
+                                   ORDER BY c.timemodified ASC, c.id ASC",
+        ['gallery' => $galleryid], $page * $perpage, $perpage);
+
+    $comments = [];
+    foreach ($records as $record) {
+        $comment = new stdClass();
+        foreach (['id', 'gallery', 'userid', 'commenttext', 'timemodified'] as $field) {
+            $comment->$field = $record->$field;
+        }
+        $comment->user = \core\output\user_picture::unalias($record, null, 'userid', 'author');
+        $comments[] = $comment;
+    }
+
+    return [$total, $comments];
+}
+
+/**
+ * The URL of a comment on its gallery page, including which page of comments it's on.
+ *
+ * @param stdClass $comment With id, gallery and timemodified.
+ * @param int $cmid The gallery's course module id.
+ * @return moodle_url
+ */
+function lightboxgallery_comment_url($comment, int $cmid): moodle_url {
+    global $DB;
+
+    $earlier = $DB->count_records_select('lightboxgallery_comments',
+        'gallery = :gallery AND (timemodified < :time OR (timemodified = :sametime AND id < :id))',
+        ['gallery' => $comment->gallery, 'time' => $comment->timemodified, 'sametime' => $comment->timemodified,
+            'id' => $comment->id]);
+    $params = ['id' => $cmid];
+    if ($cpage = intdiv($earlier, LIGHTBOXGALLERY_COMMENTS_PERPAGE)) {
+        $params['cpage'] = $cpage;
+    }
+
+    return new moodle_url('/mod/lightboxgallery/view.php', $params, 'c' . $comment->id);
+}
+
+/**
  * Output the HTML for a comment in the given context.
  * @param object $comment The comment record to output
  * @param object $context The context from which this is being displayed
+ * @param stdClass|null $user The comment's author, with the user picture fields; looked up if not given.
  */
-function lightboxgallery_print_comment($comment, $context) {
+function lightboxgallery_print_comment($comment, $context, $user = null) {
     global $DB, $CFG, $COURSE, $OUTPUT;
 
     // phpcs:disable moodle.Commenting.TodoComment
     // TODO: Move to renderer!
 
-    $user = $DB->get_record('user', ['id' => $comment->userid]);
+    if ($user === null) {
+        $user = $DB->get_record('user', ['id' => $comment->userid]);
+    }
 
     $deleteurl = new moodle_url('/mod/lightboxgallery/comment.php', ['id' => $comment->gallery, 'delete' => $comment->id]);
 
