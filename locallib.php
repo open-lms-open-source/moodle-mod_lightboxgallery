@@ -264,6 +264,72 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
 
 
 /**
+ * Add each image's IPTC keywords to it as tags.
+ *
+ * Only JPEGs carry IPTC keywords. Each one is copied to a temporary file to read them,
+ * and the copy is always removed. Keywords already on the image aren't added again.
+ *
+ * @param stdClass $gallery
+ * @param context_module $context The gallery's context.
+ * @return stdClass With tags, the number of tags added, and images, the number of files looked at.
+ */
+function lightboxgallery_import_iptc_tags($gallery, context_module $context) {
+    global $DB;
+
+    $storedfiles = get_file_storage()->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', false,
+        'itemid', false);
+
+    $result = new stdClass();
+    $result->tags = 0;
+    $result->images = count($storedfiles);
+
+    foreach ($storedfiles as $storedfile) {
+        if ($storedfile->get_mimetype() != 'image/jpeg' || !$storedfile->is_valid_image()) {
+            continue;
+        }
+
+        $path = $storedfile->copy_content_to_temp();
+        try {
+            $info = [];
+            getimagesize($path, $info);
+        } finally {
+            @unlink($path);
+        }
+        if (!isset($info['APP13']) || !($iptc = iptcparse($info['APP13'])) || !isset($iptc['2#025'])) {
+            continue;
+        }
+
+        $keywords = $iptc['2#025'];
+        sort($keywords);
+        foreach ($keywords as $tag) {
+            // Keywords are UTF-8 or, in older files, Latin-1.
+            if (!mb_check_encoding($tag, 'UTF-8')) {
+                $tag = mb_convert_encoding($tag, 'UTF-8', 'ISO-8859-1');
+            }
+            $tag = trim(strip_tags(clean_param($tag, PARAM_TAG)));
+            if ($tag === '') {
+                continue;
+            }
+
+            $select = "gallery = :gallery AND image = :image
+                       AND metatype = :metatype AND " . $DB->sql_compare_text('description', 100) . ' = :description';
+            $record = [
+                'gallery' => $gallery->id,
+                'image' => $storedfile->get_filename(),
+                'metatype' => 'tag',
+                'description' => $tag,
+            ];
+            if (!$DB->record_exists_select('lightboxgallery_image_meta', $select, $record)) {
+                $DB->insert_record('lightboxgallery_image_meta', $record);
+                $result->tags++;
+            }
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Find images whose captions or tags contain a search term.
  *
  * Each image is returned once, however many of its captions or tags match. Access to the

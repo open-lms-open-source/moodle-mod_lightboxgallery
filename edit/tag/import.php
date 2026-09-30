@@ -24,6 +24,7 @@
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
 require_once(dirname(__FILE__) . '/../../lib.php');
+require_once(dirname(__FILE__) . '/../../locallib.php');
 
 $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
@@ -57,60 +58,7 @@ if (in_array('tag', $disabledplugins)) {
 }
 
 if ($confirm && confirm_sesskey()) {
-    // For each image, get tags using iptcparse.
-
-    $fs = get_file_storage();
-    $storedfiles = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', false, 'itemid', false);
-
-    $a = new stdClass();
-    $a->tags = 0;
-    $a->images = count($storedfiles);
-
-    if ($a->images > 0) {
-        foreach ($storedfiles as $storedfile) {
-            if (!$storedfile->is_valid_image()) {
-                continue;
-            }
-
-            $path = $storedfile->copy_content_to_temp();
-            $size = getimagesize($path, $info);
-            if (isset($info['APP13'])) {
-                $iptc = iptcparse($info['APP13']);
-                if (isset($iptc['2#025'])) {
-                    sort($iptc['2#025']);
-                    $errorlevel = error_reporting(E_PARSE);
-
-                    foreach ($iptc['2#025'] as $tag) {
-                        $tag = iconv('UTF-8', 'UTF-8//IGNORE', $tag);
-                        $tag = clean_param($tag, PARAM_TAG);
-                        $tag = trim(strip_tags($tag));
-                        if (empty($tag)) {
-                            continue;
-                        }
-                        $select = "gallery = :gallery AND image = :image
-                                   AND metatype = :metatype AND " . $DB->sql_compare_text('description', 100) . ' = :description';
-                        $params = [
-                            'gallery' => $gallery->id,
-                            'image' => $storedfile->get_filename(),
-                            'metatype' => 'tag',
-                            'description' => $tag,
-                        ];
-                        if (!$DB->record_exists_select('lightboxgallery_image_meta', $select, $params)) {
-                            $record = new stdClass();
-                            $record->gallery = $gallery->id;
-                            $record->image = $storedfile->get_filename();
-                            $record->metatype = 'tag';
-                            $record->description = $tag;
-                            if ($DB->insert_record('lightboxgallery_image_meta', $record)) {
-                                $a->tags++;
-                            }
-                        }
-                    }
-                    error_reporting($errorlevel);
-                }
-            }
-        }
-    }
+    $a = lightboxgallery_import_iptc_tags($gallery, $context);
 
     foreach (array_keys((array)$a) as $b) {
         $a->{$b} = number_format($a->{$b});
