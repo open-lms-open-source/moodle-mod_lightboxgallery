@@ -110,9 +110,6 @@ if ($gallery->autoresize == AUTO_RESIZE_SCREEN || $gallery->autoresize == AUTO_R
 }
 echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix' . $resizecss);
 
-$fs = get_file_storage();
-$storedfiles = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
-
 $gallerypage = new mod_lightboxgallery\gallery_page($cm, $gallery, $editing, $page);
 echo $gallerypage->display_images();
 
