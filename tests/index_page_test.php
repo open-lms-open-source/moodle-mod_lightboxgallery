@@ -74,14 +74,9 @@ final class index_page_test extends \advanced_testcase {
 
         // One image and one non-image file in the first gallery, and a comment on each gallery.
         $context = \context_module::instance($withrss->cmid);
-        $fs = get_file_storage();
-        $gd = imagecreatetruecolor(8, 8);
-        ob_start();
-        imagepng($gd);
-        $record = ['contextid' => $context->id, 'component' => 'mod_lightboxgallery', 'filearea' => 'gallery_images',
-            'itemid' => 0, 'filepath' => '/'];
-        $fs->create_file_from_string($record + ['filename' => 'bus.png'], ob_get_clean());
-        $fs->create_file_from_string($record + ['filename' => 'notes.txt'], 'Not an image');
+        $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($withrss, 'bus.png', 8, 8);
+        get_file_storage()->create_file_from_string(['contextid' => $context->id, 'component' => 'mod_lightboxgallery',
+            'filearea' => 'gallery_images', 'itemid' => 0, 'filepath' => '/', 'filename' => 'notes.txt'], 'Not an image');
         foreach ($DB->get_fieldset_select('lightboxgallery', 'id', 'course = ?', [$course->id]) as $galleryid) {
             $DB->insert_record('lightboxgallery_comments',
                 ['gallery' => $galleryid, 'userid' => $student->id, 'commenttext' => 'Nice', 'timemodified' => time()]);

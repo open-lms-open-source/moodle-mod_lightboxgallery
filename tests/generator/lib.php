@@ -47,7 +47,7 @@ class mod_lightboxgallery_generator extends testing_module_generator {
     /**
      * Add an image to a gallery's image area, without making its thumbnail.
      *
-     * @param stdClass $gallery A gallery as returned by create_instance(), with its cmid.
+     * @param stdClass $gallery The gallery: as returned by create_instance(), or its database record.
      * @param string $filename
      * @param int $width
      * @param int $height
@@ -69,8 +69,10 @@ class mod_lightboxgallery_generator extends testing_module_generator {
         }
         $content = ob_get_clean();
 
+        $cmid = $gallery->cmid ?? get_coursemodule_from_instance('lightboxgallery', $gallery->id, 0, false, MUST_EXIST)->id;
+
         return get_file_storage()->create_file_from_string([
-            'contextid' => context_module::instance($gallery->cmid)->id,
+            'contextid' => context_module::instance($cmid)->id,
             'component' => 'mod_lightboxgallery',
             'filearea' => 'gallery_images',
             'itemid' => 0,

@@ -82,20 +82,9 @@ final class thumbnail_generation_test extends \advanced_testcase {
      * @return void
      */
     private function add_images(int $count): void {
-        $gd = imagecreatetruecolor(40, 20);
-        ob_start();
-        imagepng($gd);
-        $content = ob_get_clean();
-
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery');
         for ($i = 1; $i <= $count; $i++) {
-            get_file_storage()->create_file_from_string([
-                'contextid' => $this->context->id,
-                'component' => 'mod_lightboxgallery',
-                'filearea' => 'gallery_images',
-                'itemid' => 0,
-                'filepath' => '/',
-                'filename' => sprintf('photo%02d.png', $i),
-            ], $content);
+            $generator->create_image($this->gallery, sprintf('photo%02d.png', $i));
         }
     }
 

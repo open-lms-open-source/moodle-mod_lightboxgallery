@@ -79,20 +79,7 @@ final class image_resize_test extends \advanced_testcase {
      * @return lightboxgallery_image
      */
     private function add_image(int $width, int $height): lightboxgallery_image {
-        $gd = imagecreatetruecolor($width, $height);
-        ob_start();
-        imagepng($gd);
-        $content = ob_get_clean();
-
-        $storedfile = get_file_storage()->create_file_from_string([
-            'contextid' => $this->context->id,
-            'component' => 'mod_lightboxgallery',
-            'filearea' => 'gallery_images',
-            'itemid' => 0,
-            'filepath' => '/',
-            'filename' => 'photo.png',
-        ], $content);
-
+        $storedfile = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($this->gallery, 'photo.png', $width, $height);
         return new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
     }
 

@@ -70,19 +70,7 @@ final class rss_test extends \advanced_testcase {
      * @return lightboxgallery_image
      */
     private function add_image(string $filename): lightboxgallery_image {
-        $gd = imagecreatetruecolor(40, 20);
-        ob_start();
-        imagepng($gd);
-        $content = ob_get_clean();
-
-        $file = get_file_storage()->create_file_from_string([
-            'contextid' => $this->context->id,
-            'component' => 'mod_lightboxgallery',
-            'filearea' => 'gallery_images',
-            'itemid' => 0,
-            'filepath' => '/',
-            'filename' => $filename,
-        ], $content);
+        $file = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($this->gallery, $filename);
         return new lightboxgallery_image($file, $this->gallery, $this->cm);
     }
 

@@ -48,23 +48,12 @@ final class image_tags_test extends \advanced_testcase {
      * @return lightboxgallery_image
      */
     private function create_gallery_image(string $filename): lightboxgallery_image {
-        global $CFG, $DB;
+        global $DB;
 
         $course = $this->getDataGenerator()->create_course();
         $gallery = $this->getDataGenerator()->create_module('lightboxgallery', ['course' => $course->id]);
         $cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id, false, MUST_EXIST);
-        $context = \context_module::instance($cm->id);
-
-        $fileinfo = [
-            'contextid' => $context->id,
-            'component' => 'mod_lightboxgallery',
-            'filearea' => 'gallery_images',
-            'itemid' => 0,
-            'filepath' => '/',
-            'filename' => $filename,
-        ];
-        $storedfile = get_file_storage()->create_file_from_pathname($fileinfo,
-            $CFG->dirroot . '/mod/lightboxgallery/pix/index.png');
+        $storedfile = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($gallery, $filename);
 
         $gallery = $DB->get_record('lightboxgallery', ['id' => $gallery->id], '*', MUST_EXIST);
         return new lightboxgallery_image($storedfile, $gallery, $cm);

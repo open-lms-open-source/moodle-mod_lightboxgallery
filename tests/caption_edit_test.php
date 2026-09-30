@@ -66,17 +66,7 @@ final class caption_edit_test extends \advanced_testcase {
         $gallery = $this->getDataGenerator()->create_module('lightboxgallery', ['course' => $course->id]);
         $gallery = $DB->get_record('lightboxgallery', ['id' => $gallery->id], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id, false, MUST_EXIST);
-        $gd = imagecreatetruecolor(4, 4);
-        ob_start();
-        imagepng($gd);
-        get_file_storage()->create_file_from_string([
-            'contextid' => \context_module::instance($cm->id)->id,
-            'component' => 'mod_lightboxgallery',
-            'filearea' => 'gallery_images',
-            'itemid' => 0,
-            'filepath' => '/',
-            'filename' => 'photo.png',
-        ], ob_get_clean());
+        $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($gallery, 'photo.png', 4, 4);
 
         $html = (new \edit_caption($gallery, $cm, 'photo.png', 'caption'))->output($caption);
 

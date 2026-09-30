@@ -186,8 +186,7 @@ final class add_images_test extends \advanced_testcase {
      * An upload with the same name as an existing image leaves the existing one alone.
      */
     public function test_existing_image_is_kept(): void {
-        $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image(
-            (object) ['cmid' => $this->cm->id], 'bus.png', 10, 10);
+        $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($this->gallery, 'bus.png', 10, 10);
 
         $this->add([$this->upload('bus.png', $this->png(40, 20))]);
 

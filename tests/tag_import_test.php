@@ -143,10 +143,7 @@ final class tag_import_test extends \advanced_testcase {
     public function test_import_leaves_no_temp_files(): void {
         $this->add_file('one.jpg', $this->make_jpeg(['one']));
         $this->add_file('two.jpg', $this->make_jpeg([]));
-        $gd = imagecreatetruecolor(8, 8);
-        ob_start();
-        imagepng($gd);
-        $this->add_file('three.png', ob_get_clean());
+        $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($this->gallery, 'three.png', 8, 8);
 
         $before = $this->count_temp_files();
         $result = lightboxgallery_import_iptc_tags($this->gallery, $this->context);
