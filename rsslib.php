@@ -24,70 +24,69 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('lib.php');
-require_once('imageclass.php');
+require_once(__DIR__ . '/lib.php');
+require_once(__DIR__ . '/imageclass.php');
 
 /**
  * Returns the path to the cached rss feed contents. Creates/updates the cache if necessary.
  *
- * @param object $context the context
+ * Access to the course and activity has already been checked by rss/file.php.
+ *
+ * The feed is cached under a fingerprint of everything it shows, so it is only rebuilt when
+ * the gallery, its images, thumbnails or captions change, or for a new language.
+ *
+ * @param context $context the context
  * @param array $args the arguments received in the url
- * @return string the full path to the cached RSS feed directory. Null if there is a problem.
+ * @return string|null the full path to the cached RSS feed file. Null if there is a problem.
  */
 function lightboxgallery_rss_get_feed($context, $args) {
-    global $CFG, $DB;
+    global $DB;
 
-    $config = get_config('lightboxgallery');
-
-    $status = true;
-
-    // Are RSS feeds enabled?
-    if (empty($config->enablerssfeeds)) {
-        debugging('DISABLED (module configuration)');
+    if (empty(get_config('lightboxgallery', 'enablerssfeeds'))) {
         return null;
     }
 
     $galleryid = clean_param($args[3], PARAM_INT);
-    $cm = get_coursemodule_from_instance('lightboxgallery', $galleryid, 0, false, MUST_EXIST);
-    if ($cm) {
-        $modcontext = context_module::instance($cm->id);
-
-        // Context id from db should match the submitted one.
-        if ($context->id != $modcontext->id) {
-            return null;
-        }
+    $cm = get_coursemodule_from_instance('lightboxgallery', $galleryid, 0, false, IGNORE_MISSING);
+    if (!$cm || $context->id != context_module::instance($cm->id)->id) {
+        return null;
     }
 
     $gallery = $DB->get_record('lightboxgallery', ['id' => $galleryid], '*', MUST_EXIST);
-
-    $captions = [];
-    if ($cobjs = $DB->get_records('lightboxgallery_image_meta', ['metatype' => 'caption', 'gallery' => $gallery->id])) {
-        foreach ($cobjs as $cobj) {
-            $captions[$cobj->image] = $cobj->description;
-        }
+    if (empty($gallery->rss)) {
+        return null;
     }
 
     $fs = get_file_storage();
-    $storedfiles = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
-
-    $items = [];
-    $counter = 1;
-    $articles = '';
-    foreach ($storedfiles as $file) {
-        $filename = $file->get_filename();
-        if ($filename == '.') {
-            continue;
+    $images = [];
+    foreach ($fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', 0, 'filename', false) as $file) {
+        if (file_mimetype_in_typegroup($file->get_mimetype(), 'web_image')) {
+            $images[$file->get_filename()] = $file;
         }
-        $description = isset($captions[$filename]) ? $captions[$filename] : $filename;
-        $image = new lightboxgallery_image($file, $gallery, $cm);
-        $item = new stdClass();
-        $item->{"media:description"} = $description;
+    }
+    $thumbnails = [];
+    foreach ($fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_thumbs', 0, 'filename', false) as $file) {
+        // Thumbnails have ".png" suffixed in the filepool.
+        $thumbnails[substr($file->get_filename(), 0, -4)] = $file;
+    }
+    $captions = $DB->get_records_menu('lightboxgallery_image_meta', ['metatype' => 'caption', 'gallery' => $gallery->id],
+        '', 'image, description');
+
+    $filename = rss_get_file_name($gallery, lightboxgallery_rss_fingerprint($gallery, $images, $thumbnails, $captions));
+    $cachedfilepath = rss_get_file_full_name('mod_lightboxgallery', $filename);
+    if (file_exists($cachedfilepath)) {
+        return $cachedfilepath;
+    }
+
+    $articles = '';
+    foreach ($images as $imagename => $file) {
+        $description = $captions[$imagename] ?? $imagename;
+        $image = new lightboxgallery_image($file, $gallery, $cm, null, $thumbnails[$imagename] ?? false, false);
 
         $articles .= rss_start_tag('item', 2, true);
-        $articles .= rss_full_tag('title', 3, false, $filename);
-        $articles .= rss_full_tag('link', 3, false, $image->get_image_url());
-        $articles .= rss_full_tag('guid', 3, false, 'img' . $counter);
-
+        $articles .= rss_full_tag('title', 3, false, $imagename);
+        $articles .= rss_full_tag('link', 3, false, $image->get_image_url()->out(false));
+        $articles .= rss_full_tag('guid', 3, false, $file->get_pathnamehash(), ['isPermaLink' => 'false']);
         $articles .= rss_full_tag('media:description', 3, false, $description);
         if ($thumbnailurl = $image->get_thumbnail_url()) {
             $articles .= rss_full_tag('media:thumbnail', 3, false, '', ['url' => $thumbnailurl]);
@@ -99,127 +98,49 @@ function lightboxgallery_rss_get_feed($context, $args) {
             '',
             ['url' => $image->get_image_url(), 'type' => $file->get_mimetype()]
         );
-
         $articles .= rss_end_tag('item', 2, true);
     }
 
-    // Get the cache file info.
-    $filename = rss_get_file_name($gallery, $sql);
-    $cachedfilepath = rss_get_file_full_name('mod_lightboxgallery', $filename);
-
-    // Is the cache out of date?
-    $cachedfilelastmodified = 0;
-    if (file_exists($cachedfilepath)) {
-        $cachedfilelastmodified = filemtime($cachedfilepath);
-    }
-
-    // First all rss feeds common headers.
     $header = lightboxgallery_rss_header(
         format_string($gallery->name, true),
-        $CFG->wwwroot . "/mod/lightboxgallery/view.php?id=" . $cm->id,
+        (new moodle_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]))->out(false),
         format_string($gallery->intro, true)
     );
-
-    // Now all rss feeds common footers.
-    if (!empty($header) && !empty($articles)) {
-        $footer = rss_standard_footer();
-    }
-    // Now, if everything is ok, concatenate it.
-    if (!empty($header) && !empty($articles) && !empty($footer)) {
-        $rss = $header . $articles . $footer;
-
-        // Save the XML contents to file.
-        $status = rss_save_file('mod_lightboxgallery', $filename, $rss);
+    if (!rss_save_file('mod_lightboxgallery', $filename, $header . $articles . rss_standard_footer())) {
+        return null;
     }
 
-    if (!$status) {
-        $cachedfilepath = null;
+    // Remove this gallery's outdated copies.
+    foreach (glob(dirname($cachedfilepath) . '/' . $gallery->id . '_*.xml') ?: [] as $oldfile) {
+        if ($oldfile !== $cachedfilepath) {
+            @unlink($oldfile);
+        }
     }
 
     return $cachedfilepath;
 }
 
 /**
- * This function returns the RSS feed for the lightboxgallery module.
+ * A fingerprint of everything a gallery's feed shows, used to name its cached copy.
  *
- * @return bool
- * @throws dml_exception
- */
-function lightboxgallery_rss_feeds() {
-    global $CFG;
-
-    $status = true;
-
-    if (! $CFG->enablerssfeeds) {
-        debugging('DISABLED (admin variables)');
-    } else if (! get_config('lightboxgallery', 'enablerssfeeds')) {
-        debugging('DISABLED (module configuration)');
-    } else {
-        if ($galleries = $DB->get_records('lightboxgallery')) {
-            foreach ($galleries as $gallery) {
-                if ($gallery->rss && $status) {
-                    $filename = rss_file_name('lightboxgallery', $gallery);
-
-                    if (file_exists($filename)) {
-                        if ($lastmodified = filemtime($filename)) {
-                            if ($lastmodified > time() - HOURSECS) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (!instance_is_visible('lightboxgallery', $gallery)) {
-                        if (file_exists($filename)) {
-                            @unlink($filename);
-                        }
-                        continue;
-                    }
-
-                    mtrace('Updating RSS feed for ' . format_string($gallery->name, true) . ', ID: ' . $gallery->id);
-
-                    $result = lightboxgallery_rss_feed($gallery);
-
-                    if (! empty($result)) {
-                        $status = rss_save_file('lightboxgallery', $gallery, $result);
-                    }
-
-                    if (debugging()) {
-                        if (empty($result)) {
-                            echo('ID: ' . $gallery->id . '-> (empty) ');
-                        } else {
-                            if (! empty($status)) {
-                                echo('ID: ' . $gallery->id . '-> OK ');
-                            } else {
-                                echo('ID: ' . $gallery->id . '-> FAIL ');
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return $status;
-}
-
-/**
- * This function returns the SQL query to get the items for the RSS feed.
- *
- * @param stdClass $glossary
- * @param int $time
+ * @param stdClass $gallery
+ * @param stored_file[] $images The gallery's images, keyed by filename.
+ * @param stored_file[] $thumbnails The images' thumbnails, keyed by image filename.
+ * @param string[] $captions The images' captions, keyed by image filename.
  * @return string
  */
-function lightboxgallery_rss_get_sql($glossary, $time = 0) {
-    // Do we only want new items?
-    if ($time) {
-        $time = "AND e.timecreated > $time";
-    } else {
-        $time = "";
+function lightboxgallery_rss_fingerprint($gallery, array $images, array $thumbnails, array $captions) {
+    $parts = [$gallery->timemodified, current_language(), date('Y')];
+    foreach ($images as $imagename => $file) {
+        $parts[] = $imagename . ':' . $file->get_contenthash() . ':' . $file->get_timemodified();
+        if (isset($thumbnails[$imagename])) {
+            $parts[] = 'thumb:' . $thumbnails[$imagename]->get_timemodified();
+        }
     }
+    ksort($captions);
+    $parts[] = json_encode($captions);
 
-    $sql = '';
-
-    return $sql;
+    return implode('|', $parts);
 }
 
 /**
@@ -228,64 +149,53 @@ function lightboxgallery_rss_get_sql($glossary, $time = 0) {
  * @param string|null $title
  * @param string|null $link
  * @param string|null $description
- * @return false|string
+ * @return string
  * @throws moodle_exception
  */
 function lightboxgallery_rss_header($title = null, $link = null, $description = null) {
-    global $CFG, $USER, $OUTPUT;
-
-    $status = true;
-    $result = "";
+    global $CFG, $OUTPUT;
 
     $site = get_site();
 
-    if ($status) {
-        // Calculate title, link and description.
-        if (empty($title)) {
-            $title = format_string($site->fullname);
-        }
-        if (empty($link)) {
-            $link = $CFG->wwwroot;
-        }
-        if (empty($description)) {
-            $description = $site->summary;
-        }
-
-        // XML headers.
-        $result .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss\"" .
-                    "xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
-
-        // Open the channel.
-        $result .= rss_start_tag('channel', 1, true);
-
-        // Write channel info.
-        $result .= rss_full_tag('title', 2, false, strip_tags($title));
-        $result .= rss_full_tag('link', 2, false, $link);
-        $result .= rss_full_tag('description', 2, false, $description);
-        $result .= rss_full_tag('generator', 2, false, 'Moodle');
-        if (!empty($USER->lang)) {
-            $result .= rss_full_tag('language', 2, false, substr($USER->lang, 0, 2));
-        }
-        $today = getdate();
-        $result .= rss_full_tag('copyright', 2, false, '&#169; ' . $today['year'] . ' ' . format_string($site->fullname));
-
-        // Write image info.
-        $rsspix = $OUTPUT->image_url('i/rsssitelogo');
-
-        // Write the info.
-        $result .= rss_start_tag('image', 2, true);
-        $result .= rss_full_tag('url', 3, false, $rsspix);
-        $result .= rss_full_tag('title', 3, false, 'moodle');
-        $result .= rss_full_tag('link', 3, false, $CFG->wwwroot);
-        $result .= rss_full_tag('width', 3, false, '140');
-        $result .= rss_full_tag('height', 3, false, '35');
-        $result .= rss_end_tag('image', 2, true);
+    // Calculate title, link and description.
+    if (empty($title)) {
+        $title = format_string($site->fullname);
+    }
+    if (empty($link)) {
+        $link = $CFG->wwwroot;
+    }
+    if (empty($description)) {
+        $description = $site->summary;
     }
 
-    if (!$status) {
-        return false;
-    } else {
-        return $result;
-    }
+    // XML headers.
+    $result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    $result .= "<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss/\" " .
+                "xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
+
+    // Open the channel.
+    $result .= rss_start_tag('channel', 1, true);
+
+    // Write channel info.
+    $result .= rss_full_tag('title', 2, false, strip_tags($title));
+    $result .= rss_full_tag('link', 2, false, $link);
+    $result .= rss_full_tag('description', 2, false, $description);
+    $result .= rss_full_tag('generator', 2, false, 'Moodle');
+    $result .= rss_full_tag('language', 2, false, substr(current_language(), 0, 2));
+    $today = getdate();
+    $result .= rss_full_tag('copyright', 2, false, "\u{00A9} " . $today['year'] . ' ' . format_string($site->fullname));
+
+    // Write image info.
+    $rsspix = $OUTPUT->image_url('i/rsssitelogo');
+
+    // Write the info.
+    $result .= rss_start_tag('image', 2, true);
+    $result .= rss_full_tag('url', 3, false, $rsspix);
+    $result .= rss_full_tag('title', 3, false, 'moodle');
+    $result .= rss_full_tag('link', 3, false, $CFG->wwwroot);
+    $result .= rss_full_tag('width', 3, false, '140');
+    $result .= rss_full_tag('height', 3, false, '35');
+    $result .= rss_end_tag('image', 2, true);
+
+    return $result;
 }
