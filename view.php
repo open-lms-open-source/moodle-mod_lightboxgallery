@@ -50,7 +50,7 @@ if ($id) {
 }
 
 
-if ($gallery->ispublic) {
+if ($gallery->ispublic && lightboxgallery_public_gallery_visible($course, $cm)) {
     $userid = (isloggedin() ? $USER->id : 0);
     $PAGE->set_cm($cm, $course);
     $PAGE->set_pagelayout('incourse');
@@ -162,7 +162,7 @@ if (count($options) > 0) {
     echo $OUTPUT->box(implode(' ', $options), 'center');
 }
 
-if (!$editing && $gallery->comments && has_capability('mod/lightboxgallery:viewcomments', $context)) {
+if (!$editing && lightboxgallery_can_view_comments($gallery, $course, $context)) {
     if ($comments = $DB->get_records('lightboxgallery_comments', ['gallery' => $gallery->id], 'timemodified ASC')) {
         foreach ($comments as $comment) {
             lightboxgallery_print_comment($comment, $context);

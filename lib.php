@@ -433,8 +433,16 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     require_once($CFG->libdir . '/filelib.php');
 
-    $gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance]);
-    if (!$gallery->ispublic) {
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+    if (!in_array($filearea, ['gallery_images', 'gallery_thumbs', 'gallery_index'])) {
+        return false;
+    }
+
+    $gallery = $DB->get_record('lightboxgallery', ['id' => $cm->instance], '*', MUST_EXIST);
+    $cminfo = get_fast_modinfo($course)->get_cm($cm->id);
+    if (!$gallery->ispublic || !lightboxgallery_public_gallery_visible($course, $cminfo)) {
         require_login($course, false, $cm);
     }
 
@@ -451,6 +459,44 @@ function lightboxgallery_pluginfile($course, $cm, $context, $filearea, $args, $f
     return;
 }
 
+
+/**
+ * Whether a public gallery can be shown to the current user without the usual course login.
+ *
+ * Public galleries skip enrolment, but still honour the course's visibility and the
+ * activity's visibility and availability restrictions.
+ *
+ * @param stdClass $course
+ * @param cm_info $cm The gallery's course module, as seen by the current user.
+ * @return bool
+ */
+function lightboxgallery_public_gallery_visible(stdClass $course, cm_info $cm): bool {
+    if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
+        return false;
+    }
+    return $cm->uservisible;
+}
+
+/**
+ * Whether the current user can see a gallery's comments.
+ *
+ * Comments show their authors' names and pictures, so on a public gallery they are only
+ * shown to users who could open the course anyway, never to anonymous visitors.
+ *
+ * @param stdClass $gallery
+ * @param stdClass $course
+ * @param context_module $context
+ * @return bool
+ */
+function lightboxgallery_can_view_comments(stdClass $gallery, stdClass $course, context_module $context): bool {
+    if (!$gallery->comments || !has_capability('mod/lightboxgallery:viewcomments', $context)) {
+        return false;
+    }
+    if (!$gallery->ispublic) {
+        return true;
+    }
+    return isloggedin() && can_access_course($course);
+}
 
 /**
  * Lists all browsable file areas
