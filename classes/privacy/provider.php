@@ -231,10 +231,13 @@ class provider implements
         global $DB;
 
         $context = $userlist->get_context();
+        if (!$context instanceof \context_module) {
+            return;
+        }
         $instanceid = self::get_lightboxgallery_id_from_context($context);
         $userids = $userlist->get_userids();
 
-        if (empty($instanceid)) {
+        if (empty($instanceid) || empty($userids)) {
             return;
         }
 
