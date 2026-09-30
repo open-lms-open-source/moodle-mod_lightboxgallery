@@ -133,12 +133,12 @@ if (!$editing && $showtags) {
     $desccompare = $DB->sql_compare_text('description');
     $sql = "SELECT $desccompare AS description
               FROM {lightboxgallery_image_meta}
-             WHERE gallery = {$gallery->id}
-               AND metatype = 'tag'
+             WHERE gallery = :gallery
+               AND metatype = :metatype
           GROUP BY $desccompare
           ORDER BY COUNT($desccompare) DESC,
                    $desccompare ASC";
-    if ($tags = $DB->get_records_sql($sql, [], 0, 10)) {
+    if ($tags = $DB->get_records_sql($sql, ['gallery' => $gallery->id, 'metatype' => 'tag'], 0, 10)) {
         lightboxgallery_print_tags(get_string('tagspopular', 'lightboxgallery'), $tags, $course->id, $gallery->id);
     }
 }
