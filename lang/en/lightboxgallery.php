@@ -154,6 +154,7 @@ $string['tagsimportfinish'] = 'Finished importing {$a->tags} tags from {$a->imag
 $string['tagsiptc'] = 'IPTC tags';
 $string['tagspopular'] = 'Popular tags';
 $string['tagsrelated'] = 'Related tags';
+$string['taskgeneratethumbnails'] = 'Generate gallery thumbnails';
 $string['thumbnailoffset'] = 'Offset';
 $string['zipextracted'] = 'Zip file extracted: {$a}';
 $string['zipnonewfiles'] = 'No new images were found - make sure images are in the root directory of the archive';

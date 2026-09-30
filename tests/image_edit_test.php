@@ -49,6 +49,7 @@ final class image_edit_test extends \advanced_testcase {
         global $DB;
         parent::setUp();
         $this->resetAfterTest();
+        lightboxgallery_image::set_thumbnail_budget(lightboxgallery_image::SYNC_THUMBNAIL_LIMIT);
 
         $course = $this->getDataGenerator()->create_course();
         $gallery = $this->getDataGenerator()->create_module('lightboxgallery', ['course' => $course->id]);

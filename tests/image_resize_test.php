@@ -53,6 +53,7 @@ final class image_resize_test extends \advanced_testcase {
         global $DB;
         parent::setUp();
         $this->resetAfterTest();
+        lightboxgallery_image::set_thumbnail_budget(lightboxgallery_image::SYNC_THUMBNAIL_LIMIT);
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();

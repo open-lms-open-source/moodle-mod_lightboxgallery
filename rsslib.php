@@ -89,7 +89,9 @@ function lightboxgallery_rss_get_feed($context, $args) {
         $articles .= rss_full_tag('guid', 3, false, 'img' . $counter);
 
         $articles .= rss_full_tag('media:description', 3, false, $description);
-        $articles .= rss_full_tag('media:thumbnail', 3, false, '', ['url' => $image->get_thumbnail_url()]);
+        if ($thumbnailurl = $image->get_thumbnail_url()) {
+            $articles .= rss_full_tag('media:thumbnail', 3, false, '', ['url' => $thumbnailurl]);
+        }
         $articles .= rss_full_tag(
             'media:content',
             3,

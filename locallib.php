@@ -209,7 +209,7 @@ function lightboxgallery_resize_options() {
  * @throws stored_file_creation_exception
  */
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
-    global $CFG;
+    global $CFG, $OUTPUT;
 
     require_once(dirname(__FILE__) . '/imageclass.php');
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $courseid);
@@ -220,24 +220,23 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     $fs = get_file_storage();
     $storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_index', '0', '/', 'index.png');
 
-    if (!is_null($newimage) && is_object($storedfile)) { // Delete any existing index.
-        $storedfile->delete();
-    }
-    if (is_object($storedfile) && is_null($newimage)) {
-        // Grab the index.
-        $index = $storedfile;
-    } else if (!is_null($newimage) || $files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images')) {
-        // Get first image and create an index for that.
-        if (is_null($newimage)) {
-            $file = array_shift($files);
-            while (substr($file->get_mimetype(), 0, 6) != 'image/') {
-                $file = array_shift($files);
-            }
-            $image = new lightboxgallery_image($file, $gallery, $cm);
-        } else {
-            $image = $newimage;
+    if (!is_null($newimage)) {
+        // Replace the index with the chosen image.
+        if (is_object($storedfile)) {
+            $storedfile->delete();
         }
-        $index = $image->create_index();
+        $index = $newimage->create_index();
+    } else if (is_object($storedfile)) {
+        $index = $storedfile;
+    } else if ($file = lightboxgallery_first_indexable_image($context)) {
+        if (lightboxgallery_image::claim_thumbnail_budget()) {
+            $image = new lightboxgallery_image($file, $gallery, $cm);
+            $index = $image->create_index();
+        } else {
+            // Too many images to process in this request; show the default picture until the task has run.
+            lightboxgallery_image::queue_thumbnail_generation($cm->id);
+            return '<img src="' . $OUTPUT->image_url('index', 'mod_lightboxgallery') . '" alt="" id="' . $imageid . '" />';
+        }
     } else {
         $fileinfo = [
             'contextid' => $context->id,
@@ -263,6 +262,24 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     return '<img src="' . $path . '" alt="" ' . (! empty($imageid) ? 'id="' . $imageid . '"' : '' )  . ' />';
 }
 
+
+/**
+ * Find the first image in a gallery that an index picture can be made from.
+ *
+ * @param context_module $context The gallery's context.
+ * @return stored_file|null
+ */
+function lightboxgallery_first_indexable_image(context_module $context) {
+    $files = get_file_storage()->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', 0,
+        'itemid, filepath, filename', false);
+    foreach ($files as $file) {
+        $mimetype = $file->get_mimetype();
+        if (file_mimetype_in_typegroup($mimetype, 'web_image') && $mimetype != 'image/svg+xml') {
+            return $file;
+        }
+    }
+    return null;
+}
 
 /**
  * File browsing support class

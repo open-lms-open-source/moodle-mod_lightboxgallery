@@ -50,6 +50,18 @@ class lightboxgallery_image {
     /** @var int The largest width or height, in pixels, that a resize can produce. */
     const MAX_DIMENSION = 4096;
 
+    /** @var int How many thumbnails one request may generate before the rest are left to a background task. */
+    const SYNC_THUMBNAIL_LIMIT = 10;
+
+    /** @var int|null How many more thumbnails this request may generate; null for no limit. */
+    private static $thumbnailbudget = self::SYNC_THUMBNAIL_LIMIT;
+
+    /** @var int[] Course modules this request has already queued thumbnail generation for. */
+    private static $queuedcmids = [];
+
+    /** @var bool Whether this image's thumbnail is waiting to be generated in the background. */
+    private $thumbnailpending = false;
+
     /**
      * The course module object.
      *
@@ -170,14 +182,16 @@ class lightboxgallery_image {
             $this->width = $imageinfo['width'];
         }
 
-        $this->thumbnail = $thumbnail;
-
         // If we weren't given a thumbnail, double check if it exists before generating one.
-        if (!$thumbnail && (!$this->thumbnail = $this->get_thumbnail())) {
-            $this->thumbnail = $this->create_thumbnail();
-        }
-        if ($this->thumbnail) {
-            $this->thumburl->param('mtime', $this->thumbnail->get_timemodified());
+        // Only a few are generated per request; the rest are left to a background task.
+        $thumbnail = $thumbnail ?: $this->get_thumbnail();
+        if ($thumbnail) {
+            $this->use_thumbnail($thumbnail);
+        } else if ($this->storedfile->get_mimetype() == 'image/svg+xml' || self::claim_thumbnail_budget()) {
+            $this->use_thumbnail($this->create_thumbnail());
+        } else {
+            $this->thumbnailpending = true;
+            self::queue_thumbnail_generation($this->cmid);
         }
 
         $this->metadata = $metadata;
@@ -212,6 +226,9 @@ class lightboxgallery_image {
      * @throws stored_file_creation_exception
      */
     public function create_thumbnail($offsetx = 0, $offsety = 0) {
+        if ($this->storedfile->get_mimetype() != 'image/svg+xml') {
+            $this->load_dimensions();
+        }
         if (
             $this->storedfile->get_mimetype() == 'image/svg+xml'
             || $this->width === null || $this->height === null
@@ -255,6 +272,7 @@ class lightboxgallery_image {
             'filepath' => '/',
             'filename' => 'index.png', ];
 
+        $this->load_dimensions();
         $base = imagecreatefrompng($CFG->dirroot . '/mod/lightboxgallery/pix/index.png');
         $transparent = imagecolorat($base, 0, 0);
 
@@ -467,10 +485,17 @@ class lightboxgallery_image {
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) {
             $html .= $captiondiv;
         }
-        $html .= '<a class="lightbox-gallery-image-thumbnail" href="' .
+        if ($this->thumbnailpending) {
+            // A plain tile until the background task has made the thumbnail.
+            $thumbclass = 'lightbox-gallery-image-thumbnail lightbox-gallery-image-pending';
+            $thumbstyle = '';
+        } else {
+            $thumbclass = 'lightbox-gallery-image-thumbnail';
+            $thumbstyle = 'background-image: url(\'' . $this->thumburl . '\'); ';
+        }
+        $html .= '<a class="' . $thumbclass . '" href="' .
                  $this->imageurl . '" rel="lightbox_gallery" title="' . s($caption) .
-                 '" style="background-image: url(\'' . $this->thumburl .
-                 '\'); width: ' . THUMBNAIL_WIDTH . 'px; height: ' . THUMBNAIL_HEIGHT . 'px;"></a>';
+                 '" style="' . $thumbstyle . 'width: ' . THUMBNAIL_WIDTH . 'px; height: ' . THUMBNAIL_HEIGHT . 'px;"></a>';
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT || $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
             $html .= $captiondiv;
         }
@@ -638,10 +663,113 @@ class lightboxgallery_image {
     /**
      * Get the thumbnail URL.
      *
-     * @return \core\url
+     * @return \core\url|null Null while the thumbnail is waiting to be generated in the background;
+     *     call ensure_thumbnail() first on a page that must show it.
      */
     public function get_thumbnail_url() {
-        return $this->thumburl;
+        return $this->thumbnailpending ? null : $this->thumburl;
+    }
+
+    /**
+     * Generate this image's thumbnail now if it was left for the background task.
+     *
+     * For pages about a single image, which should always show its thumbnail. Pages that
+     * list many images rely on the per-request limit instead.
+     *
+     * @return void
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    public function ensure_thumbnail() {
+        if (!$this->thumbnailpending) {
+            return;
+        }
+        $this->use_thumbnail($this->create_thumbnail());
+        $this->thumbnailpending = false;
+    }
+
+    /**
+     * Set the thumbnail this image displays with.
+     *
+     * @param stored_file $thumbnail The thumbnail, or the image itself when it has no separate thumbnail.
+     * @return void
+     */
+    private function use_thumbnail($thumbnail) {
+        $this->thumbnail = $thumbnail;
+        if ($thumbnail === $this->storedfile) {
+            // There's no separate thumbnail, so show the image itself.
+            $this->thumburl = $this->imageurl;
+        } else {
+            $this->thumburl->param('mtime', $thumbnail->get_timemodified());
+        }
+    }
+
+    /**
+     * Whether this image's thumbnail is waiting to be generated in the background.
+     *
+     * @return bool
+     */
+    public function is_thumbnail_pending() {
+        return $this->thumbnailpending;
+    }
+
+    /**
+     * Load the image's width and height, if they weren't loaded when it was constructed.
+     *
+     * @return void
+     */
+    private function load_dimensions() {
+        if ($this->width !== null && $this->height !== null) {
+            return;
+        }
+        if ($imageinfo = $this->storedfile->get_imageinfo()) {
+            $this->width = $imageinfo['width'];
+            $this->height = $imageinfo['height'];
+        }
+    }
+
+    /**
+     * Set how many thumbnails this request may still generate.
+     *
+     * @param int|null $budget The number allowed, or null for no limit (as the background task uses).
+     * @return void
+     */
+    public static function set_thumbnail_budget(?int $budget): void {
+        self::$thumbnailbudget = $budget;
+        self::$queuedcmids = [];
+    }
+
+    /**
+     * Use up one of this request's thumbnail generations, if any are left.
+     *
+     * @return bool True if the caller may generate a thumbnail or index image now.
+     */
+    public static function claim_thumbnail_budget(): bool {
+        if (self::$thumbnailbudget === null) {
+            return true;
+        }
+        if (self::$thumbnailbudget > 0) {
+            self::$thumbnailbudget--;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Queue a background task to generate a gallery's missing thumbnails and index image.
+     *
+     * @param int $cmid The gallery's course module id.
+     * @return void
+     */
+    public static function queue_thumbnail_generation(int $cmid): void {
+        if (isset(self::$queuedcmids[$cmid])) {
+            return;
+        }
+        self::$queuedcmids[$cmid] = true;
+
+        $task = new \mod_lightboxgallery\task\generate_thumbnails();
+        $task->set_custom_data(['cmid' => $cmid]);
+        \core\task\manager::queue_adhoc_task($task, true);
     }
 
     /**

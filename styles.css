@@ -46,6 +46,11 @@
     background-size: 100% 100%;
 }
 
+/* Shown until a background task has generated the image's thumbnail. */
+.lightbox-gallery .lightbox-gallery-image-thumbnail.lightbox-gallery-image-pending {
+    background-color: #f0f0f0;
+}
+
 .lightbox-gallery .lightbox-gallery-image-caption,
 .lightbox-gallery .lightbox-gallery-image-extinfo {
     font-family: 'Verdana', 'Lucida Grande', sans-serif;

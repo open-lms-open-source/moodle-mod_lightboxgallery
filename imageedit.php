@@ -58,6 +58,7 @@ if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_i
     throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
 }
 $imageclass = new lightboxgallery_image($storedfile, $gallery, $cm);
+$imageclass->ensure_thumbnail();
 
 $edittypes = lightboxgallery_edit_types(false, $imageclass);
 

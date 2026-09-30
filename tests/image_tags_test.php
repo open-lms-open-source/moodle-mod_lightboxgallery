@@ -34,6 +34,14 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
 #[\PHPUnit\Framework\Attributes\CoversClass(lightboxgallery_image::class)]
 final class image_tags_test extends \advanced_testcase {
     /**
+     * Start each test with the normal thumbnail budget.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        lightboxgallery_image::set_thumbnail_budget(lightboxgallery_image::SYNC_THUMBNAIL_LIMIT);
+    }
+
+    /**
      * Create a gallery containing one image with the given filename.
      *
      * @param string $filename
