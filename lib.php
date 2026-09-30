@@ -247,6 +247,9 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
     $modinfo = get_fast_modinfo($course);
 
     $cm = $modinfo->cms[$cmid];
+    if (!$cm->uservisible || !has_capability('mod/lightboxgallery:viewcomments', $cm->context)) {
+        return true;
+    }
 
     $userfields = \core_user\fields::for_userpic()->get_sql('u', false, '', 'userid', false)->selects;
     $userfieldsnoalias = \core_user\fields::get_picture_fields();
@@ -254,7 +257,7 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
               FROM {lightboxgallery_comments} c
                    JOIN {lightboxgallery} l ON l.id = c.gallery
                    JOIN {user}            u ON u.id = c.userid
-             WHERE c.timemodified > ? AND l.id = ?
+             WHERE c.timemodified > ? AND l.id = ? AND l.comments = 1
                    " . ($userid ? "AND u.id = ?" : '') . "
           ORDER BY c.timemodified ASC";
     $params = [$timestart, $cm->instance];
@@ -263,7 +266,7 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
     }
     if ($comments = $DB->get_records_sql($sql, $params)) {
         foreach ($comments as $comment) {
-            $display = lightboxgallery_resize_text(trim(strip_tags($comment->commenttext)), MAX_COMMENT_PREVIEW);
+            $display = lightboxgallery_comment_preview($comment->commenttext);
 
             $activity = new stdClass();
 
@@ -317,7 +320,7 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
          ) .
          '<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $activity->cmid . '#c' . $activity->content->id .
          '">' .
-         $activity->content->comment . '</a>' .
+         s($activity->content->comment) . '</a>' .
          '</div>' .
          '<div class="user"> ' .
          html_writer::link($userviewurl, fullname($activity->user, $viewfullnames)) .
@@ -343,39 +346,52 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
 function lightboxgallery_print_recent_activity($course, $viewfullnames, $timestart) {
     global $DB, $CFG, $OUTPUT;
 
+    $galleryids = [];
+    foreach (get_fast_modinfo($course)->get_instances_of('lightboxgallery') as $cm) {
+        if ($cm->uservisible && has_capability('mod/lightboxgallery:viewcomments', $cm->context)) {
+            $galleryids[] = $cm->instance;
+        }
+    }
+    if (!$galleryids) {
+        return false;
+    }
+
+    [$insql, $params] = $DB->get_in_or_equal($galleryids, SQL_PARAMS_NAMED);
+    $params['timestart'] = $timestart;
     $userfields = \core_user\fields::for_name()->get_sql('u', true, '', '', false)->selects;
     $sql = "SELECT c.*, l.name, $userfields
               FROM {lightboxgallery_comments} c
                    JOIN {lightboxgallery} l ON l.id = c.gallery
                    JOIN {user}            u ON u.id = c.userid
-             WHERE c.timemodified > ? AND l.course = ?
+             WHERE c.timemodified > :timestart AND l.id $insql AND l.comments = 1
           ORDER BY c.timemodified ASC";
-    $params = [$timestart, $course->id];
 
-    if ($comments = $DB->get_records_sql($sql, $params)) {
-        echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 3);
-
-        echo '<ul class="unlist">';
-
-        foreach ($comments as $comment) {
-            $display = lightboxgallery_resize_text(trim(strip_tags($comment->commenttext)), MAX_COMMENT_PREVIEW);
-
-            $output = '<li>' .
-                 ' <div class="head">' .
-                 '  <div class="date">' . userdate($comment->timemodified, get_string('strftimerecent')) . '</div>' .
-                 '  <div class="name">' . fullname($comment, $viewfullnames) . ' - ' . format_string($comment->name) . '</div>' .
-                 ' </div>' .
-                 ' <div class="info">' .
-                 '  "<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?l=' . $comment->gallery . '#c' . $comment->id .
-                 '">' .
-                 $display . '</a>"' .
-                 ' </div>' .
-                 '</li>';
-            echo $output;
-        }
-
-        echo '</ul>';
+    if (!$comments = $DB->get_records_sql($sql, $params)) {
+        return false;
     }
+
+    echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 3);
+
+    echo '<ul class="unlist">';
+
+    foreach ($comments as $comment) {
+        $display = s(lightboxgallery_comment_preview($comment->commenttext));
+
+        $output = '<li>' .
+             ' <div class="head">' .
+             '  <div class="date">' . userdate($comment->timemodified, get_string('strftimerecent')) . '</div>' .
+             '  <div class="name">' . fullname($comment, $viewfullnames) . ' - ' . format_string($comment->name) . '</div>' .
+             ' </div>' .
+             ' <div class="info">' .
+             '  "<a href="' . $CFG->wwwroot . '/mod/lightboxgallery/view.php?l=' . $comment->gallery . '#c' . $comment->id .
+             '">' .
+             $display . '</a>"' .
+             ' </div>' .
+             '</li>';
+        echo $output;
+    }
+
+    echo '</ul>';
 
     return true;
 }
@@ -569,6 +585,19 @@ function lightboxgallery_get_file_info($browser, $areas, $course, $cm, $context,
  */
 function lightboxgallery_resize_text($text, $length) {
     return core_text::strlen($text) > $length ? core_text::substr($text, 0, $length) . '...' : $text;
+}
+
+/**
+ * A short plain-text preview of a comment, for recent activity listings.
+ *
+ * The result is plain text, so escape it with s() before output.
+ *
+ * @param string $commenttext The comment's HTML.
+ * @return string
+ */
+function lightboxgallery_comment_preview($commenttext) {
+    $text = html_entity_decode(strip_tags($commenttext), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return lightboxgallery_resize_text(trim($text), MAX_COMMENT_PREVIEW);
 }
 
 /**
