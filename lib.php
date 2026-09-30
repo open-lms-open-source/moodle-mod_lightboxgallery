@@ -370,7 +370,7 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
         return false;
     }
 
-    echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 3);
+    echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 6);
 
     echo '<ul class="unlist">';
 
