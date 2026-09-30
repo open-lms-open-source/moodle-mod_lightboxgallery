@@ -114,7 +114,7 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
             lightboxgallery_resize_options()
         );
         $mform->setType('resize', PARAM_INT);
-        $mform->disabledIf('resize', 'autoresize', 'eq', 1);
+        $mform->disabledIf('resize', 'autoresize', 'eq', LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN);
         $mform->disabledIf('resize', 'autoresizedisabled', 'checked');
 
         $mform->addElement('select', 'comments', get_string('allowcomments', 'lightboxgallery'), $yesno);
@@ -187,8 +187,8 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
     private function get_autoresize_options() {
         $screen = get_string('screen', 'lightboxgallery');
         $upload = get_string('upload');
-        return [AUTO_RESIZE_SCREEN => $screen,
-                     AUTO_RESIZE_UPLOAD => $upload,
-                     AUTO_RESIZE_BOTH   => $screen . ' &amp; ' . $upload, ];
+        return [LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN => $screen,
+                     LIGHTBOXGALLERY_AUTO_RESIZE_UPLOAD => $upload,
+                     LIGHTBOXGALLERY_AUTO_RESIZE_BOTH   => $screen . ' &amp; ' . $upload, ];
     }
 }

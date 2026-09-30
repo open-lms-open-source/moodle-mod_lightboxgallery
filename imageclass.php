@@ -21,14 +21,6 @@ require_once($CFG->libdir . '/gdlib.php');
 /**
  *
  */
-define('THUMBNAIL_WIDTH', 162);
-/**
- *
- */
-define('THUMBNAIL_HEIGHT', 132);
-/**
- *
- */
 define('LIGHTBOXGALLERY_POS_HID', 2);
 /**
  *
@@ -47,6 +39,15 @@ define('LIGHTBOXGALLERY_POS_BOT', 0);
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lightboxgallery_image {
+    /** @var int The width of a thumbnail, in pixels. */
+    const THUMBNAIL_WIDTH = 162;
+
+    /** @var int The height of a thumbnail, in pixels. */
+    const THUMBNAIL_HEIGHT = 132;
+
+    /** @var int How many characters of a caption to show when the gallery doesn't show full captions. */
+    const CAPTION_PREVIEW_LENGTH = 13;
+
     /** @var int The largest width or height, in pixels, that a resize can produce. */
     const MAX_DIMENSION = 4096;
 
@@ -246,7 +247,7 @@ class lightboxgallery_image {
             'filename' => $this->storedfile->get_filename() . '.png', ];
 
         ob_start();
-        imagepng($this->get_image_resized(THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH, $offsetx, $offsety));
+        imagepng($this->get_image_resized(self::THUMBNAIL_HEIGHT, self::THUMBNAIL_WIDTH, $offsetx, $offsety));
         $thumbnail = ob_get_clean();
 
         $this->delete_thumbnail();
@@ -409,7 +410,8 @@ class lightboxgallery_image {
                     '<input type="hidden" name="id" value="' . $this->cmid . '" />' .
                     '<input type="hidden" name="image" value="' . $this->storedfile->get_filename() . '" />' .
                     '<input type="hidden" name="page" value="0" />' .
-                    '<select name="tab" class="lightbox-edit-select ' . $customselect . ' mb-1" style="width: ' . THUMBNAIL_WIDTH .
+                    '<select name="tab" class="lightbox-edit-select ' . $customselect . ' mb-1" style="width: ' .
+                    self::THUMBNAIL_WIDTH .
                     'px;" ' . 'onchange="submit();">' .
                     '<option disabled selected>' . get_string('edit_choose', 'lightboxgallery') . '</option>';
         foreach ($options as $option) {
@@ -467,7 +469,7 @@ class lightboxgallery_image {
         if ($this->gallery->captionfull) {
             $caption = $this->get_image_caption();
         } else {
-            $caption = lightboxgallery_resize_text($this->get_image_caption(), MAX_IMAGE_LABEL);
+            $caption = lightboxgallery_resize_text($this->get_image_caption(), self::CAPTION_PREVIEW_LENGTH);
         }
         $timemodified = userdate($this->storedfile->get_timemodified(), get_string('strftimedatetimeshort', 'langconfig'));
         $filesize = round($this->storedfile->get_filesize() / 100) / 10;
@@ -495,7 +497,8 @@ class lightboxgallery_image {
         }
         $html .= '<a class="' . $thumbclass . '" href="' .
                  $this->imageurl . '" rel="lightbox_gallery" title="' . s($caption) .
-                 '" style="' . $thumbstyle . 'width: ' . THUMBNAIL_WIDTH . 'px; height: ' . THUMBNAIL_HEIGHT . 'px;"></a>';
+                 '" style="' . $thumbstyle . 'width: ' . self::THUMBNAIL_WIDTH . 'px; height: ' . self::THUMBNAIL_HEIGHT .
+                 'px;"></a>';
         if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT || $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
             $html .= $captiondiv;
         }
@@ -533,7 +536,12 @@ class lightboxgallery_image {
      * @param int $offsety
      * @return false|GdImage|resource
      */
-    private function get_image_resized($height = THUMBNAIL_HEIGHT, $width = THUMBNAIL_WIDTH, $offsetx = 0, $offsety = 0) {
+    private function get_image_resized(
+        $height = self::THUMBNAIL_HEIGHT,
+        $width = self::THUMBNAIL_WIDTH,
+        $offsetx = 0,
+        $offsety = 0
+    ) {
         raise_memory_limit(MEMORY_EXTRA);
         $image = imagecreatefromstring($this->storedfile->get_content());
         $resized = imagecreatetruecolor($width, $height);

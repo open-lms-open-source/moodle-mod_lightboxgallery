@@ -30,16 +30,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/lib.php');
 require_once("$CFG->libdir/filelib.php");
 
-define('THUMB_WIDTH', 150);
-define('THUMB_HEIGHT', 150);
-define('MAX_IMAGE_LABEL', 13);
-define('MAX_COMMENT_PREVIEW', 20);
+// How many characters of a comment to show in recent activity.
+define('LIGHTBOXGALLERY_COMMENT_PREVIEW_LENGTH', 20);
 // How many comments to show on each page of a gallery.
 define('LIGHTBOXGALLERY_COMMENTS_PERPAGE', 25);
 
-define('AUTO_RESIZE_SCREEN', 1);
-define('AUTO_RESIZE_UPLOAD', 2);
-define('AUTO_RESIZE_BOTH', 3);
+// Values of the gallery's autoresize setting: resize images to fit the screen, when they're uploaded, or both.
+define('LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN', 1);
+define('LIGHTBOXGALLERY_AUTO_RESIZE_UPLOAD', 2);
+define('LIGHTBOXGALLERY_AUTO_RESIZE_BOTH', 3);
 
 /**
  * Add a set of uploaded files to the gallery.

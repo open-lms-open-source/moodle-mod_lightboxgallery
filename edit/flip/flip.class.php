@@ -23,15 +23,6 @@
  */
 
 /**
- * Flip vertical
- */
-define('FLIP_VERTICAL', 1);
-/**
- * Flip horizontal
- */
-define('FLIP_HORIZONTAL', 2);
-
-/**
  * The flip plugin class.
  *
  * @package   mod_lightboxgallery
@@ -39,6 +30,12 @@ define('FLIP_HORIZONTAL', 2);
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_flip extends edit_base {
+    /** @var int The form value for flipping top to bottom. */
+    const VERTICAL = 1;
+
+    /** @var int The form value for flipping left to right. */
+    const HORIZONTAL = 2;
+
     /**
      * Constructor
      *
@@ -59,10 +56,10 @@ class edit_flip extends edit_base {
      */
     public function output() {
         $result = get_string('selectflipmode', 'lightboxgallery') . '<br /><br />' .
-                  '<label for="' . FLIP_VERTICAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
-                  FLIP_VERTICAL . '" required /> Vertical</label><br />' .
-                  '<label for="' . FLIP_HORIZONTAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
-                  FLIP_HORIZONTAL . '" /> Horizontal</label>' .
+                  '<label for="' . self::VERTICAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
+                  self::VERTICAL . '" required /> Vertical</label><br />' .
+                  '<label for="' . self::HORIZONTAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
+                  self::HORIZONTAL . '" /> Horizontal</label>' .
                   '<br /><br /><input type="submit" class="btn btn-secondary" value="' .
                   get_string('edit_flip', 'lightboxgallery') . '" />';
 
@@ -79,7 +76,7 @@ class edit_flip extends edit_base {
         $mode = required_param('mode', PARAM_INT);
 
         $flip = 'vertical';
-        if ($mode & FLIP_HORIZONTAL) {
+        if ($mode & self::HORIZONTAL) {
             $flip = 'horizontal';
         }
         $this->image = $this->lbgimage->flip_image($flip);

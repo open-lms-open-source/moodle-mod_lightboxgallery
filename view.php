@@ -102,7 +102,7 @@ if ($allowrssfeed) {
 
 echo $OUTPUT->header();
 
-if ($gallery->autoresize == AUTO_RESIZE_SCREEN || $gallery->autoresize == AUTO_RESIZE_BOTH) {
+if ($gallery->autoresize == LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN || $gallery->autoresize == LIGHTBOXGALLERY_AUTO_RESIZE_BOTH) {
     $resizecss = ' autoresize';
 } else {
     $resizecss = '';

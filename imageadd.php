@@ -61,7 +61,7 @@ if ($mform->is_cancelled()) {
         redirect($PAGE->url);
     }
 
-    if ($gallery->autoresize == AUTO_RESIZE_UPLOAD || $gallery->autoresize == AUTO_RESIZE_BOTH) {
+    if ($gallery->autoresize == LIGHTBOXGALLERY_AUTO_RESIZE_UPLOAD || $gallery->autoresize == LIGHTBOXGALLERY_AUTO_RESIZE_BOTH) {
         $resize = $gallery->resize;
     } else if (isset($formdata->resize)) {
         $resize = $formdata->resize;

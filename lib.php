@@ -598,7 +598,7 @@ function lightboxgallery_resize_text($text, $length) {
  */
 function lightboxgallery_comment_preview($commenttext) {
     $text = html_entity_decode(strip_tags($commenttext), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    return lightboxgallery_resize_text(trim($text), MAX_COMMENT_PREVIEW);
+    return lightboxgallery_resize_text(trim($text), LIGHTBOXGALLERY_COMMENT_PREVIEW_LENGTH);
 }
 
 /**
