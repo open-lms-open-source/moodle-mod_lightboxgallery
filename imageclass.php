@@ -324,34 +324,18 @@ class lightboxgallery_image {
     }
 
     /**
-     * Get the image flipped in a given direction.
+     * Flip the image in a given direction.
      *
      * @param string $direction
-     * @return array|string|string[]|null
+     * @return string The image filename, which is unchanged.
      * @throws dml_exception
      * @throws file_exception
+     * @throws moodle_exception
      * @throws stored_file_creation_exception
      */
     public function flip_image($direction) {
-
-        $fileinfo = [
-            'contextid'     => $this->context->id,
-            'component'     => 'mod_lightboxgallery',
-            'filearea'      => 'gallery_images',
-            'itemid'        => 0,
-            'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename(), ];
-
-        ob_start();
-        $original = $this->storedfile->get_filename();
-        $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_flipped($direction));
-        $flipped = ob_get_clean();
-        $this->delete_file(false);
-        $fs = get_file_storage();
-        $this->set_stored_file($fs->create_file_from_string($fileinfo, $flipped));
-        $this->create_thumbnail();
-        $this->update_meta_file($original, $fileinfo['filename']);
-        return $fileinfo['filename'];
+        $this->replace_content($this->encode_image($this->get_image_flipped($direction)));
+        return $this->storedfile->get_filename();
     }
 
     /**
@@ -572,7 +556,10 @@ class lightboxgallery_image {
      */
     private function get_image_rotated($angle) {
         $image = imagecreatefromstring($this->storedfile->get_content());
-        $rotated = imagerotate($image, $angle, 0);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        $rotated = imagerotate($image, $angle, $transparent);
 
         return $rotated;
     }
@@ -650,23 +637,81 @@ class lightboxgallery_image {
     }
 
     /**
-     * Output the image in the correct format based on the stored file's mimetype.
+     * Encode a GD image in the same format as the stored file.
      *
-     * @param stdClass $gdcall
-     * @return array|string|string[]|null
+     * Keeping the original format means the filename, and so the image's
+     * captions and tags, never need to change after an edit.
+     *
+     * @param GdImage $image
+     * @return string The encoded image.
+     * @throws moodle_exception If the format can't be written.
      */
-    protected function output_by_mimetype($gdcall) {
-        if ($this->storedfile->get_mimetype() == 'image/png') {
-            $imgfunc = 'imagepng';
-        } else {
-            $imgfunc = 'imagejpeg';
+    protected function encode_image($image) {
+        $mimetype = $this->storedfile->get_mimetype();
+
+        ob_start();
+        switch ($mimetype) {
+            case 'image/png':
+                imagesavealpha($image, true);
+                $result = imagepng($image);
+                break;
+            case 'image/gif':
+                $result = imagegif($image);
+                break;
+            case 'image/jpeg':
+                $result = imagejpeg($image);
+                break;
+            case 'image/webp':
+                imagesavealpha($image, true);
+                $result = function_exists('imagewebp') && imagewebp($image);
+                break;
+            default:
+                $result = false;
         }
-        $imgfunc($gdcall);
-        if ($this->storedfile->get_mimetype() == 'image/png') {
-            return preg_replace('/\..+$/', '.png', $this->storedfile->get_filename());
-        } else {
-            return preg_replace('/\..+$/', '.jpg', $this->storedfile->get_filename());
+        $content = ob_get_clean();
+
+        if (!$result || $content === '') {
+            throw new moodle_exception('invalidfiletype', 'error', '', $this->storedfile->get_filename());
         }
+
+        return $content;
+    }
+
+    /**
+     * Replace the image's content in place.
+     *
+     * The new content is stored before the original is touched, and the swap is a
+     * single update of the existing file record, so a failure leaves the original
+     * image intact. The file keeps its id, name, captions and tags.
+     *
+     * @param string $content The new image content, in the same format as the original.
+     * @return void
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    protected function replace_content($content) {
+        $fs = get_file_storage();
+
+        $tempfile = $fs->create_file_from_string([
+            'contextid' => $this->context->id,
+            'component' => 'mod_lightboxgallery',
+            'filearea' => 'edittemp',
+            'itemid' => $this->storedfile->get_id(),
+            'filepath' => '/',
+            'filename' => random_string(20),
+            'userid' => $this->storedfile->get_userid(),
+        ], $content);
+
+        try {
+            $this->storedfile->replace_file_with($tempfile);
+            $this->storedfile->set_timemodified(time());
+        } finally {
+            $tempfile->delete();
+        }
+
+        $this->set_stored_file($this->storedfile);
+        $this->thumbnail = $this->create_thumbnail();
     }
 
     /**
@@ -674,68 +719,30 @@ class lightboxgallery_image {
      *
      * @param int $width
      * @param int $height
-     * @return array|string|string[]|null
+     * @return string The image filename, which is unchanged.
      * @throws dml_exception
      * @throws file_exception
+     * @throws moodle_exception
      * @throws stored_file_creation_exception
      */
     public function resize_image($width, $height) {
-        $fileinfo = [
-            'contextid'     => $this->context->id,
-            'component'     => 'mod_lightboxgallery',
-            'filearea'      => 'gallery_images',
-            'itemid'        => 0,
-            'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename(), ];
-
-        ob_start();
-        $original = $fileinfo['filename'];
-        $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_resized($height, $width));
-        $resized = ob_get_clean();
-
-        $this->delete_file(false);
-        $fs = get_file_storage();
-        $this->storedfile = $fs->create_file_from_string($fileinfo, $resized);
-        $imageinfo = $this->storedfile->get_imageinfo();
-        $this->height = $imageinfo['height'];
-        $this->width = $imageinfo['width'];
-
-        $this->thumbnail = $this->create_thumbnail();
-        $this->update_meta_file($original, $fileinfo['filename']);
-
-        return $fileinfo['filename'];
+        $this->replace_content($this->encode_image($this->get_image_resized($height, $width)));
+        return $this->storedfile->get_filename();
     }
 
     /**
      * Rotate the image by a given angle.
      *
      * @param int $angle
-     * @return array|string|string[]|null
+     * @return string The image filename, which is unchanged.
      * @throws dml_exception
      * @throws file_exception
+     * @throws moodle_exception
      * @throws stored_file_creation_exception
      */
     public function rotate_image($angle) {
-        $fileinfo = [
-            'contextid'     => $this->context->id,
-            'component'     => 'mod_lightboxgallery',
-            'filearea'      => 'gallery_images',
-            'itemid'        => 0,
-            'filepath'      => $this->storedfile->get_filepath(),
-            'filename'      => $this->storedfile->get_filename(), ];
-
-        ob_start();
-        $original = $fileinfo['filename'];
-        $fileinfo['filename'] = $this->output_by_mimetype($this->get_image_rotated($angle));
-        $rotated = ob_get_clean();
-
-        $this->delete_file(false);
-        $fs = get_file_storage();
-        $this->set_stored_file($fs->create_file_from_string($fileinfo, $rotated));
-
-        $this->create_thumbnail();
-        $this->update_meta_file($original, $fileinfo['filename']);
-        return $fileinfo['filename'];
+        $this->replace_content($this->encode_image($this->get_image_rotated($angle)));
+        return $this->storedfile->get_filename();
     }
 
     /**
