@@ -38,15 +38,15 @@ $event = \mod_lightboxgallery\event\course_module_instance_list_viewed::create([
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $id]);
+$PAGE->set_url('/mod/lightboxgallery/index.php', ['id' => $course->id]);
 $PAGE->set_title(get_string('modulenameplural', 'lightboxgallery'));
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
 if (! $galleries = get_all_instances_in_course('lightboxgallery', $course)) {
-    echo $OUTPUT->heading(get_string('thereareno', 'moodle', $strgalleries), 2);
-    echo $OUTPUT->continue_button('view.php?id=' . $course->id);
+    echo $OUTPUT->heading(get_string('thereareno', 'moodle', get_string('modulenameplural', 'lightboxgallery')), 2);
+    echo $OUTPUT->continue_button(new moodle_url('/course/view.php', ['id' => $course->id]));
     echo $OUTPUT->footer();
     die();
 }
