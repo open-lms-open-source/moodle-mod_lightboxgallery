@@ -86,7 +86,8 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
                 if ($resize > 0) {
                     $resizeoptions = lightboxgallery_resize_options();
                     [$width, $height] = explode('x', $resizeoptions[$resize]);
-                    $image->resize_image($width, $height);
+                    // Uploads are only ever shrunk to fit; small images keep their size.
+                    $image->resize_image($width, $height, false);
                 }
 
                 $image->set_caption($filename);

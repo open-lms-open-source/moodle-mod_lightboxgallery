@@ -47,6 +47,9 @@ define('LIGHTBOXGALLERY_POS_BOT', 0);
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lightboxgallery_image {
+    /** @var int The largest width or height, in pixels, that a resize can produce. */
+    const MAX_DIMENSION = 4096;
+
     /**
      * The course module object.
      *
@@ -536,6 +539,24 @@ class lightboxgallery_image {
     }
 
     /**
+     * Get the whole image scaled to a given width and height, without cropping.
+     *
+     * @param int $width
+     * @param int $height
+     * @return GdImage
+     */
+    private function get_image_scaled($width, $height) {
+        raise_memory_limit(MEMORY_EXTRA);
+        $image = imagecreatefromstring($this->storedfile->get_content());
+        $scaled = imagecreatetruecolor($width, $height);
+        imagealphablending($scaled, false);
+        imagesavealpha($scaled, true);
+        imagecopyresampled($scaled, $image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
+
+        return $scaled;
+    }
+
+    /**
      * Get the image rotated by a given angle.
      *
      * @param int $angle
@@ -702,18 +723,51 @@ class lightboxgallery_image {
     }
 
     /**
-     * Resize the image to a given width and height.
+     * Work out the size of an image scaled to fit inside a box, keeping its aspect ratio.
      *
-     * @param int $width
-     * @param int $height
+     * The result is never larger than MAX_DIMENSION on either side.
+     *
+     * @param int $width The image's current width.
+     * @param int $height The image's current height.
+     * @param int $maxwidth The box's width.
+     * @param int $maxheight The box's height.
+     * @param bool $enlarge Whether a smaller image may be scaled up to fill the box.
+     * @return int[] [width, height]
+     */
+    public static function fit_dimensions(int $width, int $height, int $maxwidth, int $maxheight, bool $enlarge): array {
+        $maxwidth = min($maxwidth, self::MAX_DIMENSION);
+        $maxheight = min($maxheight, self::MAX_DIMENSION);
+
+        $ratio = min($maxwidth / $width, $maxheight / $height);
+        if (!$enlarge) {
+            $ratio = min($ratio, 1);
+        }
+
+        return [max(1, (int) round($width * $ratio)), max(1, (int) round($height * $ratio))];
+    }
+
+    /**
+     * Resize the image to fit inside a box, keeping its aspect ratio.
+     *
+     * @param int $width The box's width.
+     * @param int $height The box's height.
+     * @param bool $enlarge Whether a smaller image may be scaled up to fill the box.
      * @return string The image filename, which is unchanged.
      * @throws dml_exception
      * @throws file_exception
      * @throws moodle_exception
      * @throws stored_file_creation_exception
      */
-    public function resize_image($width, $height) {
-        $this->replace_content($this->encode_image($this->get_image_resized($height, $width)));
+    public function resize_image($width, $height, $enlarge = true) {
+        if (empty($this->width) || empty($this->height)) {
+            throw new moodle_exception('invalidfiletype', 'error', '', $this->storedfile->get_filename());
+        }
+
+        [$newwidth, $newheight] = self::fit_dimensions($this->width, $this->height, (int) $width, (int) $height, $enlarge);
+        if ($newwidth != $this->width || $newheight != $this->height) {
+            $this->replace_content($this->encode_image($this->get_image_scaled($newwidth, $newheight)));
+        }
+
         return $this->storedfile->get_filename();
     }
 

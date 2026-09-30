@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_resize extends edit_base {
+    /** @var int[] The scale percentages offered, largest first. */
+    const SCALES = [200, 150, 125, 75, 50, 25];
+
     /**
      * @var lang_string|string
      */
@@ -72,15 +75,12 @@ class edit_resize extends edit_base {
         $sizeselect .= '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
                        $this->strresize . '" /></div><br /><br />';
 
-        $scaleselect = '<div class="input-group"><select name="scale" class="form-select">' .
-                       '  <option value="200">200&#37;</option>' .
-                       '  <option value="150">150&#37;</option>' .
-                       '  <option value="125">125&#37;</option>' .
-                       '  <option value="75">75&#37;</option>' .
-                       '  <option value="50">50&#37;</option>' .
-                       '  <option value="25">25&#37;</option>' .
-                       '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
-                       $this->strscale . '" /></div>';
+        $scaleselect = '<div class="input-group"><select name="scale" class="form-select">';
+        foreach (self::SCALES as $scale) {
+            $scaleselect .= '<option value="' . $scale . '">' . $scale . '&#37;</option>';
+        }
+        $scaleselect .= '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
+                        $this->strscale . '" /></div>';
 
         return $this->enclose_in_form($currentsize . $sizeselect . $scaleselect);
     }
@@ -100,13 +100,21 @@ class edit_resize extends edit_base {
         switch ($button) {
             case $this->strresize:
                 $size = required_param('size', PARAM_INT);
+                if (!isset($this->resizeoptions[$size])) {
+                    throw new \moodle_exception('invalidparameter', 'debug');
+                }
                 [$width, $height] = explode('x', $this->resizeoptions[$size]);
                 break;
             case $this->strscale:
                 $scale = required_param('scale', PARAM_INT);
-                $width = $this->lbgimage->width * ($scale / 100);
-                $height = $this->lbgimage->height * ($scale / 100);
+                if (!in_array($scale, self::SCALES, true)) {
+                    throw new \moodle_exception('invalidparameter', 'debug');
+                }
+                $width = (int) round($this->lbgimage->width * $scale / 100);
+                $height = (int) round($this->lbgimage->height * $scale / 100);
                 break;
+            default:
+                throw new \moodle_exception('invalidparameter', 'debug');
         }
 
         $this->image = $this->lbgimage->resize_image($width, $height);
