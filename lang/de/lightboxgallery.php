@@ -129,7 +129,6 @@ $string['tagsdisabled'] = 'Schlagworte deaktiviert';
 $string['tagsimport'] = 'Schlagworte importieren';
 $string['tagsimportconfirm'] = 'Möchten Sie Schlagworte für jedes Bild in dieser Galerie importieren?';
 $string['tagsimportfinish'] = 'Import von {$a->tags} Schlagworten für {$a->images} Bilder beendet';
-$string['tagsiptc'] = 'IPTC Schlagworte';
 $string['tagspopular'] = 'Beliebte Schlagworte';
 $string['tagsrelated'] = 'Ähnliche Schlagworte';
 $string['thumbnailoffset'] = 'Offset';

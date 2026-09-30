@@ -132,7 +132,6 @@ $string['tagsdisabled'] = 'L\'éditeur d\'étiquettes est désactivé';
 $string['tagsimport'] = 'Importer des étiquettes';
 $string['tagsimportconfirm'] = 'Etes vous certain de vouloir importer les étiquettes de toutes les images de cette gallerie?';
 $string['tagsimportfinish'] = 'Importation de {$a->tags} étiquettes provenant de {$a->images} terminées';
-$string['tagsiptc'] = 'Etiquettes IPTC';
 $string['tagspopular'] = 'Etiquettes populaires';
 $string['tagsrelated'] = 'Etiquettes liées';
 $string['thumbnailoffset'] = 'Décalage';

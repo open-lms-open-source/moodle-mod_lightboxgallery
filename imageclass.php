@@ -962,15 +962,6 @@ class lightboxgallery_image {
     }
 
     /**
-     * Copy the content of the stored file to a temporary location.
-     *
-     * @return bool|string
-     */
-    public function copy_content_to_temp() {
-        return $this->storedfile->copy_content_to_temp();
-    }
-
-    /**
      * Set the stored file.
      *
      * @param stdClass $storedfile

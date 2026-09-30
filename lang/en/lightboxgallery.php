@@ -151,7 +151,6 @@ $string['tagsdisabled'] = 'Tagging editor is disabled';
 $string['tagsimport'] = 'Import tags';
 $string['tagsimportconfirm'] = 'Are you sure you want to import tags from every image in this gallery?';
 $string['tagsimportfinish'] = 'Finished importing {$a->tags} tags from {$a->images} images';
-$string['tagsiptc'] = 'IPTC tags';
 $string['tagspopular'] = 'Popular tags';
 $string['tagsrelated'] = 'Related tags';
 $string['taskgeneratethumbnails'] = 'Generate gallery thumbnails';
