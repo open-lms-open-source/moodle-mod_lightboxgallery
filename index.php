@@ -60,15 +60,20 @@ $table->head = [get_string($course->format == 'weeks' ? 'week' : 'topic'),
 $table->align = ['center', 'center', 'left', 'left', 'center'];
 $table->width = '*';
 
-$fobj = new stdClass();
-$fobj->para = false;
+// Count every gallery's comments in one query.
+[$insql, $inparams] = $DB->get_in_or_equal(array_column($galleries, 'id'));
+$commentcounts = $DB->get_records_sql_menu("SELECT gallery, COUNT(1)
+                                              FROM {lightboxgallery_comments}
+                                             WHERE gallery $insql
+                                          GROUP BY gallery", $inparams);
 
+$fs = get_file_storage();
 $prevsection = '';
 
 // phpcs:disable moodle.Commenting.TodoComment
 // TODO: Put this in a renderer.
 foreach ($galleries as $gallery) {
-    $cm = context_module::instance($gallery->coursemodule);
+    $gallerycontext = context_module::instance($gallery->coursemodule);
 
     $printsection = ($gallery->section !== $prevsection ? true : false);
     if ($printsection) {
@@ -76,27 +81,31 @@ foreach ($galleries as $gallery) {
     }
 
     if (lightboxgallery_rss_enabled() && $gallery->rss) {
-        $rss = rss_get_link($course->id, $USER->id, 'lightboxgallery', $gallery->id, get_string('rsssubscribe', 'lightboxgallery'));
+        $rss = rss_get_link($gallerycontext->id, $USER->id, 'mod_lightboxgallery', $gallery->id,
+            get_string('rsssubscribe', 'lightboxgallery'));
+    } else {
+        $rss = get_string('norssfeedavailable', 'lightboxgallery');
     }
 
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($cm->id, 'mod_lightboxgallery', 'gallery_images');
     $imagecount = 0;
-    foreach ($files as $file) {
-        if ($file->get_filename() != '.') {
+    foreach ($fs->get_area_files($gallerycontext->id, 'mod_lightboxgallery', 'gallery_images', 0, 'filename', false) as $file) {
+        if (file_mimetype_in_typegroup($file->get_mimetype(), 'web_image')) {
             $imagecount++;
         }
     }
-    $commentcount = $DB->count_records('lightboxgallery_comments', ['gallery' => $gallery->id]);
+    $counts = get_string('imagecounta', 'lightboxgallery', $imagecount);
+    if (lightboxgallery_can_view_comments($gallery, $course, $gallerycontext)) {
+        $counts .= ' ' . get_string('commentcount', 'lightboxgallery', $commentcounts[$gallery->id] ?? 0);
+    }
 
     $viewurl = new moodle_url('/mod/lightboxgallery/view.php', ['id' => $gallery->coursemodule]);
+    $linkattributes = $gallery->visible ? [] : ['class' => 'dimmed'];
     $table->data[] = [($printsection ? $gallery->section : ''),
                            lightboxgallery_index_thumbnail($course->id, $gallery),
-                           html_writer::link($viewurl, $gallery->name) .
-                           '<br />' . get_string('imagecounta', 'lightboxgallery', $imagecount) . ' ' .
-                           get_string('commentcount', 'lightboxgallery', $commentcount),
-                           format_text($gallery->intro, FORMAT_MOODLE, $fobj),
-                           (isset($rss) ? $rss : get_string('norssfeedavailable', 'lightboxgallery')), ];
+                           html_writer::link($viewurl, format_string($gallery->name), $linkattributes) .
+                           '<br />' . $counts,
+                           format_module_intro('lightboxgallery', $gallery, $gallery->coursemodule),
+                           $rss, ];
 
     $prevsection = $gallery->section;
 }
