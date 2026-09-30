@@ -37,11 +37,12 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
  * @copyright  Copyright (c) 2021 Open LMS (https://www.openlms.net)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+#[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_resize_text')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_edit_types')]
 final class lib_test extends \advanced_testcase {
     /**
      * Test lightboxgallery_get_edit_types.
      *
-     * @covers \lightboxgallery_resize_text
      * @return void
      */
     public function test_lightboxgallery_resize_text(): void {
@@ -52,7 +53,6 @@ final class lib_test extends \advanced_testcase {
     /**
      * Test lightboxgallery_get_edit_types.
      *
-     * @covers \lightboxgallery_edit_types
      * @return void
      */
     public function test_lightboxgallery_edit_types(): void {
