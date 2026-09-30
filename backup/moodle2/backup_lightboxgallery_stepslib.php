@@ -47,7 +47,7 @@ class backup_lightboxgallery_activity_structure_step extends backup_activity_str
         $lightboxgallery = new backup_nested_element('lightboxgallery', ['id'], [
             'course', 'name', 'perpage', 'comments', 'extinfo',
             'timemodified', 'ispublic', 'rss', 'autoresize', 'resize', 'perrow',
-            'captionfull', 'captionpos', 'intro', 'introformat',
+            'captionfull', 'captionpos', 'intro', 'introformat', 'sortby',
         ]);
 
         $comments = new backup_nested_element('usercomments');
