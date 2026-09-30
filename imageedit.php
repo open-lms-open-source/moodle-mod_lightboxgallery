@@ -120,7 +120,6 @@ if ($editinstance->showthumb) {
 } else {
     $table->align = ['center'];
     $table->size = ['*'];
-    $table->data[] = [$editinstance->output($image->get_image_caption())];
     $table->data[] = [$editinstance->output($imageclass->get_image_caption())];
 }
 

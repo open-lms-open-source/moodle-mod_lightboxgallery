@@ -42,6 +42,8 @@ class edit_caption extends edit_base {
      * @throws coding_exception
      */
     public function output($captiontext = '') {
+        // Not s(), which leaves numeric entities alone: the caption must come back exactly as stored.
+        $captiontext = htmlspecialchars($captiontext, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $result = '<textarea name="caption" class="form-control" cols="24" rows="4">' . $captiontext . '</textarea><br /><br />' .
                   '<input type="submit" class="btn btn-secondary"  value="' . get_string('update') . '" />';
         return $this->enclose_in_form($result);

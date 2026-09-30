@@ -613,8 +613,9 @@ YUI.add('moodle-mod_lightboxgallery-lightbox', function(Y) {
 				caption = imageArray[activeImage][1];
 
 			// If caption is not null
+			// The caption is user text: insert it as text, never as HTML.
 			if (caption !== "") {
-				this.get("caption").setContent(caption).show();
+				this.get("caption").set("text", caption).show();
 			}
 
 			this.get("numberDisplay").setContent(this.get("strings.labelImage") + " " + (activeImage + 1) + " " + this.get("strings.labelOf") + "  " + imageArray.length).show();
