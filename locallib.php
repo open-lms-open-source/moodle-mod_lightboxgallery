@@ -55,13 +55,15 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
     $fs = get_file_storage();
 
     $images = [];
+    $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
     foreach ($files as $storedfile) {
         if ($storedfile->get_mimetype() == 'application/zip') {
-            // Unpack.
+            // Unpack each zip into its own folder, alongside any other uploaded files.
             $packer = get_file_packer('application/zip');
-            $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
-            $storedfile->extract_to_storage($packer, $context->id, 'mod_lightboxgallery', 'unpacktemp', 0, '/');
-            $images = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
+            $folder = '/' . $storedfile->get_id() . '/';
+            $storedfile->extract_to_storage($packer, $context->id, 'mod_lightboxgallery', 'unpacktemp', 0, $folder);
+            $images = array_merge($images, array_values($fs->get_directory_files($context->id, 'mod_lightboxgallery',
+                'unpacktemp', 0, $folder, true, false)));
             $storedfile->delete();
         } else {
             $images[] = $storedfile;

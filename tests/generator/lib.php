@@ -43,4 +43,39 @@ class mod_lightboxgallery_generator extends testing_module_generator {
     public function create_instance($record = null, ?array $options = null) {
         return parent::create_instance($record, (array)$options);
     }
+
+    /**
+     * Add an image to a gallery's image area, without making its thumbnail.
+     *
+     * @param stdClass $gallery A gallery as returned by create_instance(), with its cmid.
+     * @param string $filename
+     * @param int $width
+     * @param int $height
+     * @return stored_file
+     */
+    public function create_image(stdClass $gallery, string $filename, int $width = 40, int $height = 20): stored_file {
+        $image = imagecreatetruecolor($width, $height);
+        ob_start();
+        switch (strtolower(pathinfo($filename, PATHINFO_EXTENSION))) {
+            case 'gif':
+                imagegif($image);
+                break;
+            case 'jpg':
+            case 'jpeg':
+                imagejpeg($image);
+                break;
+            default:
+                imagepng($image);
+        }
+        $content = ob_get_clean();
+
+        return get_file_storage()->create_file_from_string([
+            'contextid' => context_module::instance($gallery->cmid)->id,
+            'component' => 'mod_lightboxgallery',
+            'filearea' => 'gallery_images',
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => $filename,
+        ], $content);
+    }
 }
