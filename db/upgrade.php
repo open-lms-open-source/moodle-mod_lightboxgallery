@@ -304,5 +304,23 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2024012301, 'lightboxgallery');
     }
 
+    if ($oldversion < 2026100100) {
+        // Replace the gallery index on image metadata with one that also covers lookups by image and type.
+        // It starts with gallery, so it still serves everything the old index did.
+        $table = new xmldb_table('lightboxgallery_image_meta');
+
+        $index = new xmldb_index('gallery-image-metatype', XMLDB_INDEX_NOTUNIQUE, ['gallery', 'image', 'metatype']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('gallery', XMLDB_INDEX_NOTUNIQUE, ['gallery']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, 2026100100, 'lightboxgallery');
+    }
+
     return true;
 }

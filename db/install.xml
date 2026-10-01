@@ -58,7 +58,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for lightbox gallery captions"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="gallery" UNIQUE="false" FIELDS="gallery"/>
+        <INDEX NAME="gallery-image-metatype" UNIQUE="false" FIELDS="gallery, image, metatype"/>
       </INDEXES>
     </TABLE>
   </TABLES>

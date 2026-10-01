@@ -135,6 +135,31 @@ final class gallery_page_test extends \advanced_testcase {
     }
 
     /**
+     * Only the current page's captions and tags are loaded, with one query whatever the gallery's size.
+     */
+    public function test_metadata_loaded_for_page_only(): void {
+        global $DB;
+        $files = ['a.png', 'b.png', 'c.png', 'd.png', 'e.png'];
+        $captions = array_combine($files, ['Ant', 'Bee', 'Cat', 'Dog', 'Eel']);
+        $gallery = $this->create_gallery(['perpage' => 2], $files, $captions);
+        $cm = get_fast_modinfo($this->course)->get_cm($gallery->cmid);
+        $metadata = new \ReflectionProperty(gallery_page::class, 'metadata');
+
+        $reads = $DB->perf_get_reads();
+        $page = new gallery_page($cm, $gallery, false, 1);
+        // The image and thumbnail lists, then this page's captions and tags.
+        $this->assertSame(3, $DB->perf_get_reads() - $reads);
+        $this->assertSame(['c.png', 'd.png'], array_keys($metadata->getValue($page)));
+        $this->assertSame('Cat', $metadata->getValue($page)['c.png'][0]->description);
+
+        // Showing every image loads the gallery's metadata by gallery, not by listing each image.
+        $DB->set_field('lightboxgallery', 'perpage', 0, ['id' => $gallery->id]);
+        $gallery->perpage = 0;
+        $page = new gallery_page($cm, $gallery, false, 0);
+        $this->assertSame($files, array_keys($metadata->getValue($page)));
+    }
+
+    /**
      * Files that aren't images aren't shown or counted.
      */
     public function test_non_images_are_left_out(): void {

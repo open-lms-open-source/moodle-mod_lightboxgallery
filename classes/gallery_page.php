@@ -137,17 +137,14 @@ class gallery_page {
     protected function load_metadata() {
         global $DB;
 
-        $filenames = [];
         foreach ($this->files as $storedfile) {
             if (!file_mimetype_in_typegroup($storedfile->get_mimetype(), 'web_image')) {
                 continue;
             }
 
             $filename = $storedfile->get_filename();
-            $filenames[] = $filename;
             $this->pagefiles[$filename] = $storedfile;
             $this->pagethumbs[$filename] = false;
-            $this->metadata[$filename] = [];
         }
 
         foreach ($this->thumbnails as $thumbnail) {
@@ -156,27 +153,15 @@ class gallery_page {
             $this->pagethumbs[$filename] = $thumbnail;
         }
 
-        if (!$filenames) {
+        $this->imagecount = 0;
+        if (!$this->pagefiles) {
             return;
         }
 
-        [$insql, $params] = $DB->get_in_or_equal($filenames, SQL_PARAMS_NAMED);
-        $params['gallery'] = $this->gallery->id;
-        $select = "gallery = :gallery AND image $insql";
-        $metadata = $DB->get_records_select('lightboxgallery_image_meta', $select, $params);
-
-        // Store the records keyed on the image name.
-        $captions = [];
-        foreach ($metadata as $metarecord) {
-            $this->metadata[$metarecord->image][] = $metarecord;
-
-            if ($metarecord->metatype == 'caption') {
-                $captions[$metarecord->image] = $metarecord->description;
-            }
-        }
-
-        // Sort the files.
+        // Sort the files. Sorting by caption needs every caption, but nothing else.
         if ($this->gallery->sortby == self::SORTBY_CAPTION) {
+            $captions = $DB->get_records_menu('lightboxgallery_image_meta',
+                ['gallery' => $this->gallery->id, 'metatype' => 'caption'], '', 'image, description');
             uasort($this->pagefiles, function ($a, $b) use ($captions) {
                 $filenamea = $a->get_filename();
                 $filenameb = $b->get_filename();
@@ -192,20 +177,38 @@ class gallery_page {
             });
         }
 
-        $this->imagecount = 0;
         // Whittle down to the ones for this page.
         foreach ($this->pagefiles as $filename => $storedfile) {
             $this->imagecount++;
             if ($this->gallery->perpage > 0) {
                 if ($this->imagecount > (($this->gallery->perpage * $this->page) + $this->gallery->perpage)) {
                     // We've already found all the images to display on this page.
-                    unset($this->metadata[$filename]);
                     unset($this->pagefiles[$filename]);
                 } else if ($this->imagecount <= ($this->gallery->perpage * $this->page)) {
                     // We haven't gotten to the first image of this page yet.
-                    unset($this->metadata[$filename]);
                     unset($this->pagefiles[$filename]);
                 }
+            }
+        }
+        if (!$this->pagefiles) {
+            return;
+        }
+
+        // Load the captions and tags for just this page's images. When the page shows the whole
+        // gallery, select by gallery alone rather than listing every image in the query.
+        foreach (array_keys($this->pagefiles) as $filename) {
+            $this->metadata[$filename] = [];
+        }
+        if ($this->gallery->perpage > 0) {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($this->pagefiles), SQL_PARAMS_NAMED);
+            $params['gallery'] = $this->gallery->id;
+            $metadata = $DB->get_records_select('lightboxgallery_image_meta', "gallery = :gallery AND image $insql", $params);
+        } else {
+            $metadata = $DB->get_records('lightboxgallery_image_meta', ['gallery' => $this->gallery->id]);
+        }
+        foreach ($metadata as $metarecord) {
+            if (isset($this->metadata[$metarecord->image])) {
+                $this->metadata[$metarecord->image][] = $metarecord;
             }
         }
     }
