@@ -23,7 +23,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
 require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/base.class.php');
 
 /**
  * Tests that the image editing tools remember which page of the gallery the user came from.
@@ -33,8 +32,8 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/edit/base.class.php');
  * @copyright  Copyright (c) 2026 Open LMS (https://www.openlms.net)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\edit_base::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\edit_delete::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_lightboxgallery\local\edit\base::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_lightboxgallery\local\edit\delete::class)]
 final class edit_tools_test extends \advanced_testcase {
     /** @var \stdClass The gallery record. */
     private $gallery;
@@ -64,12 +63,10 @@ final class edit_tools_test extends \advanced_testcase {
      *
      * @param string $tool
      * @param int $page
-     * @return \edit_base
+     * @return \mod_lightboxgallery\local\edit\base
      */
-    private function make_tool(string $tool, int $page): \edit_base {
-        global $CFG;
-        require_once($CFG->dirroot . "/mod/lightboxgallery/edit/$tool/$tool.class.php");
-        $class = "edit_$tool";
+    private function make_tool(string $tool, int $page): \mod_lightboxgallery\local\edit\base {
+        $class = "\\mod_lightboxgallery\\local\\edit\\$tool";
         return new $class($this->gallery, $this->cm, 'photo.png', $tool, $page);
     }
 

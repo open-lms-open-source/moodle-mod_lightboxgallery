@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
  * The edit caption plugin class.
  *
@@ -21,14 +23,14 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_caption extends edit_base {
+class caption extends base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
@@ -38,9 +40,9 @@ class edit_caption extends edit_base {
     /**
      * Output the form.
      *
-     * @param stdClass $captiontext The caption text.
+     * @param \stdClass $captiontext The caption text.
      * @return string|void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function output($captiontext = '') {
         // Not s(), which leaves numeric entities alone: the caption must come back exactly as stored.
@@ -54,8 +56,8 @@ class edit_caption extends edit_base {
      * Process the form submission.
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function process_form() {
         $caption = required_param('caption', PARAM_NOTAGS);

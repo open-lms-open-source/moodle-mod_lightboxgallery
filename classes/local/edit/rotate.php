@@ -14,21 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
- * The delete plugin class.
+ * The rotate plugin class.
  *
  * @package   mod_lightboxgallery
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_delete extends edit_base {
+class rotate extends base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
@@ -39,23 +41,32 @@ class edit_delete extends edit_base {
      * Output the form.
      *
      * @return string|void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function output() {
-        $result = get_string('deletecheck', '', $this->image) . '<br /><br />';
-        $result .= '<input type="submit" class="btn btn-secondary" value="' . get_string('yes') . '" />';
+        $result = get_string('selectrotation', 'lightboxgallery') . '<br /><br />' .
+                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="-90" required ' .
+                  '/>-90&#176;</label>' .
+                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="180" ' .
+                  '/>180&#176;</label>' .
+                  '<label><input type="radio" class="form-check-input me-1" name="angle" value="90" />90&#176;</label>' .
+                  '<br /><br /><input type="submit" class="btn btn-secondary" value="' .
+                  get_string('edit_rotate', 'lightboxgallery') . '" />';
+
         return $this->enclose_in_form($result);
     }
 
     /**
-     * Process the form submission.
+     * Process the form.
      *
      * @return void
-     * @throws dml_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      */
     public function process_form() {
-        $this->lbgimage->delete_file();
-        redirect(new moodle_url('/mod/lightboxgallery/view.php', ['id' => $this->cm->id, 'page' => $this->page, 'editing' => 1]));
+        $angle = required_param('angle', PARAM_INT);
+        $this->image = $this->lbgimage->rotate_image($angle);
     }
 }

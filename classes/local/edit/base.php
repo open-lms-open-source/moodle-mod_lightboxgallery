@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
+defined('MOODLE_INTERNAL') || die();
+
+// The tools use the plugin's image class and library functions.
+global $CFG;
+require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
+require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
+
 /**
  * Base class to be extended for edit plugins
  *
@@ -21,29 +30,29 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_base {
+class base {
     /**
-     * @var lightboxgallery_image $imageobj The image object
+     * @var \lightboxgallery_image $imageobj The image object
      */
     public $imageobj;
     /**
-     * @var context_module $cm The context module
+     * @var \context_module $cm The context module
      */
     public $cm;
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     public $gallery;
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     public $image;
     /**
-     * @var lightboxgallery_image
+     * @var \lightboxgallery_image
      */
     public $lbgimage;
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     public $tab;
     /**
@@ -62,10 +71,10 @@ class edit_base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param bool|null $showthumb
      * @param int $page The page of the gallery the user came from.
      */
@@ -76,18 +85,18 @@ class edit_base {
         $this->image = $image;
         $this->tab = $tab;
         $this->showthumb = $showthumb;
-        $this->context = context_module::instance($this->cm->id);
+        $this->context = \context_module::instance($this->cm->id);
 
         $fs = get_file_storage();
         $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
-        $this->lbgimage = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
+        $this->lbgimage = new \lightboxgallery_image($storedfile, $this->gallery, $this->cm);
     }
 
     /**
      * Check if the form is being processed.
      *
      * @return mixed
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function processing() {
         return optional_param('process', false, PARAM_BOOL);

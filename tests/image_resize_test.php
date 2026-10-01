@@ -23,8 +23,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
 require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/base.class.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/resize/resize.class.php');
 
 /**
  * Tests for resizing gallery images.
@@ -35,7 +33,7 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/edit/resize/resize.class.php'
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(lightboxgallery_image::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\edit_resize::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_lightboxgallery\local\edit\resize::class)]
 final class image_resize_test extends \advanced_testcase {
     /** @var \stdClass The gallery record. */
     private $gallery;
@@ -175,7 +173,7 @@ final class image_resize_test extends \advanced_testcase {
      */
     private function submit_resize_form(array $post): void {
         $_POST = $post;
-        $tool = new \edit_resize($this->gallery, $this->cm, 'photo.png', 'resize');
+        $tool = new \mod_lightboxgallery\local\edit\resize($this->gallery, $this->cm, 'photo.png', 'resize');
         $tool->process_form();
     }
 

@@ -23,8 +23,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
 require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/base.class.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/tag/tag.class.php');
 
 /**
  * Tests for importing IPTC keywords as tags, and for the tag tool.
@@ -35,7 +33,7 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/edit/tag/tag.class.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_import_iptc_tags')]
-#[\PHPUnit\Framework\Attributes\CoversClass(\edit_tag::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_lightboxgallery\local\edit\tag::class)]
 final class tag_import_test extends \advanced_testcase {
     /** @var \stdClass The gallery record. */
     private $gallery;
@@ -157,7 +155,7 @@ final class tag_import_test extends \advanced_testcase {
      */
     public function test_tag_tool_leaves_no_temp_files(): void {
         $this->add_file('trip.jpg', $this->make_jpeg(['beach']));
-        $tool = new \edit_tag($this->gallery, $this->cm, 'trip.jpg', 'tag');
+        $tool = new \mod_lightboxgallery\local\edit\tag($this->gallery, $this->cm, 'trip.jpg', 'tag');
 
         $before = $this->count_temp_files();
         $tool->output();

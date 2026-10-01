@@ -26,7 +26,6 @@ use core\output\tabobject;
 
 require_once(dirname(__DIR__, 2) . '/config.php');
 require_once(__DIR__ . '/locallib.php');
-require_once(__DIR__ . '/edit/base.class.php');
 require_once(__DIR__ . '/imageclass.php');
 
 global $DB;
@@ -80,8 +79,8 @@ if (!in_array($tab, array_keys($edittypes))) {
     }
 }
 
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/' . $tab . '/' . $tab . '.class.php');
-$editclass = 'edit_' . $tab;
+// The tab is one of the tool names listed above, so this names one of the tool classes.
+$editclass = '\\mod_lightboxgallery\\local\\edit\\' . $tab;
 $editinstance = new $editclass($gallery, $cm, $image, $tab, $page);
 
 if ($editinstance->processing() && confirm_sesskey()) {

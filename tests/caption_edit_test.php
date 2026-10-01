@@ -23,8 +23,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/lightboxgallery/locallib.php');
 require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/base.class.php');
-require_once($CFG->dirroot . '/mod/lightboxgallery/edit/caption/caption.class.php');
 
 /**
  * Tests for the caption editor.
@@ -34,7 +32,7 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/edit/caption/caption.class.ph
  * @copyright  Copyright (c) 2026 Open LMS (https://www.openlms.net)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\edit_caption::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_lightboxgallery\local\edit\caption::class)]
 final class caption_edit_test extends \advanced_testcase {
     /**
      * Data provider for test_caption_round_trips.
@@ -68,7 +66,7 @@ final class caption_edit_test extends \advanced_testcase {
         $cm = get_coursemodule_from_instance('lightboxgallery', $gallery->id, $course->id, false, MUST_EXIST);
         $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($gallery, 'photo.png', 4, 4);
 
-        $html = (new \edit_caption($gallery, $cm, 'photo.png', 'caption'))->output($caption);
+        $html = (new \mod_lightboxgallery\local\edit\caption($gallery, $cm, 'photo.png', 'caption'))->output($caption);
 
         $doc = new \DOMDocument();
         @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);

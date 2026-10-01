@@ -163,7 +163,15 @@ function lightboxgallery_edit_types($showall = false, $image = null) {
 
     $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 
-    $edittypes = get_list_of_plugins('mod/lightboxgallery/edit');
+    // The editing tools are the classes in mod_lightboxgallery\local\edit, apart from their base class.
+    $edittypes = [];
+    foreach (array_keys(core_component::get_component_classes_in_namespace('mod_lightboxgallery', 'local\\edit')) as $class) {
+        $name = substr($class, strrpos($class, '\\') + 1);
+        if ($name !== 'base') {
+            $edittypes[] = $name;
+        }
+    }
+    sort($edittypes);
     if ($image !== null && !$showall) {
         $edittypes = array_intersect($image->get_editing_options(), $edittypes);
     }

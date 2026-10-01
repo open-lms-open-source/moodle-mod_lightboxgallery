@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
  * The flip plugin class.
  *
@@ -29,7 +31,7 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_flip extends edit_base {
+class flip extends base {
     /** @var int The form value for flipping top to bottom. */
     const VERTICAL = 1;
 
@@ -39,10 +41,10 @@ class edit_flip extends edit_base {
     /**
      * Constructor
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
@@ -53,7 +55,7 @@ class edit_flip extends edit_base {
      * Output the form.
      *
      * @return string|void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function output() {
         $result = get_string('selectflipmode', 'lightboxgallery') . '<br /><br />' .
@@ -71,7 +73,7 @@ class edit_flip extends edit_base {
      * Process the form submission.
      *
      * @return void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function process_form() {
         $mode = required_param('mode', PARAM_INT);

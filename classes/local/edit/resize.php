@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
  * The resize plugin class.
  *
@@ -21,16 +23,16 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_resize extends edit_base {
+class resize extends base {
     /** @var int[] The scale percentages offered, largest first. */
     const SCALES = [200, 150, 125, 75, 50, 25];
 
     /**
-     * @var lang_string|string
+     * @var \lang_string|string
      */
     private $strresize;
     /**
-     * @var lang_string|string
+     * @var \lang_string|string
      */
     private $strscale;
     /**
@@ -41,12 +43,12 @@ class edit_resize extends edit_base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
         parent::__construct($gallery, $cm, $image, $tab, true, $page);
@@ -59,12 +61,12 @@ class edit_resize extends edit_base {
      * Output the form.
      *
      * @return string|void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function output() {
         $fs = get_file_storage();
         $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
-        $image = new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
+        $image = new \lightboxgallery_image($storedfile, $this->gallery, $this->cm);
 
         $currentsize = sprintf('%s: %dx%d', get_string('currentsize', 'lightboxgallery'), $image->width, $image->height) .
                        '<br /><br />';
@@ -90,10 +92,10 @@ class edit_resize extends edit_base {
      * Process the form submission.
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws stored_file_creation_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      */
     public function process_form() {
         $button = required_param('button', PARAM_TEXT);

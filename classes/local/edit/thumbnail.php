@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
  * The thumbnail plugin class.
  *
@@ -21,14 +23,14 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_thumbnail extends edit_base {
+class thumbnail extends base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
@@ -39,12 +41,12 @@ class edit_thumbnail extends edit_base {
      * Output the form.
      *
      * @return string|void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     public function output() {
         global $OUTPUT;
 
-        $url = new moodle_url('/mod/lightboxgallery/index.php', ['id' => $this->gallery->course]);
+        $url = new \moodle_url('/mod/lightboxgallery/index.php', ['id' => $this->gallery->course]);
         $helpbutton = $OUTPUT->help_icon('setasindex', 'lightboxgallery', true, $url);
         $result = '<input type="submit" class="btn btn-secondary" name="index" value="' .
             get_string('setasindex', 'lightboxgallery') . '" />' . $helpbutton;
@@ -76,9 +78,9 @@ class edit_thumbnail extends edit_base {
      * Process the form submission.
      *
      * @return string|void
-     * @throws coding_exception
-     * @throws file_exception
-     * @throws stored_file_creation_exception
+     * @throws \coding_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      */
     public function process_form() {
         $domove = true;

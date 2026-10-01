@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_lightboxgallery\local\edit;
+
 /**
  * The tag plugin class.
  *
@@ -21,14 +23,14 @@
  * @copyright 2010 John Kelsh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_tag extends edit_base {
+class tag extends base {
     /**
      * Constructor.
      *
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass $image
-     * @param stdClass $tab
+     * @param \stdClass $gallery
+     * @param \context_module $cm
+     * @param \stdClass $image
+     * @param \stdClass $tab
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $page = 0) {
@@ -40,8 +42,8 @@ class edit_tag extends edit_base {
      *
      * @return string
      * @throws \core\exception\moodle_exception
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function output() {
         global $OUTPUT;
@@ -55,7 +57,7 @@ class edit_tag extends edit_base {
         $iptcform = '';
         $deleteform = '';
 
-        $iptcaddurl = new moodle_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $this->gallery->id]);
+        $iptcaddurl = new \moodle_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $this->gallery->id]);
         $iptcform .= $OUTPUT->single_button($iptcaddurl, get_string('tagsimport', 'lightboxgallery'));
 
         if ($tags = $this->lbgimage->get_tags()) {
@@ -76,8 +78,8 @@ class edit_tag extends edit_base {
      * Process the form submission.
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function process_form() {
         $tag = optional_param('tag', '', PARAM_TAG);
