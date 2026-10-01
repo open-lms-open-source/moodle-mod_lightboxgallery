@@ -91,9 +91,40 @@ final class edit_tools_test extends \advanced_testcase {
     public function test_form_keeps_page(string $tool): void {
         $html = $this->make_tool($tool, 3)->output('');
 
-        $this->assertMatchesRegularExpression('/<input type="hidden" name="page" value="3" \/>/', $html);
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $xpath = new \DOMXPath($doc);
         // Every form that posts back to the editing page carries it; the tag tool's import button goes elsewhere.
-        $this->assertSame(substr_count($html, 'imageedit.php" method="post"'), substr_count($html, 'name="page"'));
+        $forms = $xpath->query('//form[contains(@action, "/mod/lightboxgallery/imageedit.php")]');
+        $this->assertGreaterThan(0, $forms->length);
+        foreach ($forms as $form) {
+            $page = $xpath->query('.//input[@type="hidden"][@name="page"]', $form);
+            $this->assertSame(1, $page->length);
+            $this->assertSame('3', $page->item(0)->getAttribute('value'));
+            $this->assertSame(1, $xpath->query('.//input[@name="sesskey"]', $form)->length);
+        }
+    }
+
+    /**
+     * Every control in each tool's forms has a label that points at it.
+     *
+     * @param string $tool
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('tool_provider')]
+    public function test_controls_are_labelled(string $tool): void {
+        // The tag tool only lists tags to remove when the image has some.
+        $this->make_tool('tag', 0)->lbgimage->add_tag('beach');
+        $html = $this->make_tool($tool, 0)->output('A caption');
+
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $xpath = new \DOMXPath($doc);
+        $controls = $xpath->query('//textarea | //select | //input[not(@type="hidden") and not(@type="submit")]');
+        foreach ($controls as $control) {
+            $id = $control->getAttribute('id');
+            $this->assertNotSame('', $id, "A {$control->nodeName} named {$control->getAttribute('name')} has no id.");
+            $this->assertSame(1, $xpath->query('//label[@for="' . $id . '"]')->length, "Nothing labels #$id.");
+        }
     }
 
     /**

@@ -40,13 +40,10 @@ class delete extends base {
     /**
      * Output the form.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * @return string
      */
     public function output() {
-        $result = get_string('deletecheck', '', $this->image) . '<br /><br />';
-        $result .= '<input type="submit" class="btn btn-secondary" value="' . get_string('yes') . '" />';
-        return $this->enclose_in_form($result);
+        return $this->render_form('delete', ['message' => get_string('deletecheck', '', $this->image)]);
     }
 
     /**

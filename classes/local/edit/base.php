@@ -103,30 +103,41 @@ class base {
     }
 
     /**
-     * Enclose the form in a form tag.
+     * The values every tool's form needs to post back to the image editing page.
      *
-     * @param string $text The text to enclose in the form
-     * @return string
+     * @return array
      */
-    public function enclose_in_form($text) {
-        global $CFG, $USER;
-
-        return '<form action="' . $CFG->wwwroot . '/mod/lightboxgallery/imageedit.php" method="post">' .
-               '<fieldset class="invisiblefieldset">' .
-               '<input type="hidden" name="sesskey" value="' . $USER->sesskey . '" />' .
-               '<input type="hidden" name="id" value="' . $this->cm->id . '" />' .
-               '<input type="hidden" name="image" value="' . $this->image . '" />' .
-               '<input type="hidden" name="tab" value="' . $this->tab . '" />' .
-               '<input type="hidden" name="page" value="' . $this->page . '" />' .
-               '<input type="hidden" name="process" value="1" />' . $text . '</fieldset></form>';
+    protected function get_form_context(): array {
+        return [
+            'action' => (new \moodle_url('/mod/lightboxgallery/imageedit.php'))->out(false),
+            'sesskey' => sesskey(),
+            'cmid' => $this->cm->id,
+            'image' => $this->image,
+            'tab' => $this->tab,
+            'page' => $this->page,
+        ];
     }
 
     /**
-     * Output the form.
+     * Render one of the tools' templates, which post back to the image editing page.
      *
-     * @return void
+     * @param string $template The template's name within mod_lightboxgallery/edit.
+     * @param array $context The tool's own values for the template.
+     * @return string
+     */
+    protected function render_form(string $template, array $context = []): string {
+        global $OUTPUT;
+
+        return $OUTPUT->render_from_template('mod_lightboxgallery/edit/' . $template, $context + $this->get_form_context());
+    }
+
+    /**
+     * Output the tool's form.
+     *
+     * @return string
      */
     public function output() {
+        return '';
     }
 
     /**

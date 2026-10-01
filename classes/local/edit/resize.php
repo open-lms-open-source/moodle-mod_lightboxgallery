@@ -60,32 +60,30 @@ class resize extends base {
     /**
      * Output the form.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * @return string
      */
     public function output() {
-        $fs = get_file_storage();
-        $storedfile = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $this->image);
-        $image = new \lightboxgallery_image($storedfile, $this->gallery, $this->cm);
-
-        $currentsize = sprintf('%s: %dx%d', get_string('currentsize', 'lightboxgallery'), $image->width, $image->height) .
-                       '<br /><br />';
-
-        $sizeselect = '<div class="input-group"><select name="size" class="form-select">';
-        foreach ($this->resizeoptions as $index => $option) {
-            $sizeselect .= '<option value="' . $index . '">' . $option . '</option>';
+        $sizes = [];
+        foreach ($this->resizeoptions as $value => $label) {
+            $sizes[] = ['value' => $value, 'label' => $label];
         }
-        $sizeselect .= '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
-                       $this->strresize . '" /></div><br /><br />';
-
-        $scaleselect = '<div class="input-group"><select name="scale" class="form-select">';
+        $scales = [];
         foreach (self::SCALES as $scale) {
-            $scaleselect .= '<option value="' . $scale . '">' . $scale . '&#37;</option>';
+            $scales[] = ['value' => $scale, 'label' => $scale . '%'];
         }
-        $scaleselect .= '</select>&nbsp;<input type="submit" class="btn btn-secondary" name="button" value="' .
-                        $this->strscale . '" /></div>';
 
-        return $this->enclose_in_form($currentsize . $sizeselect . $scaleselect);
+        return $this->render_form('resize', [
+            'currentsize' => sprintf(
+                '%s: %dx%d',
+                get_string('currentsize', 'lightboxgallery'),
+                $this->lbgimage->width,
+                $this->lbgimage->height
+            ),
+            'sizes' => $sizes,
+            'scales' => $scales,
+            'resizelabel' => $this->strresize,
+            'scalelabel' => $this->strscale,
+        ]);
     }
 
     /**

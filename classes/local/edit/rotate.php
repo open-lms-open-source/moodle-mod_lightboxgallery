@@ -40,20 +40,14 @@ class rotate extends base {
     /**
      * Output the form.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * @return string
      */
     public function output() {
-        $result = get_string('selectrotation', 'lightboxgallery') . '<br /><br />' .
-                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="-90" required ' .
-                  '/>-90&#176;</label>' .
-                  '<label class="me-3"><input type="radio" class="form-check-input me-1" name="angle" value="180" ' .
-                  '/>180&#176;</label>' .
-                  '<label><input type="radio" class="form-check-input me-1" name="angle" value="90" />90&#176;</label>' .
-                  '<br /><br /><input type="submit" class="btn btn-secondary" value="' .
-                  get_string('edit_rotate', 'lightboxgallery') . '" />';
-
-        return $this->enclose_in_form($result);
+        $angles = [];
+        foreach ([-90, 180, 90] as $index => $angle) {
+            $angles[] = ['value' => $angle, 'label' => $angle . "\u{00B0}", 'first' => $index === 0];
+        }
+        return $this->render_form('rotate', ['angles' => $angles]);
     }
 
     /**

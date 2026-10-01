@@ -23,6 +23,7 @@
  */
 
 use core\output\tabobject;
+use core\output\tabtree;
 
 require_once(dirname(__DIR__, 2) . '/config.php');
 require_once(__DIR__ . '/locallib.php');
@@ -104,29 +105,15 @@ if ($editinstance->processing() && confirm_sesskey()) {
     ));
 }
 
-$table = new html_table();
-$table->width = '*';
-
-if ($editinstance->showthumb) {
-    $table->attributes = ['style' => 'margin-left:auto;margin-right:auto;'];
-    $table->align = ['center', 'center'];
-    $table->size = ['*', '*'];
-    $thumbnailurl = $imageclass->get_thumbnail_url();
-    $caption = s($imageclass->get_image_caption());
-    $table->data[] = [
-        "<img src=\"{$thumbnailurl}\" alt=\"\" /><br /><span title=\"{$caption}\">{$caption}</span>",
-        $editinstance->output($imageclass->get_image_caption()),
-    ];
-} else {
-    $table->align = ['center'];
-    $table->size = ['*'];
-    $table->data[] = [$editinstance->output($imageclass->get_image_caption())];
-}
+$thumbnailurl = $imageclass->get_thumbnail_url();
+$content = $OUTPUT->render_from_template('mod_lightboxgallery/edit/page', [
+    'showthumb' => $editinstance->showthumb,
+    'thumbnailurl' => $thumbnailurl ? $thumbnailurl->out(false) : null,
+    'caption' => $imageclass->get_image_caption(),
+    'tool' => $editinstance->output($imageclass->get_image_caption()),
+]);
 
 echo $OUTPUT->header();
-
-print_tabs([$tabs], $tab);
-
-echo html_writer::table($table);
-
+echo $OUTPUT->render(new tabtree($tabs, $tab));
+echo $content;
 echo $OUTPUT->footer();

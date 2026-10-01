@@ -38,40 +38,24 @@ class tag extends base {
     }
 
     /**
-     * Output the form.
+     * Output the forms.
      *
      * @return string
-     * @throws \core\exception\moodle_exception
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function output() {
         global $OUTPUT;
 
-        $stradd = get_string('add');
-
-        $manualform = '<div class="input-group mb-3"><input type="text" class="form-control" name="tag" />' .
-                      '<input type="submit" class="btn btn-secondary" value="' . $stradd . '" /></div>';
-        $manualform = $this->enclose_in_form($manualform);
-
-        $iptcform = '';
-        $deleteform = '';
-
-        $iptcaddurl = new \moodle_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $this->gallery->id]);
-        $iptcform .= $OUTPUT->single_button($iptcaddurl, get_string('tagsimport', 'lightboxgallery'));
-
-        if ($tags = $this->lbgimage->get_tags()) {
-            $deleteform = '<input type="hidden" name="delete" value="1" />';
-            foreach ($tags as $tag) {
-                $deleteform .= '<label><input type="checkbox" name="deletetags[]" value="' . $tag->id . '" /> ' .
-                               htmlentities($tag->description) . '</label><br />';
-            }
-            $deleteform .= '<input type="submit" class="btn btn-secondary" value="' . get_string('remove') . '" />';
-            $deleteform = '<span class="tag-head"> ' . get_string('tagscurrent', 'lightboxgallery') . '</span>'
-                          . $this->enclose_in_form($deleteform);
+        $importurl = new \moodle_url('/mod/lightboxgallery/edit/tag/import.php', ['id' => $this->gallery->id]);
+        $tags = [];
+        foreach ($this->lbgimage->get_tags() as $tag) {
+            $tags[] = ['id' => $tag->id, 'description' => $tag->description];
         }
 
-        return $manualform . $iptcform . $deleteform;
+        return $this->render_form('tag', [
+            'importbutton' => $OUTPUT->single_button($importurl, get_string('tagsimport', 'lightboxgallery')),
+            'hastags' => !empty($tags),
+            'tags' => $tags,
+        ]);
     }
 
     /**

@@ -38,40 +38,27 @@ class thumbnail extends base {
     }
 
     /**
-     * Output the form.
+     * Output the forms.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * @return string
      */
     public function output() {
         global $OUTPUT;
 
-        $url = new \moodle_url('/mod/lightboxgallery/index.php', ['id' => $this->gallery->course]);
-        $helpbutton = $OUTPUT->help_icon('setasindex', 'lightboxgallery', true, $url);
-        $result = '<input type="submit" class="btn btn-secondary" name="index" value="' .
-            get_string('setasindex', 'lightboxgallery') . '" />' . $helpbutton;
-
-        $result .= '<br /><br />' .
-            get_string('selectthumbpos', 'lightboxgallery') . '<br /><br />';
-
+        // Tall images can move up or down, others left or right.
         if ($this->lbgimage->width < $this->lbgimage->height) {
-            $result .= '<label class="me-3"><input type="radio" class="form-check-input me-1" name="move" value="1" />' .
-                       get_string('dirup', 'lightboxgallery') . '</label>&nbsp;' .
-                       '<label><input type="radio" class="form-check-input me-1" name="move" value="2" />' .
-                       get_string('dirdown', 'lightboxgallery') . '</label>';
+            $directions = [['value' => 1, 'label' => get_string('dirup', 'lightboxgallery')],
+                ['value' => 2, 'label' => get_string('dirdown', 'lightboxgallery')]];
         } else {
-            $result .= '<label class="me-3"><input type="radio" class="form-check-input me-1"  name="move" value="3" />' .
-                       get_string('dirleft', 'lightboxgallery') . '</label>&nbsp;' .
-                       '<label><input type="radio" class="form-check-input me-1" name="move" value="4" />' .
-                       get_string('dirright', 'lightboxgallery') . '</label>';
+            $directions = [['value' => 3, 'label' => get_string('dirleft', 'lightboxgallery')],
+                ['value' => 4, 'label' => get_string('dirright', 'lightboxgallery')]];
         }
-        $result .= '<br /><br /><div class="d-flex flex-wrap align-items-center"><label for="offset" class="me-1">' .
-                   get_string('thumbnailoffset', 'lightboxgallery') .
-                   ':</label> <input type="text" class="form-control" name="offset" value="20" size="4" /></div><br /><br />' .
-                   '<input type="submit" class="btn btn-secondary" value="' . get_string('move') .
-                   '" />&nbsp;<input type="submit" class="btn btn-secondary" name="reset" value="' . get_string('reset') . '" />';
 
-        return $this->enclose_in_form($result);
+        $indexurl = new \moodle_url('/mod/lightboxgallery/index.php', ['id' => $this->gallery->course]);
+        return $this->render_form('thumbnail', [
+            'helpicon' => $OUTPUT->help_icon('setasindex', 'lightboxgallery', true, $indexurl),
+            'directions' => $directions,
+        ]);
     }
 
     /**

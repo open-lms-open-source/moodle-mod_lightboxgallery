@@ -40,16 +40,14 @@ class caption extends base {
     /**
      * Output the form.
      *
-     * @param \stdClass $captiontext The caption text.
-     * @return string|void
-     * @throws \coding_exception
+     * @param string $captiontext The caption text.
+     * @return string
      */
     public function output($captiontext = '') {
         // Not s(), which leaves numeric entities alone: the caption must come back exactly as stored.
-        $captiontext = htmlspecialchars($captiontext, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $result = '<textarea name="caption" class="form-control" cols="24" rows="4">' . $captiontext . '</textarea><br /><br />' .
-                  '<input type="submit" class="btn btn-secondary"  value="' . get_string('update') . '" />';
-        return $this->enclose_in_form($result);
+        return $this->render_form('caption', [
+            'captionhtml' => htmlspecialchars($captiontext, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+        ]);
     }
 
     /**

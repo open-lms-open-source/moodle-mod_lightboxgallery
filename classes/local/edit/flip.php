@@ -54,19 +54,10 @@ class flip extends base {
     /**
      * Output the form.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * @return string
      */
     public function output() {
-        $result = get_string('selectflipmode', 'lightboxgallery') . '<br /><br />' .
-                  '<label for="' . self::VERTICAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
-                  self::VERTICAL . '" required /> Vertical</label><br />' .
-                  '<label for="' . self::HORIZONTAL . '"><input type="radio" class="form-check-input me-1" name="mode" value="' .
-                  self::HORIZONTAL . '" /> Horizontal</label>' .
-                  '<br /><br /><input type="submit" class="btn btn-secondary" value="' .
-                  get_string('edit_flip', 'lightboxgallery') . '" />';
-
-        return $this->enclose_in_form($result);
+        return $this->render_form('flip', ['vertical' => self::VERTICAL, 'horizontal' => self::HORIZONTAL]);
     }
 
     /**
