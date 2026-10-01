@@ -950,26 +950,6 @@ class lightboxgallery_image {
     }
 
     /**
-     * Update the image meta file name in the database.
-     *
-     * @param stdClass $old
-     * @param stdClass $new
-     * @return void
-     * @throws dml_exception
-     */
-    public function update_meta_file($old, $new) {
-        global $DB;
-
-        if ($old == $new) {
-            return;
-        }
-
-        $sql = 'UPDATE {lightboxgallery_image_meta} SET image = ?
-                WHERE image = ? AND gallery = ?';
-        $DB->execute($sql, [$new, $old, $this->gallery->id]);
-    }
-
-    /**
      * Set the stored file.
      *
      * @param stdClass $storedfile
