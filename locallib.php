@@ -210,28 +210,7 @@ function lightboxgallery_edit_types($showall = false, $image = null) {
 function lightboxgallery_print_tags($heading, $tags, $courseid, $galleryid) {
     global $OUTPUT;
 
-    echo $OUTPUT->box_start();
-
-    echo '<form action="search.php" style="float: right; margin-left: 4px;">' .
-         ' <fieldset class="invisiblefieldset">' .
-         '  <input type="hidden" name="id" value="' . $courseid . '" />' .
-         '  <input type="hidden" name="gallery" value="' . $galleryid . '" />' .
-         '  <input type="text" name="search" size="8" />' .
-         '  <input type="submit" class="btn btn-secondary" value="' . get_string('search') . '" />' .
-         ' </fieldset>' .
-         '</form>' .
-         $heading . ': ';
-
-    $tagarray = [];
-    foreach ($tags as $tag) {
-        $tagparams = ['id' => $courseid, 'gallery' => $galleryid, 'search' => stripslashes($tag->description)];
-        $tagurl = new moodle_url('/mod/lightboxgallery/search.php', $tagparams);
-        $tagarray[] = html_writer::link($tagurl, s($tag->description), ['class' => 'taglink']);
-    }
-
-    echo implode(', ', $tagarray);
-
-    echo $OUTPUT->box_end();
+    echo $OUTPUT->render(new \mod_lightboxgallery\output\popular_tags($heading, $tags, $courseid, $galleryid));
 }
 
 /**

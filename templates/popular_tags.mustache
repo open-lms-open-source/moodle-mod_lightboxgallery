@@ -1,0 +1,60 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_lightboxgallery/popular_tags
+
+    A gallery's most used tags, each linking to a search for it, beside a box to search the gallery.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * heading - What to call the list of tags.
+    * tags - The tags: name, url and first (whether it's the first one).
+    * searchaction - The search page's URL.
+    * searchid - A unique id for the search box.
+    * courseid, galleryid - What to search.
+
+    Example context (json):
+    {
+        "heading": "Popular tags",
+        "tags": [
+            {"name": "beach", "url": "https://example.com/mod/lightboxgallery/search.php?id=2&gallery=1&search=beach", "first": true},
+            {"name": "bus", "url": "https://example.com/mod/lightboxgallery/search.php?id=2&gallery=1&search=bus", "first": false}
+        ],
+        "searchaction": "https://example.com/mod/lightboxgallery/search.php",
+        "searchid": "lightboxgallery-search-abc123",
+        "courseid": 2,
+        "galleryid": 1
+    }
+}}
+<div class="lightboxgallery-tags box py-3 d-flex flex-wrap align-items-center gap-2">
+    <div class="flex-grow-1">
+        {{heading}}:
+        {{#tags}}{{^first}}, {{/first}}<a class="taglink" href="{{url}}">{{name}}</a>{{/tags}}
+    </div>
+    <form action="{{searchaction}}" method="get" class="d-flex" role="search">
+        <input type="hidden" name="id" value="{{courseid}}">
+        <input type="hidden" name="gallery" value="{{galleryid}}">
+        <label for="{{searchid}}" class="visually-hidden">{{#str}}search{{/str}}</label>
+        <input type="text" name="search" id="{{searchid}}" class="form-control form-control-sm" size="12">
+        <button type="submit" class="btn btn-secondary btn-sm ms-1">{{#str}}search{{/str}}</button>
+    </form>
+</div>
