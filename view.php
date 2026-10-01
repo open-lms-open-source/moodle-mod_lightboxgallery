@@ -88,8 +88,7 @@ $PAGE->set_cm($cm);
 $PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->fullname);
-$PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
-$PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox', 'M.mod_lightboxgallery.init');
+$PAGE->requires->js_call_amd('mod_lightboxgallery/lightbox', 'init');
 
 $allowrssfeed = (lightboxgallery_rss_enabled() && $gallery->rss);
 $heading = get_string('displayinggallery', 'lightboxgallery', $gallery->name);

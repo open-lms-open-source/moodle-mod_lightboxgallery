@@ -1,0 +1,66 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_lightboxgallery/lightbox
+
+    The viewer that opens when a gallery thumbnail is clicked. It's rendered once per page by
+    mod_lightboxgallery/lightbox, which fills in the image, caption and counter.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-region="mod_lightboxgallery-lightbox", "image", "loading", "caption", "counter", "download"
+    * data-action="previous", "next", "close"
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {}
+}}
+<dialog class="mod-lightboxgallery-lightbox" data-region="mod_lightboxgallery-lightbox"
+        aria-label="{{#str}}imageviewer, mod_lightboxgallery{{/str}}">
+    <div class="mod-lightboxgallery-lightbox-frame">
+        <div class="mod-lightboxgallery-lightbox-stage">
+            <img class="mod-lightboxgallery-lightbox-image" data-region="image" alt="" hidden>
+            <div class="mod-lightboxgallery-lightbox-loading" data-region="loading">
+                {{> core/loading }}
+            </div>
+            <button type="button" class="btn mod-lightboxgallery-lightbox-nav mod-lightboxgallery-lightbox-previous"
+                    data-action="previous" aria-label="{{#str}}previous{{/str}}" hidden>
+                {{#pix}}t/left, core{{/pix}}
+            </button>
+            <button type="button" class="btn mod-lightboxgallery-lightbox-nav mod-lightboxgallery-lightbox-next"
+                    data-action="next" aria-label="{{#str}}next{{/str}}" hidden>
+                {{#pix}}t/right, core{{/pix}}
+            </button>
+        </div>
+        <div class="mod-lightboxgallery-lightbox-details">
+            <div class="mod-lightboxgallery-lightbox-text">
+                <p class="mod-lightboxgallery-lightbox-caption" data-region="caption" hidden></p>
+                <p class="mod-lightboxgallery-lightbox-counter text-muted" data-region="counter"></p>
+            </div>
+            <div class="mod-lightboxgallery-lightbox-actions">
+                <a class="btn btn-secondary" data-region="download" href="#" download>
+                    {{#pix}}t/download, core{{/pix}} {{#str}}imagedownload, mod_lightboxgallery{{/str}}
+                </a>
+                <button type="button" class="btn btn-primary" data-action="close">{{#str}}closebuttontitle{{/str}}</button>
+            </div>
+        </div>
+    </div>
+</dialog>

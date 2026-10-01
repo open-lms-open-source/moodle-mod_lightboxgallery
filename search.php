@@ -71,8 +71,7 @@ $pageurl = new moodle_url('/mod/lightboxgallery/search.php', ['id' => $course->i
 $PAGE->set_url($pageurl, ['page' => $page]);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->shortname);
-$PAGE->requires->css('/mod/lightboxgallery/assets/skins/sam/gallery-lightbox-skin.css');
-$PAGE->requires->yui_module('moodle-mod_lightboxgallery-lightbox', 'M.mod_lightboxgallery.init');
+$PAGE->requires->js_call_amd('mod_lightboxgallery/lightbox', 'init');
 
 echo $OUTPUT->header();
 
