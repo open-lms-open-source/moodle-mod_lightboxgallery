@@ -82,7 +82,7 @@ if (!in_array($tab, array_keys($edittypes))) {
 
 require_once($CFG->dirroot . '/mod/lightboxgallery/edit/' . $tab . '/' . $tab . '.class.php');
 $editclass = 'edit_' . $tab;
-$editinstance = new $editclass($gallery, $cm, $image, $tab);
+$editinstance = new $editclass($gallery, $cm, $image, $tab, $page);
 
 if ($editinstance->processing() && confirm_sesskey()) {
     $params = [
@@ -99,9 +99,8 @@ if ($editinstance->processing() && confirm_sesskey()) {
     $event->trigger();
 
     $editinstance->process_form();
-    redirect(
-        $CFG->wwwroot . '/mod/lightboxgallery/imageedit.php?id=' . $cm->id . '&image=' . $editinstance->image . '&tab=' . $tab
-    );
+    redirect(new moodle_url('/mod/lightboxgallery/imageedit.php',
+        ['id' => $cm->id, 'image' => $editinstance->image, 'tab' => $tab, 'page' => $page]));
 }
 
 $table = new html_table();

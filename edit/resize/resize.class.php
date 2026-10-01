@@ -45,10 +45,11 @@ class edit_resize extends edit_base {
      * @param context_module $cm
      * @param stdClass $image
      * @param stdClass $tab
+     * @param int $page The page of the gallery the user came from.
      * @throws coding_exception
      */
-    public function __construct($gallery, $cm, $image, $tab) {
-        parent::__construct($gallery, $cm, $image, $tab, true);
+    public function __construct($gallery, $cm, $image, $tab, $page = 0) {
+        parent::__construct($gallery, $cm, $image, $tab, true, $page);
         $this->strresize = get_string('edit_resize', 'lightboxgallery');
         $this->strscale = get_string('edit_resizescale', 'lightboxgallery');
         $this->resizeoptions = lightboxgallery_resize_options();

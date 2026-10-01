@@ -29,9 +29,10 @@ class edit_delete extends edit_base {
      * @param context_module $cm
      * @param stdClass $image
      * @param stdClass $tab
+     * @param int $page The page of the gallery the user came from.
      */
-    public function __construct($gallery, $cm, $image, $tab) {
-        parent::__construct($gallery, $cm, $image, $tab, true);
+    public function __construct($gallery, $cm, $image, $tab, $page = 0) {
+        parent::__construct($gallery, $cm, $image, $tab, true, $page);
     }
 
     /**
@@ -41,9 +42,7 @@ class edit_delete extends edit_base {
      * @throws coding_exception
      */
     public function output() {
-        global $page;
         $result = get_string('deletecheck', '', $this->image) . '<br /><br />';
-        $result .= '<input type="hidden" name="page" value="' . $page . '" />';
         $result .= '<input type="submit" class="btn btn-secondary" value="' . get_string('yes') . '" />';
         return $this->enclose_in_form($result);
     }
@@ -56,8 +55,7 @@ class edit_delete extends edit_base {
      * @throws moodle_exception
      */
     public function process_form() {
-        global $CFG, $page;
         $this->lbgimage->delete_file();
-        redirect($CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $this->cm->id . '&page=' . $page . '&editing=1');
+        redirect(new moodle_url('/mod/lightboxgallery/view.php', ['id' => $this->cm->id, 'page' => $this->page, 'editing' => 1]));
     }
 }

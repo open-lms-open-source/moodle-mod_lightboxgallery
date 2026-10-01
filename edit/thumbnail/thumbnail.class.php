@@ -29,9 +29,10 @@ class edit_thumbnail extends edit_base {
      * @param context_module $cm
      * @param stdClass $image
      * @param stdClass $tab
+     * @param int $page The page of the gallery the user came from.
      */
-    public function __construct($gallery, $cm, $image, $tab) {
-        parent::__construct($gallery, $cm, $image, $tab, true);
+    public function __construct($gallery, $cm, $image, $tab, $page = 0) {
+        parent::__construct($gallery, $cm, $image, $tab, true, $page);
     }
 
     /**

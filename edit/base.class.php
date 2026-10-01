@@ -54,6 +54,10 @@ class edit_base {
      * @var \core\context\module|false
      */
     public $context;
+    /**
+     * @var int The page of the gallery the user came from, so they can return to it.
+     */
+    public $page;
 
     /**
      * Constructor.
@@ -63,9 +67,11 @@ class edit_base {
      * @param stdClass $image
      * @param stdClass $tab
      * @param bool|null $showthumb
+     * @param int $page The page of the gallery the user came from.
      */
-    public function __construct($gallery, $cm, $image, $tab, $showthumb = true) {
+    public function __construct($gallery, $cm, $image, $tab, $showthumb = true, $page = 0) {
         $this->gallery = $gallery;
+        $this->page = (int) $page;
         $this->cm = $cm;
         $this->image = $image;
         $this->tab = $tab;
@@ -102,6 +108,7 @@ class edit_base {
                '<input type="hidden" name="id" value="' . $this->cm->id . '" />' .
                '<input type="hidden" name="image" value="' . $this->image . '" />' .
                '<input type="hidden" name="tab" value="' . $this->tab . '" />' .
+               '<input type="hidden" name="page" value="' . $this->page . '" />' .
                '<input type="hidden" name="process" value="1" />' . $text . '</fieldset></form>';
     }
 
