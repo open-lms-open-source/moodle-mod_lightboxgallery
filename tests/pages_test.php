@@ -49,8 +49,10 @@ final class pages_test extends \advanced_testcase {
         lightboxgallery_image::set_thumbnail_budget(lightboxgallery_image::SYNC_THUMBNAIL_LIMIT);
 
         $this->course = $this->getDataGenerator()->create_course();
-        $this->gallery = $this->getDataGenerator()->create_module('lightboxgallery',
-            ['course' => $this->course->id, 'comments' => 0]);
+        $this->gallery = $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            ['course' => $this->course->id, 'comments' => 0]
+        );
         $this->setUser($this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher'));
     }
 

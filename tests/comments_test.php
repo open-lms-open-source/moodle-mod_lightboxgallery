@@ -48,8 +48,10 @@ final class comments_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $this->gallery = $this->getDataGenerator()->create_module('lightboxgallery',
-            ['course' => $course->id, 'comments' => 1]);
+        $this->gallery = $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            ['course' => $course->id, 'comments' => 1]
+        );
 
         // Two comments share a time, so the order also depends on their ids.
         $times = [100, 200, 200, 300, 400];
@@ -88,8 +90,10 @@ final class comments_test extends \advanced_testcase {
         // Push the last comment onto the second page.
         global $DB;
         for ($i = 0; $i < $perpage; $i++) {
-            $DB->insert_record('lightboxgallery_comments',
-                ['gallery' => $this->gallery->id, 'userid' => 2, 'commenttext' => 'Early', 'timemodified' => 50]);
+            $DB->insert_record(
+                'lightboxgallery_comments',
+                ['gallery' => $this->gallery->id, 'userid' => 2, 'commenttext' => 'Early', 'timemodified' => 50]
+            );
         }
         $url = lightboxgallery_comment_url($this->comments[4], $this->gallery->cmid);
         $this->assertEquals(1, $url->get_param('cpage'));

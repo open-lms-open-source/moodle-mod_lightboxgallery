@@ -69,8 +69,10 @@ final class index_page_test extends \advanced_testcase {
             'course' => $course->id, 'name' => 'Field trip', 'rss' => 1, 'comments' => 1,
             'intro' => '<p>Photos from the <strong>field trip</strong></p>', 'introformat' => FORMAT_HTML,
         ]);
-        $this->getDataGenerator()->create_module('lightboxgallery',
-            ['course' => $course->id, 'name' => 'Science fair', 'rss' => 0, 'comments' => 0]);
+        $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            ['course' => $course->id, 'name' => 'Science fair', 'rss' => 0, 'comments' => 0]
+        );
 
         // One image and one non-image file in the first gallery, and a comment on each gallery.
         $context = \context_module::instance($withrss->cmid);
@@ -78,8 +80,10 @@ final class index_page_test extends \advanced_testcase {
         get_file_storage()->create_file_from_string(['contextid' => $context->id, 'component' => 'mod_lightboxgallery',
             'filearea' => 'gallery_images', 'itemid' => 0, 'filepath' => '/', 'filename' => 'notes.txt'], 'Not an image');
         foreach ($DB->get_fieldset_select('lightboxgallery', 'id', 'course = ?', [$course->id]) as $galleryid) {
-            $DB->insert_record('lightboxgallery_comments',
-                ['gallery' => $galleryid, 'userid' => $student->id, 'commenttext' => 'Nice', 'timemodified' => time()]);
+            $DB->insert_record(
+                'lightboxgallery_comments',
+                ['gallery' => $galleryid, 'userid' => $student->id, 'commenttext' => 'Nice', 'timemodified' => time()]
+            );
         }
 
         $this->setUser($student);

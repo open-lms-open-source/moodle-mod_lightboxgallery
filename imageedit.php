@@ -98,8 +98,10 @@ if ($editinstance->processing() && confirm_sesskey()) {
     $event->trigger();
 
     $editinstance->process_form();
-    redirect(new moodle_url('/mod/lightboxgallery/imageedit.php',
-        ['id' => $cm->id, 'image' => $editinstance->image, 'tab' => $tab, 'page' => $page]));
+    redirect(new moodle_url(
+        '/mod/lightboxgallery/imageedit.php',
+        ['id' => $cm->id, 'image' => $editinstance->image, 'tab' => $tab, 'page' => $page]
+    ));
 }
 
 $table = new html_table();

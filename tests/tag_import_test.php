@@ -103,8 +103,12 @@ final class tag_import_test extends \advanced_testcase {
      */
     private function get_tags(): array {
         global $DB;
-        $tags = $DB->get_fieldset_select('lightboxgallery_image_meta', 'description', 'gallery = ? AND metatype = ?',
-            [$this->gallery->id, 'tag']);
+        $tags = $DB->get_fieldset_select(
+            'lightboxgallery_image_meta',
+            'description',
+            'gallery = ? AND metatype = ?',
+            [$this->gallery->id, 'tag']
+        );
         sort($tags);
         return $tags;
     }

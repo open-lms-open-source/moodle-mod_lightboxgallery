@@ -130,8 +130,15 @@ final class upload_validation_test extends \advanced_testcase {
     private function draft_filenames(): array {
         global $USER;
         $names = [];
-        foreach (get_file_storage()->get_area_files(\context_user::instance($USER->id)->id, 'user', 'draft',
-                $this->draftitemid, 'filename', false) as $file) {
+        $files = get_file_storage()->get_area_files(
+            \context_user::instance($USER->id)->id,
+            'user',
+            'draft',
+            $this->draftitemid,
+            'filename',
+            false
+        );
+        foreach ($files as $file) {
             $names[] = $file->get_filename();
         }
         return $names;
@@ -212,8 +219,10 @@ final class upload_validation_test extends \advanced_testcase {
         // A lower site limit still applies.
         $DB->set_field('course', 'maxbytes', 0, ['id' => $this->gallery->course]);
         $CFG->maxbytes = 999;
-        $this->assertStringContainsString(display_size(999),
-            lightboxgallery_check_zip($zip, get_course($this->gallery->course)));
+        $this->assertStringContainsString(
+            display_size(999),
+            lightboxgallery_check_zip($zip, get_course($this->gallery->course))
+        );
     }
 
     /**

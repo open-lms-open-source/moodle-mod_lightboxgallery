@@ -58,7 +58,9 @@ class delete extends base {
      */
     public function process_form() {
         $this->lbgimage->delete_file();
-        redirect(new \moodle_url('/mod/lightboxgallery/view.php',
-            ['id' => $this->cm->id, 'page' => $this->page, 'editing' => 1]));
+        redirect(new \moodle_url(
+            '/mod/lightboxgallery/view.php',
+            ['id' => $this->cm->id, 'page' => $this->page, 'editing' => 1]
+        ));
     }
 }

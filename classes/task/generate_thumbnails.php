@@ -76,8 +76,14 @@ class generate_thumbnails extends \core\task\adhoc_task {
      */
     private function generate(\stdClass $gallery, \stdClass $cm): void {
         $context = \context_module::instance($cm->id);
-        $files = get_file_storage()->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', 0, 'filename',
-            false);
+        $files = get_file_storage()->get_area_files(
+            $context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            'filename',
+            false
+        );
         foreach ($files as $file) {
             if (!file_mimetype_in_typegroup($file->get_mimetype(), 'web_image')) {
                 continue;

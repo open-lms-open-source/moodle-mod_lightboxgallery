@@ -143,8 +143,12 @@ final class image_edit_test extends \advanced_testcase {
      * @param int $expectedheight
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('edit_provider')]
-    public function test_edit_keeps_file_and_metadata(string $format, string $edit, int $expectedwidth,
-            int $expectedheight): void {
+    public function test_edit_keeps_file_and_metadata(
+        string $format,
+        string $edit,
+        int $expectedwidth,
+        int $expectedheight
+    ): void {
         global $DB;
 
         $filename = 'trip.day1.' . $format;
@@ -187,14 +191,22 @@ final class image_edit_test extends \advanced_testcase {
         $this->assertNotEmpty($neighbour->get_content());
 
         // Captions and tags still belong to the image.
-        $this->assertTrue($DB->record_exists('lightboxgallery_image_meta',
-            ['gallery' => $this->gallery->id, 'image' => $filename, 'metatype' => 'caption']));
+        $this->assertTrue($DB->record_exists(
+            'lightboxgallery_image_meta',
+            ['gallery' => $this->gallery->id, 'image' => $filename, 'metatype' => 'caption']
+        ));
         $this->assertTrue($DB->record_exists('lightboxgallery_image_meta', ['id' => $tagid, 'image' => $filename]));
 
         // The thumbnail was regenerated, and no temporary files are left behind.
         $fs = get_file_storage();
-        $this->assertNotFalse($fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_thumbs', 0, '/',
-            $filename . '.png'));
+        $this->assertNotFalse($fs->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_thumbs',
+            0,
+            '/',
+            $filename . '.png'
+        ));
         $this->assertTrue($fs->is_area_empty($this->context->id, 'mod_lightboxgallery', 'edittemp', false));
     }
 

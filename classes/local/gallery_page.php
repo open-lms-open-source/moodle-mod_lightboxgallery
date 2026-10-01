@@ -161,8 +161,12 @@ class gallery_page {
 
         // Sort the files. Sorting by caption needs every caption, but nothing else.
         if ($this->gallery->sortby == self::SORTBY_CAPTION) {
-            $captions = $DB->get_records_menu('lightboxgallery_image_meta',
-                ['gallery' => $this->gallery->id, 'metatype' => 'caption'], '', 'image, description');
+            $captions = $DB->get_records_menu(
+                'lightboxgallery_image_meta',
+                ['gallery' => $this->gallery->id, 'metatype' => 'caption'],
+                '',
+                'image, description'
+            );
             uasort($this->pagefiles, function ($a, $b) use ($captions) {
                 $filenamea = $a->get_filename();
                 $filenameb = $b->get_filename();

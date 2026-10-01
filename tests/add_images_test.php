@@ -120,8 +120,15 @@ final class add_images_test extends \advanced_testcase {
      */
     private function gallery_filenames(): array {
         $names = [];
-        foreach (get_file_storage()->get_area_files($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0,
-                'filename', false) as $file) {
+        $files = get_file_storage()->get_area_files(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            'filename',
+            false
+        );
+        foreach ($files as $file) {
             $names[] = $file->get_filename();
         }
         return $names;
@@ -147,10 +154,19 @@ final class add_images_test extends \advanced_testcase {
         $this->add([$this->upload('bus.png', $this->png())]);
 
         $this->assertSame(['bus.png'], $this->gallery_filenames());
-        $this->assertSame('bus.png', $DB->get_field('lightboxgallery_image_meta', 'description',
-            ['gallery' => $this->gallery->id, 'image' => 'bus.png', 'metatype' => 'caption']));
-        $this->assertNotFalse(get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_thumbs', 0,
-            '/', 'bus.png.png'));
+        $this->assertSame('bus.png', $DB->get_field(
+            'lightboxgallery_image_meta',
+            'description',
+            ['gallery' => $this->gallery->id, 'image' => 'bus.png', 'metatype' => 'caption']
+        ));
+        $this->assertNotFalse(get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_thumbs',
+            0,
+            '/',
+            'bus.png.png'
+        ));
     }
 
     /**
@@ -204,9 +220,13 @@ final class add_images_test extends \advanced_testcase {
         $fs = get_file_storage();
         $large = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', 'large.png');
         $small = $fs->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', 'small.png');
-        $this->assertSame(['width' => 640, 'height' => 320],
-            array_intersect_key($large->get_imageinfo(), ['width' => 0, 'height' => 0]));
-        $this->assertSame(['width' => 40, 'height' => 20],
-            array_intersect_key($small->get_imageinfo(), ['width' => 0, 'height' => 0]));
+        $this->assertSame(
+            ['width' => 640, 'height' => 320],
+            array_intersect_key($large->get_imageinfo(), ['width' => 0, 'height' => 0])
+        );
+        $this->assertSame(
+            ['width' => 40, 'height' => 20],
+            array_intersect_key($small->get_imageinfo(), ['width' => 0, 'height' => 0])
+        );
     }
 }

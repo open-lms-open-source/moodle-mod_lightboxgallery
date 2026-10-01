@@ -60,8 +60,10 @@ final class recent_activity_test extends \advanced_testcase {
     private function create_gallery_with_comment(string $commenttext, array $options = []): \stdClass {
         global $DB;
 
-        $gallery = $this->getDataGenerator()->create_module('lightboxgallery',
-            array_merge(['course' => $this->course->id, 'comments' => 1], $options));
+        $gallery = $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            array_merge(['course' => $this->course->id, 'comments' => 1], $options)
+        );
         $DB->insert_record('lightboxgallery_comments', [
             'gallery' => $gallery->id,
             'userid' => $this->student->id,
@@ -107,8 +109,12 @@ final class recent_activity_test extends \advanced_testcase {
         global $DB;
         $gallery = $this->create_gallery_with_comment('Secret comment');
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
-        assign_capability('mod/lightboxgallery:viewcomments', CAP_PROHIBIT, $roleid,
-            \context_module::instance($gallery->cmid));
+        assign_capability(
+            'mod/lightboxgallery:viewcomments',
+            CAP_PROHIBIT,
+            $roleid,
+            \context_module::instance($gallery->cmid)
+        );
 
         $this->setUser($this->student);
         [$result, $output] = $this->print_recent();
@@ -142,15 +148,24 @@ final class recent_activity_test extends \advanced_testcase {
         $disabled = $this->create_gallery_with_comment('Disabled comment', ['comments' => 0]);
         $prohibited = $this->create_gallery_with_comment('Secret comment');
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
-        assign_capability('mod/lightboxgallery:viewcomments', CAP_PROHIBIT, $roleid,
-            \context_module::instance($prohibited->cmid));
+        assign_capability(
+            'mod/lightboxgallery:viewcomments',
+            CAP_PROHIBIT,
+            $roleid,
+            \context_module::instance($prohibited->cmid)
+        );
 
         $this->setUser($this->student);
         $activities = [];
         $index = 0;
         foreach ([$visible, $hidden, $disabled, $prohibited] as $gallery) {
-            lightboxgallery_get_recent_mod_activity($activities, $index, time() - HOURSECS, $this->course->id,
-                $gallery->cmid);
+            lightboxgallery_get_recent_mod_activity(
+                $activities,
+                $index,
+                time() - HOURSECS,
+                $this->course->id,
+                $gallery->cmid
+            );
         }
 
         $this->assertCount(1, $activities);

@@ -101,8 +101,12 @@ if ($search === '' || !$galleryids) {
     die();
 }
 
-[$total, $pageresults] = lightboxgallery_search_images($galleryids, $search, $page * LIGHTBOXGALLERY_SEARCH_PERPAGE,
-    LIGHTBOXGALLERY_SEARCH_PERPAGE);
+[$total, $pageresults] = lightboxgallery_search_images(
+    $galleryids,
+    $search,
+    $page * LIGHTBOXGALLERY_SEARCH_PERPAGE,
+    LIGHTBOXGALLERY_SEARCH_PERPAGE
+);
 
 if (!$pageresults) {
     echo $OUTPUT->box(get_string('errornosearchresults', 'lightboxgallery'));
@@ -116,8 +120,11 @@ $galleryrecords = $DB->get_records_list('lightboxgallery', 'id', $pagegalleryids
 [$gallerysql, $galleryparams] = $DB->get_in_or_equal($pagegalleryids, SQL_PARAMS_NAMED, 'g');
 [$imagesql, $imageparams] = $DB->get_in_or_equal(array_unique(array_column($pageresults, 'image')), SQL_PARAMS_NAMED, 'i');
 $metadata = [];
-$metarecords = $DB->get_records_select('lightboxgallery_image_meta', "gallery $gallerysql AND image $imagesql",
-    $galleryparams + $imageparams);
+$metarecords = $DB->get_records_select(
+    'lightboxgallery_image_meta',
+    "gallery $gallerysql AND image $imagesql",
+    $galleryparams + $imageparams
+);
 foreach ($metarecords as $metarecord) {
     $metadata[$metarecord->gallery][$metarecord->image][] = $metarecord;
 }
@@ -128,8 +135,12 @@ foreach ($pageresults as $result) {
     $imgcm = $cms[$result->gallery];
     $storedfile = $fs->get_file($imgcm->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/', $result->image);
     if ($storedfile) {
-        $image = new lightboxgallery_image($storedfile, $galleryrecords[$result->gallery], $imgcm,
-            $metadata[$result->gallery][$result->image] ?? []);
+        $image = new lightboxgallery_image(
+            $storedfile,
+            $galleryrecords[$result->gallery],
+            $imgcm,
+            $metadata[$result->gallery][$result->image] ?? []
+        );
         echo $image->get_image_display_html();
     }
 }

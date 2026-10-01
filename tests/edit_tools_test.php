@@ -118,7 +118,13 @@ final class edit_tools_test extends \advanced_testcase {
         }
 
         $context = \context_module::instance($this->cm->id);
-        $this->assertFalse(get_file_storage()->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/',
-            'photo.png'));
+        $this->assertFalse(get_file_storage()->get_file(
+            $context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            '/',
+            'photo.png'
+        ));
     }
 }

@@ -121,8 +121,14 @@ final class image_resize_test extends \advanced_testcase {
      * @param array $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('fit_dimensions_provider')]
-    public function test_fit_dimensions(int $width, int $height, int $maxwidth, int $maxheight, bool $enlarge,
-            array $expected): void {
+    public function test_fit_dimensions(
+        int $width,
+        int $height,
+        int $maxwidth,
+        int $maxheight,
+        bool $enlarge,
+        array $expected
+    ): void {
         $this->assertSame($expected, lightboxgallery_image::fit_dimensions($width, $height, $maxwidth, $maxheight, $enlarge));
     }
 
@@ -142,13 +148,25 @@ final class image_resize_test extends \advanced_testcase {
      */
     public function test_resize_without_enlarging_leaves_small_image(): void {
         $image = $this->add_image(40, 20);
-        $before = get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/',
-            'photo.png')->get_contenthash();
+        $before = get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            '/',
+            'photo.png'
+        )->get_contenthash();
 
         $image->resize_image(1280, 1024, false);
 
-        $after = get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/',
-            'photo.png')->get_contenthash();
+        $after = get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            '/',
+            'photo.png'
+        )->get_contenthash();
         $this->assertSame($before, $after);
     }
 

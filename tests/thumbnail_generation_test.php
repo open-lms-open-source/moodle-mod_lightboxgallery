@@ -69,8 +69,10 @@ final class thumbnail_generation_test extends \advanced_testcase {
     private function create_gallery(array $options = []): void {
         global $DB;
         $this->course = $this->getDataGenerator()->create_course();
-        $gallery = $this->getDataGenerator()->create_module('lightboxgallery',
-            array_merge(['course' => $this->course->id, 'extinfo' => 1], $options));
+        $gallery = $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            array_merge(['course' => $this->course->id, 'extinfo' => 1], $options)
+        );
         $this->gallery = $DB->get_record('lightboxgallery', ['id' => $gallery->id], '*', MUST_EXIST);
         $this->cmid = $gallery->cmid;
         $this->context = \context_module::instance($gallery->cmid);
@@ -95,8 +97,14 @@ final class thumbnail_generation_test extends \advanced_testcase {
      * @return int
      */
     private function count_thumbnails(): int {
-        return count(get_file_storage()->get_area_files($this->context->id, 'mod_lightboxgallery', 'gallery_thumbs', 0,
-            'filename', false));
+        return count(get_file_storage()->get_area_files(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_thumbs',
+            0,
+            'filename',
+            false
+        ));
     }
 
     /**
@@ -155,8 +163,14 @@ final class thumbnail_generation_test extends \advanced_testcase {
         $this->runAdhocTasks(generate_thumbnails::class);
         ob_end_clean();
         $this->assertSame(lightboxgallery_image::SYNC_THUMBNAIL_LIMIT + 5, $this->count_thumbnails());
-        $this->assertNotFalse(get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_index', 0,
-            '/', 'index.png'));
+        $this->assertNotFalse(get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_index',
+            0,
+            '/',
+            'index.png'
+        ));
 
         // With the budget spent, the page still shows every thumbnail.
         lightboxgallery_image::set_thumbnail_budget(0);
@@ -169,8 +183,14 @@ final class thumbnail_generation_test extends \advanced_testcase {
     public function test_ensure_thumbnail_ignores_budget(): void {
         $this->add_images(1);
         lightboxgallery_image::set_thumbnail_budget(0);
-        $file = get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/',
-            'photo01.png');
+        $file = get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_images',
+            0,
+            '/',
+            'photo01.png'
+        );
         $cm = get_coursemodule_from_id('lightboxgallery', $this->cmid, 0, false, MUST_EXIST);
 
         $image = new lightboxgallery_image($file, $this->gallery, $cm);
@@ -205,8 +225,14 @@ final class thumbnail_generation_test extends \advanced_testcase {
         $html = lightboxgallery_index_thumbnail($this->course->id, $this->gallery);
 
         $this->assertStringContainsString('/gallery_index/0/index.png', $html);
-        $this->assertNotFalse(get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_index', 0,
-            '/', 'index.png'));
+        $this->assertNotFalse(get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_index',
+            0,
+            '/',
+            'index.png'
+        ));
     }
 
     /**
@@ -219,8 +245,14 @@ final class thumbnail_generation_test extends \advanced_testcase {
         $html = lightboxgallery_index_thumbnail($this->course->id, $this->gallery);
 
         $this->assertStringNotContainsString('/gallery_index/', $html);
-        $this->assertFalse(get_file_storage()->get_file($this->context->id, 'mod_lightboxgallery', 'gallery_index', 0,
-            '/', 'index.png'));
+        $this->assertFalse(get_file_storage()->get_file(
+            $this->context->id,
+            'mod_lightboxgallery',
+            'gallery_index',
+            0,
+            '/',
+            'index.png'
+        ));
         $this->assertCount(1, $this->queued_tasks());
     }
 

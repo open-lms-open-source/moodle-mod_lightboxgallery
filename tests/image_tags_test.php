@@ -82,8 +82,12 @@ final class image_tags_test extends \advanced_testcase {
         // A caption on this image can't be deleted as though it were a tag.
         $mine->set_caption('A caption');
         $mygalleryid = $DB->get_field('lightboxgallery_image_meta', 'gallery', ['id' => $mytagid], MUST_EXIST);
-        $captionid = $DB->get_field('lightboxgallery_image_meta', 'id',
-            ['gallery' => $mygalleryid, 'metatype' => 'caption'], MUST_EXIST);
+        $captionid = $DB->get_field(
+            'lightboxgallery_image_meta',
+            'id',
+            ['gallery' => $mygalleryid, 'metatype' => 'caption'],
+            MUST_EXIST
+        );
         $mine->delete_tag($captionid);
         $this->assertTrue($DB->record_exists('lightboxgallery_image_meta', ['id' => $captionid]));
 

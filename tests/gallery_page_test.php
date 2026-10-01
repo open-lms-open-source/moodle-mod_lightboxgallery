@@ -65,8 +65,10 @@ final class gallery_page_test extends \advanced_testcase {
             $generator->create_image($instance, $filename);
         }
         foreach ($captions as $filename => $caption) {
-            $DB->insert_record('lightboxgallery_image_meta',
-                ['gallery' => $instance->id, 'image' => $filename, 'metatype' => 'caption', 'description' => $caption]);
+            $DB->insert_record(
+                'lightboxgallery_image_meta',
+                ['gallery' => $instance->id, 'image' => $filename, 'metatype' => 'caption', 'description' => $caption]
+            );
         }
         $gallery = $DB->get_record('lightboxgallery', ['id' => $instance->id], '*', MUST_EXIST);
         $gallery->cmid = $instance->cmid;
@@ -184,8 +186,10 @@ final class gallery_page_test extends \advanced_testcase {
         global $DB;
         $gallery = $this->create_gallery([], ['a.png'], ['a.png' => 'A caption']);
         $this->show_page($gallery);
-        $DB->insert_record('lightboxgallery_comments',
-            ['gallery' => $gallery->id, 'userid' => 2, 'commenttext' => 'Nice', 'timemodified' => time()]);
+        $DB->insert_record(
+            'lightboxgallery_comments',
+            ['gallery' => $gallery->id, 'userid' => 2, 'commenttext' => 'Nice', 'timemodified' => time()]
+        );
         $contextid = \context_module::instance($gallery->cmid)->id;
 
         $this->assertTrue(lightboxgallery_delete_instance($gallery->id));

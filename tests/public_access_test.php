@@ -51,8 +51,10 @@ final class public_access_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $this->course = $this->getDataGenerator()->create_course();
-        $gallery = $this->getDataGenerator()->create_module('lightboxgallery',
-            ['course' => $this->course->id, 'ispublic' => 1, 'comments' => 1]);
+        $gallery = $this->getDataGenerator()->create_module(
+            'lightboxgallery',
+            ['course' => $this->course->id, 'ispublic' => 1, 'comments' => 1]
+        );
         $this->gallery = $DB->get_record('lightboxgallery', ['id' => $gallery->id], '*', MUST_EXIST);
         $this->cmid = $gallery->cmid;
     }
@@ -113,7 +115,8 @@ final class public_access_test extends \advanced_testcase {
         global $DB;
         set_config('enableavailability', 1);
         $availability = \core_availability\tree::get_root_json(
-            [\availability_date\condition::get_json('>=', time() + DAYSECS)]);
+            [\availability_date\condition::get_json('>=', time() + DAYSECS)]
+        );
         $DB->set_field('course_modules', 'availability', json_encode($availability), ['id' => $this->cmid]);
         rebuild_course_cache($this->course->id, true);
 

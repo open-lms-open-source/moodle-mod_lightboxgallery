@@ -69,8 +69,12 @@ function lightboxgallery_rss_get_feed($context, $args) {
         // Thumbnails have ".png" suffixed in the filepool.
         $thumbnails[substr($file->get_filename(), 0, -4)] = $file;
     }
-    $captions = $DB->get_records_menu('lightboxgallery_image_meta', ['metatype' => 'caption', 'gallery' => $gallery->id],
-        '', 'image, description');
+    $captions = $DB->get_records_menu(
+        'lightboxgallery_image_meta',
+        ['metatype' => 'caption', 'gallery' => $gallery->id],
+        '',
+        'image, description'
+    );
 
     $filename = rss_get_file_name($gallery, lightboxgallery_rss_fingerprint($gallery, $images, $thumbnails, $captions));
     $cachedfilepath = rss_get_file_full_name('mod_lightboxgallery', $filename);

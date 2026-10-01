@@ -81,8 +81,13 @@ foreach ($galleries as $gallery) {
     }
 
     if (lightboxgallery_rss_enabled() && $gallery->rss) {
-        $rss = rss_get_link($gallerycontext->id, $USER->id, 'mod_lightboxgallery', $gallery->id,
-            get_string('rsssubscribe', 'lightboxgallery'));
+        $rss = rss_get_link(
+            $gallerycontext->id,
+            $USER->id,
+            'mod_lightboxgallery',
+            $gallery->id,
+            get_string('rsssubscribe', 'lightboxgallery')
+        );
     } else {
         $rss = get_string('norssfeedavailable', 'lightboxgallery');
     }

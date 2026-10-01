@@ -334,8 +334,11 @@ final class privacy_test extends provider_testcase {
 
         // An empty list, or a context that isn't a gallery's, removes nothing and doesn't fail.
         provider::delete_data_for_users(new approved_userlist($contexta, 'mod_lightboxgallery', []));
-        provider::delete_data_for_users(new approved_userlist(\context_course::instance($course->id), 'mod_lightboxgallery',
-            [$u2->id]));
+        provider::delete_data_for_users(new approved_userlist(
+            \context_course::instance($course->id),
+            'mod_lightboxgallery',
+            [$u2->id]
+        ));
         $this->assertEquals(2, $DB->count_records('lightboxgallery_comments'));
     }
 

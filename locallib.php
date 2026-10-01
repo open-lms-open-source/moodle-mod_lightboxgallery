@@ -57,8 +57,12 @@ define('LIGHTBOXGALLERY_ZIP_MAX_FILES', 1000);
  *     null for the course's maximum upload size.
  * @return string|null Why the zip can't be used, or null if it can.
  */
-function lightboxgallery_check_zip(stored_file $zip, stdClass $course, int $maxfiles = LIGHTBOXGALLERY_ZIP_MAX_FILES,
-        ?int $maxsize = null): ?string {
+function lightboxgallery_check_zip(
+    stored_file $zip,
+    stdClass $course,
+    int $maxfiles = LIGHTBOXGALLERY_ZIP_MAX_FILES,
+    ?int $maxsize = null
+): ?string {
     global $CFG;
 
     $maxsize = $maxsize ?? get_max_upload_file_size($CFG->maxbytes, $course->maxbytes);
@@ -112,8 +116,15 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
             $packer = get_file_packer('application/zip');
             $folder = '/' . $storedfile->get_id() . '/';
             $storedfile->extract_to_storage($packer, $context->id, 'mod_lightboxgallery', 'unpacktemp', 0, $folder);
-            $images = array_merge($images, array_values($fs->get_directory_files($context->id, 'mod_lightboxgallery',
-                'unpacktemp', 0, $folder, true, false)));
+            $images = array_merge($images, array_values($fs->get_directory_files(
+                $context->id,
+                'mod_lightboxgallery',
+                'unpacktemp',
+                0,
+                $folder,
+                true,
+                false
+            )));
             $storedfile->delete();
         } else {
             $images[] = $storedfile;
@@ -311,8 +322,14 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
 function lightboxgallery_import_iptc_tags($gallery, context_module $context) {
     global $DB;
 
-    $storedfiles = get_file_storage()->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', false,
-        'itemid', false);
+    $storedfiles = get_file_storage()->get_area_files(
+        $context->id,
+        'mod_lightboxgallery',
+        'gallery_images',
+        false,
+        'itemid',
+        false
+    );
 
     $result = new stdClass();
     $result->tags = 0;
@@ -408,8 +425,14 @@ function lightboxgallery_search_images(array $galleryids, string $search, int $o
  * @return stored_file|null
  */
 function lightboxgallery_first_indexable_image(context_module $context) {
-    $files = get_file_storage()->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images', 0,
-        'itemid, filepath, filename', false);
+    $files = get_file_storage()->get_area_files(
+        $context->id,
+        'mod_lightboxgallery',
+        'gallery_images',
+        0,
+        'itemid, filepath, filename',
+        false
+    );
     foreach ($files as $file) {
         $mimetype = $file->get_mimetype();
         if (file_mimetype_in_typegroup($mimetype, 'web_image') && $mimetype != 'image/svg+xml') {

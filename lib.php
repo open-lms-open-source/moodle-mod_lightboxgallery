@@ -593,12 +593,16 @@ function lightboxgallery_get_comments(int $galleryid, int $page, int $perpage): 
 
     $total = $DB->count_records('lightboxgallery_comments', ['gallery' => $galleryid]);
     $userfields = \core_user\fields::for_userpic()->get_sql('u', false, 'author', '', false)->selects;
-    $records = $DB->get_records_sql("SELECT c.*, $userfields
+    $records = $DB->get_records_sql(
+        "SELECT c.*, $userfields
                                        FROM {lightboxgallery_comments} c
                                        JOIN {user} u ON u.id = c.userid
                                       WHERE c.gallery = :gallery
                                    ORDER BY c.timemodified ASC, c.id ASC",
-        ['gallery' => $galleryid], $page * $perpage, $perpage);
+        ['gallery' => $galleryid],
+        $page * $perpage,
+        $perpage
+    );
 
     $comments = [];
     foreach ($records as $record) {
@@ -623,10 +627,12 @@ function lightboxgallery_get_comments(int $galleryid, int $page, int $perpage): 
 function lightboxgallery_comment_url($comment, int $cmid): moodle_url {
     global $DB;
 
-    $earlier = $DB->count_records_select('lightboxgallery_comments',
+    $earlier = $DB->count_records_select(
+        'lightboxgallery_comments',
         'gallery = :gallery AND (timemodified < :time OR (timemodified = :sametime AND id < :id))',
         ['gallery' => $comment->gallery, 'time' => $comment->timemodified, 'sametime' => $comment->timemodified,
-            'id' => $comment->id]);
+        'id' => $comment->id]
+    );
     $params = ['id' => $cmid];
     if ($cpage = intdiv($earlier, LIGHTBOXGALLERY_COMMENTS_PERPAGE)) {
         $params['cpage'] = $cpage;

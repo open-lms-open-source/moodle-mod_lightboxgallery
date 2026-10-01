@@ -96,8 +96,10 @@ final class lib_test extends \advanced_testcase {
         unset_config('disabledplugins', 'lightboxgallery');
         unset_config('enablerssfeeds', 'lightboxgallery');
         $CFG->enablerssfeeds = 1;
-        $this->assertEquals(['caption', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'],
-            array_keys(lightboxgallery_edit_types()));
+        $this->assertEquals(
+            ['caption', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'],
+            array_keys(lightboxgallery_edit_types())
+        );
         $this->assertFalse((bool) lightboxgallery_rss_enabled());
     }
 }

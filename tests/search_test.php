@@ -64,8 +64,10 @@ final class search_test extends \advanced_testcase {
      */
     private function add_meta(int $galleryid, string $image, string $description, string $metatype = 'caption'): void {
         global $DB;
-        $DB->insert_record('lightboxgallery_image_meta',
-            ['gallery' => $galleryid, 'image' => $image, 'metatype' => $metatype, 'description' => $description]);
+        $DB->insert_record(
+            'lightboxgallery_image_meta',
+            ['gallery' => $galleryid, 'image' => $image, 'metatype' => $metatype, 'description' => $description]
+        );
     }
 
     /**
