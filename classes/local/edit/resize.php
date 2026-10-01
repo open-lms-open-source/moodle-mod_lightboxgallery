@@ -25,7 +25,7 @@ namespace mod_lightboxgallery\local\edit;
  */
 class resize extends base {
     /** @var int[] The scale percentages offered, largest first. */
-    const SCALES = [200, 150, 125, 75, 50, 25];
+    public const SCALES = [200, 150, 125, 75, 50, 25];
 
     /**
      * @var \lang_string|string

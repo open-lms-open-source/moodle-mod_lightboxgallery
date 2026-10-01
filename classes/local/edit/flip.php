@@ -33,10 +33,10 @@ namespace mod_lightboxgallery\local\edit;
  */
 class flip extends base {
     /** @var int The form value for flipping top to bottom. */
-    const VERTICAL = 1;
+    public const VERTICAL = 1;
 
     /** @var int The form value for flipping left to right. */
-    const HORIZONTAL = 2;
+    public const HORIZONTAL = 2;
 
     /**
      * Constructor

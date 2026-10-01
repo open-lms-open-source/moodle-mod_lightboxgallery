@@ -36,15 +36,15 @@ class gallery_page {
     /**
      * Sort by filename.
      */
-    const SORTBY_FILENAME = 0;
+    public const SORTBY_FILENAME = 0;
     /**
      * Sort by caption.
      */
-    const SORTBY_CAPTION = 1;
+    public const SORTBY_CAPTION = 1;
     /**
      * Sort by filename natural.
      */
-    const SORTBY_FILENAME_NATURAL = 2;
+    public const SORTBY_FILENAME_NATURAL = 2;
 
     /**
      * @var cm_info Course module information.

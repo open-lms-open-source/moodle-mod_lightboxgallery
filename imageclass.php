@@ -40,19 +40,19 @@ define('LIGHTBOXGALLERY_POS_BOT', 0);
  */
 class lightboxgallery_image {
     /** @var int The width of a thumbnail, in pixels. */
-    const THUMBNAIL_WIDTH = 162;
+    public const THUMBNAIL_WIDTH = 162;
 
     /** @var int The height of a thumbnail, in pixels. */
-    const THUMBNAIL_HEIGHT = 132;
+    public const THUMBNAIL_HEIGHT = 132;
 
     /** @var int How many characters of a caption to show when the gallery doesn't show full captions. */
-    const CAPTION_PREVIEW_LENGTH = 13;
+    public const CAPTION_PREVIEW_LENGTH = 13;
 
     /** @var int The largest width or height, in pixels, that a resize can produce. */
-    const MAX_DIMENSION = 4096;
+    public const MAX_DIMENSION = 4096;
 
     /** @var int How many thumbnails one request may generate before the rest are left to a background task. */
-    const SYNC_THUMBNAIL_LIMIT = 10;
+    public const SYNC_THUMBNAIL_LIMIT = 10;
 
     /** @var int|null How many more thumbnails this request may generate; null for no limit. */
     private static $thumbnailbudget = self::SYNC_THUMBNAIL_LIMIT;
