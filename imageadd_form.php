@@ -106,16 +106,27 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
         if (!$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['image'], 'id', false)) {
             $errors['image'] = get_string('required');
             return $errors;
-        } else {
-            $file = reset($files);
-            if ($file->get_mimetype() != 'application/zip' && !$file->is_valid_image()) {
-                $errors['image'] = get_string('invalidfiletype', 'error', $file->get_filename());
-                if ($file->get_mimetype() == 'image/svg+xml') {
-                    $errors['image'] = get_string('svgzunsupported', 'mod_lightboxgallery', $file->get_filename());
-                }
-                // Better delete current file, it is not usable anyway.
-                $fs->delete_area_files($usercontext->id, 'user', 'draft', $data['image']);
+        }
+
+        // Check every file, and remove only the ones that can't be used.
+        $problems = [];
+        foreach ($files as $file) {
+            if ($file->get_mimetype() == 'application/zip') {
+                $problem = lightboxgallery_check_zip($file, get_course($this->_customdata['gallery']->course));
+            } else if (!$file->is_valid_image()) {
+                $problem = $file->get_mimetype() == 'image/svg+xml'
+                    ? get_string('svgzunsupported', 'mod_lightboxgallery', $file->get_filename())
+                    : get_string('invalidfiletype', 'error', $file->get_filename());
+            } else {
+                $problem = null;
             }
+            if ($problem !== null) {
+                $problems[] = $problem;
+                $file->delete();
+            }
+        }
+        if ($problems) {
+            $errors['image'] = implode(' ', $problems);
         }
 
         return $errors;

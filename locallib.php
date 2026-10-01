@@ -40,6 +40,52 @@ define('LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN', 1);
 define('LIGHTBOXGALLERY_AUTO_RESIZE_UPLOAD', 2);
 define('LIGHTBOXGALLERY_AUTO_RESIZE_BOTH', 3);
 
+// The most files an uploaded zip may hold.
+define('LIGHTBOXGALLERY_ZIP_MAX_FILES', 1000);
+
+/**
+ * Check an uploaded zip is small enough to extract into a gallery.
+ *
+ * By default its files may take up no more, once extracted, than a user may upload to the
+ * course in one go. The sizes come from the zip's directory; extraction itself rejects any
+ * entry larger than its listed size, so the total can be trusted.
+ *
+ * @param stored_file $zip
+ * @param stdClass $course The course of the gallery the zip is for.
+ * @param int $maxfiles The most files the zip may hold.
+ * @param int|null $maxsize The largest total size, in bytes, of its files once extracted;
+ *     null for the course's maximum upload size.
+ * @return string|null Why the zip can't be used, or null if it can.
+ */
+function lightboxgallery_check_zip(stored_file $zip, stdClass $course, int $maxfiles = LIGHTBOXGALLERY_ZIP_MAX_FILES,
+        ?int $maxsize = null): ?string {
+    global $CFG;
+
+    $maxsize = $maxsize ?? get_max_upload_file_size($CFG->maxbytes, $course->maxbytes);
+    $entries = $zip->list_files(get_file_packer('application/zip'));
+    if ($entries === false) {
+        return get_string('invalidfiletype', 'error', $zip->get_filename());
+    }
+
+    $count = 0;
+    $size = 0;
+    foreach ($entries as $entry) {
+        if (!$entry->is_directory) {
+            $count++;
+            $size += $entry->size;
+        }
+    }
+
+    $a = ['filename' => $zip->get_filename()];
+    if ($count > $maxfiles) {
+        return get_string('errorziptoomanyfiles', 'lightboxgallery', $a + ['max' => $maxfiles]);
+    }
+    if ($size > $maxsize) {
+        return get_string('errorziptoolarge', 'lightboxgallery', $a + ['max' => display_size($maxsize)]);
+    }
+    return null;
+}
+
 /**
  * Add a set of uploaded files to the gallery.
  *
@@ -59,6 +105,9 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
     $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
     foreach ($files as $storedfile) {
         if ($storedfile->get_mimetype() == 'application/zip') {
+            if ($error = lightboxgallery_check_zip($storedfile, get_course($gallery->course))) {
+                throw new invalid_parameter_exception($error);
+            }
             // Unpack each zip into its own folder, alongside any other uploaded files.
             $packer = get_file_packer('application/zip');
             $folder = '/' . $storedfile->get_id() . '/';
