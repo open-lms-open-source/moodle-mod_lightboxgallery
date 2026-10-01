@@ -126,6 +126,37 @@ final class pages_test extends \advanced_testcase {
     }
 
     /**
+     * The search form's controls are labelled, offer every gallery, and keep what was searched for.
+     */
+    public function test_search_form(): void {
+        global $DB;
+        $second = $this->getDataGenerator()->create_module('lightboxgallery', ['course' => $this->course->id, 'name' => 'Zoo']);
+        // A match, so the page runs to its end rather than stopping at "no results".
+        $DB->insert_record(
+            'lightboxgallery_image_meta',
+            ['gallery' => $second->id, 'image' => 'a.png', 'metatype' => 'caption', 'description' => 'The bus & coach']
+        );
+
+        $html = $this->load_page('search.php', ['id' => $this->course->id, 'gallery' => $second->id, 'search' => 'bus & co']);
+
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $xpath = new \DOMXPath($doc);
+        $form = $xpath->query('//form[contains(@class, "mod-lightboxgallery-search-form")]')->item(0);
+        $this->assertNotNull($form);
+        foreach ($xpath->query('.//select | .//input[@type="search"]', $form) as $control) {
+            $this->assertSame(1, $xpath->query('//label[@for="' . $control->getAttribute('id') . '"]')->length);
+        }
+        $this->assertSame('bus & co', $xpath->query('.//input[@name="search"]', $form)->item(0)->getAttribute('value'));
+        $options = $xpath->query('.//select[@name="gallery"]/option', $form);
+        $this->assertSame('0', $options->item(0)->getAttribute('value'));
+        $this->assertSame(get_string('allgalleries', 'lightboxgallery'), $options->item(0)->textContent);
+        $selected = $xpath->query('.//select[@name="gallery"]/option[@selected]', $form);
+        $this->assertSame(1, $selected->length);
+        $this->assertSame((string) $second->id, $selected->item(0)->getAttribute('value'));
+    }
+
+    /**
      * The recent activity report shows the plugin's icon when asked for details.
      */
     public function test_recent_activity_icon(): void {

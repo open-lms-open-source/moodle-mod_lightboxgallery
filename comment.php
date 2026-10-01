@@ -58,7 +58,6 @@ if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
     } else {
         echo $OUTPUT->header();
         lightboxgallery_print_comment($comment, $context);
-        echo('<br />');
         $paramsyes = ['id' => $gallery->id, 'delete' => $comment->id, 'sesskey' => sesskey(), 'confirm' => 1];
         $paramsno = ['id' => $cm->id];
         echo $OUTPUT->confirm(

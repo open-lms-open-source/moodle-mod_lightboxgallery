@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(lightboxgallery_image::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(generate_thumbnails::class)]
-#[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_index_thumbnail')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('lightboxgallery_index_image_url')]
 final class thumbnail_generation_test extends \advanced_testcase {
     /** @var \stdClass */
     private $course;
@@ -222,7 +222,7 @@ final class thumbnail_generation_test extends \advanced_testcase {
     public function test_index_image_generated(): void {
         $this->add_images(1);
 
-        $html = lightboxgallery_index_thumbnail($this->course->id, $this->gallery);
+        $html = lightboxgallery_index_image_url($this->course->id, $this->gallery)->out(false);
 
         $this->assertStringContainsString('/gallery_index/0/index.png', $html);
         $this->assertNotFalse(get_file_storage()->get_file(
@@ -242,7 +242,7 @@ final class thumbnail_generation_test extends \advanced_testcase {
         $this->add_images(1);
         lightboxgallery_image::set_thumbnail_budget(0);
 
-        $html = lightboxgallery_index_thumbnail($this->course->id, $this->gallery);
+        $html = lightboxgallery_index_image_url($this->course->id, $this->gallery)->out(false);
 
         $this->assertStringNotContainsString('/gallery_index/', $html);
         $this->assertFalse(get_file_storage()->get_file(
@@ -262,7 +262,7 @@ final class thumbnail_generation_test extends \advanced_testcase {
     public function test_index_image_with_no_images(): void {
         get_file_storage()->create_directory($this->context->id, 'mod_lightboxgallery', 'gallery_images', 0, '/sub/');
 
-        $html = lightboxgallery_index_thumbnail($this->course->id, $this->gallery);
+        $html = lightboxgallery_index_image_url($this->course->id, $this->gallery)->out(false);
 
         $this->assertStringContainsString('/gallery_index/0/index.png', $html);
     }

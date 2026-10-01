@@ -223,24 +223,26 @@ function lightboxgallery_resize_options() {
 }
 
 /**
- * Get the list of thumbnail sizes.
+ * Get the URL of the picture that represents a gallery in the course's list of galleries.
+ *
+ * The picture is made from the gallery's first image, or from a given image, and kept. Making
+ * one counts against the request's thumbnail limit; past it, the default picture is used and a
+ * background task makes the real one.
  *
  * @param int $courseid
  * @param stdClass $gallery
- * @param stdClass|null $newimage
- * @return string
+ * @param lightboxgallery_image|null $newimage An image to make the picture from, replacing the current one.
+ * @return moodle_url
  * @throws coding_exception
  * @throws file_exception
  * @throws stored_file_creation_exception
  */
-function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
+function lightboxgallery_index_image_url($courseid, $gallery, $newimage = null) {
     global $CFG, $OUTPUT;
 
     require_once(__DIR__ . '/imageclass.php');
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $courseid);
     $context = context_module::instance($cm->id);
-
-    $imageid = 'Gallery Index Image';
 
     $fs = get_file_storage();
     $storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_index', '0', '/', 'index.png');
@@ -260,7 +262,7 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
         } else {
             // Too many images to process in this request; show the default picture until the task has run.
             lightboxgallery_image::queue_thumbnail_generation($cm->id);
-            return '<img src="' . $OUTPUT->image_url('index', 'mod_lightboxgallery') . '" alt="" id="' . $imageid . '" />';
+            return $OUTPUT->image_url('index', 'mod_lightboxgallery');
         }
     } else {
         $fileinfo = [
@@ -284,7 +286,7 @@ function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) 
     );
     $path->param('mtime', $index->get_timemodified());
 
-    return '<img src="' . $path . '" alt="" ' . (! empty($imageid) ? 'id="' . $imageid . '"' : '' )  . ' />';
+    return $path;
 }
 
 

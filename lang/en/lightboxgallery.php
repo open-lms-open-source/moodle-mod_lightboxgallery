@@ -30,6 +30,7 @@ $string['addimage'] = 'Add images';
 $string['addimage_help'] = 'Browse for an image on your local machine to add to the current gallery.
 
 You can also select a zip archive containing multiple images, which will be extracted into the image directory after being uploaded.';
+$string['allgalleries'] = 'All galleries';
 $string['allowcomments'] = 'Allow comments';
 $string['allowrss'] = 'Allow RSS feeds';
 $string['allpluginsdisabled'] = 'Sorry, all the editing plugins are currently disabled.';
@@ -100,6 +101,7 @@ $string['imagesperpage'] = 'Images per page';
 $string['imagesperrow'] = 'Images per row';
 $string['imageuploaded'] = 'Uploaded image: {$a}';
 $string['imageviewer'] = 'Image viewer';
+$string['indeximage'] = 'Index image';
 $string['invalidlightboxgalleryid'] = 'Invalid lightboxgallery ID';
 $string['lightboxgallery'] = 'Lightbox Gallery';
 $string['lightboxgallery:addcomment'] = 'Add comment to lightbox gallery';

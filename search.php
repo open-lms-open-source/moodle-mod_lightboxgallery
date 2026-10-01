@@ -33,7 +33,7 @@ define('LIGHTBOXGALLERY_SEARCH_PERPAGE', 50);
 
 $cid = required_param('id', PARAM_INT);
 $g = optional_param('gallery', 0, PARAM_INT);
-$search = trim(optional_param('search', '', PARAM_CLEAN));
+$search = trim(optional_param('search', '', PARAM_TEXT));
 $page = optional_param('page', 0, PARAM_INT);
 
 if ($g) {
@@ -76,22 +76,16 @@ $PAGE->requires->js_call_amd('mod_lightboxgallery/lightbox', 'init');
 echo $OUTPUT->header();
 
 if ($cms) {
-    $options = [];
+    $galleries = [];
     foreach ($cms as $instanceid => $instancecm) {
-        $options[$instanceid] = $instancecm->get_formatted_name();
+        $galleries[] = ['id' => $instanceid, 'name' => $instancecm->get_formatted_name(), 'selected' => $instanceid == $g];
     }
-
-    echo('<form action="search.php">');
-
-    $table = new html_table();
-    $table->width = '*';
-    $table->align = ['left', 'left', 'left', 'left'];
-    $table->data[] = [get_string('modulenameshort', 'lightboxgallery'), html_writer::select($options, 'gallery', $g),
-                           '<input type="text" name="search" size="10" value="' . s($search, true) . '" />' .
-                           '<input type="hidden" name="id" value="' . $course->id . '" />',
-                           '<input type="submit" value="' . get_string('search') . '" />', ];
-    echo html_writer::table($table);
-    echo html_writer::end_tag('form');
+    echo $OUTPUT->render_from_template('mod_lightboxgallery/search_form', [
+        'action' => (new moodle_url('/mod/lightboxgallery/search.php'))->out(false),
+        'courseid' => $course->id,
+        'search' => $search,
+        'galleries' => $galleries,
+    ]);
 }
 
 $galleryids = $g ? array_intersect([$g], array_keys($cms)) : array_keys($cms);

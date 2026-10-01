@@ -101,5 +101,28 @@ final class index_page_test extends \advanced_testcase {
         // One RSS link, built for the gallery's context; the other gallery says there's no feed.
         $this->assertSame(1, substr_count($html, '/rss/file.php/' . $context->id . '/'));
         $this->assertStringContainsString(get_string('norssfeedavailable', 'lightboxgallery'), $html);
+
+        // The section column uses the course format's own names, once per section.
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $xpath = new \DOMXPath($doc);
+        $table = '//table[contains(@class, "mod-lightboxgallery-index")]';
+        $this->assertSame(
+            get_string('sectionname', 'format_' . $course->format),
+            trim($xpath->query("$table/thead/tr/th[1]")->item(0)->textContent)
+        );
+        $sections = [];
+        foreach ($xpath->query("$table/tbody/tr/td[1]") as $cell) {
+            $sections[] = trim($cell->textContent);
+        }
+        $this->assertSame([get_section_name($course, 0), ''], $sections);
+
+        // Each gallery's picture is decorative and doesn't repeat an id.
+        $images = $xpath->query("$table/tbody/tr/td[2]/img");
+        $this->assertSame(2, $images->length);
+        foreach ($images as $image) {
+            $this->assertSame('', $image->getAttribute('alt'));
+            $this->assertFalse($image->hasAttribute('id'));
+        }
     }
 }

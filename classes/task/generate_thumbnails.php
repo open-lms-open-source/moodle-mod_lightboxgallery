@@ -98,7 +98,7 @@ class generate_thumbnails extends \core\task\adhoc_task {
         }
 
         try {
-            lightboxgallery_index_thumbnail($cm->course, $gallery);
+            lightboxgallery_index_image_url($cm->course, $gallery);
         } catch (\Throwable $e) {
             mtrace("Couldn't make the index image for gallery {$gallery->id}: " . $e->getMessage());
         }

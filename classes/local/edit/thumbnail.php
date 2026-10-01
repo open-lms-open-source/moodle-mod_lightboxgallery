@@ -73,7 +73,7 @@ class thumbnail extends base {
         $domove = true;
 
         if (optional_param('index', '', PARAM_TEXT)) {
-            return lightboxgallery_index_thumbnail($this->gallery->course, $this->gallery, $this->lbgimage);
+            return lightboxgallery_index_image_url($this->gallery->course, $this->gallery, $this->lbgimage);
         } else if (optional_param('reset', '', PARAM_TEXT)) {
             $offsetx = 0;
             $offsety = 0;
