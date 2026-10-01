@@ -65,7 +65,6 @@ $string['dirup'] = 'Haut';
 $string['displayinggallery'] = 'Gallerie d\'affichage: {$a}';
 $string['edit_caption'] = 'Sous-titre';
 $string['edit_choose'] = 'Choix...';
-$string['edit_crop'] = 'Tronquer';
 $string['edit_delete'] = 'Effacer';
 $string['edit_flip'] = 'Mirroir';
 $string['edit_resize'] = 'Redimensionner';

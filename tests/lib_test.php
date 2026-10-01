@@ -59,14 +59,13 @@ final class lib_test extends \advanced_testcase {
     public function test_lightboxgallery_edit_types(): void {
         $this->resetAfterTest();
 
-        $types = ['caption', 'crop', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'];
+        $types = ['caption', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'];
 
-        // Test showall returns all types..
+        // Test showall returns all types.
         $actual = array_keys(lightboxgallery_edit_types(true));
         $this->assertEquals($types, $actual);
 
-        // Check crop is currently forcefully disabled.
-        $types = ['caption', 'delete', 'flip', 'resize', 'rotate', 'tag', 'thumbnail'];
+        // With nothing disabled, every type is available.
         $actual = array_keys(lightboxgallery_edit_types());
         $this->assertEquals($types, $actual);
 

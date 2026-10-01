@@ -65,7 +65,6 @@ $string['dirup'] = 'Up';
 $string['displayinggallery'] = 'Showing gallery: {$a}';
 $string['edit_caption'] = 'Caption';
 $string['edit_choose'] = 'Choose...';
-$string['edit_crop'] = 'Crop';
 $string['edit_delete'] = 'Delete';
 $string['edit_flip'] = 'Flip';
 $string['edit_resize'] = 'Resize';

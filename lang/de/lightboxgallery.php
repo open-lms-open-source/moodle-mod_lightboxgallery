@@ -66,7 +66,6 @@ $string['dirup'] = 'Hoch';
 $string['displayinggallery'] = 'Bilder der Galerie: {$a}';
 $string['edit_caption'] = 'Titel';
 $string['edit_choose'] = 'Auswahl...';
-$string['edit_crop'] = 'Beschneiden';
 $string['edit_delete'] = 'Löschen';
 $string['edit_flip'] = 'Spiegeln';
 $string['edit_resize'] = 'Größe anpassen';

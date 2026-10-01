@@ -114,10 +114,6 @@ function lightboxgallery_edit_types($showall = false, $image = null) {
 
     $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 
-    // phpcs:disable moodle.Commenting.TodoComment
-    // TODO: Remove this once crop functionality is working.
-    $disabledplugins[] = 'crop';
-
     $edittypes = get_list_of_plugins('mod/lightboxgallery/edit');
     if ($image !== null && !$showall) {
         $edittypes = array_intersect($image->get_editing_options(), $edittypes);
