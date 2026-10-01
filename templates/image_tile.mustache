@@ -1,0 +1,98 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_lightboxgallery/image_tile
+
+    One image's tile in a gallery. The thumbnail links to the full image, which
+    mod_lightboxgallery/lightbox opens in its viewer.
+
+    Classes required for JS:
+    * lightbox-gallery-image-thumbnail, inside an element with the lightbox-gallery class.
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * imageurl - The full image's URL.
+    * thumbnailurl - The thumbnail's URL, or null while it's waiting to be made.
+    * pending - Whether the thumbnail is waiting to be made.
+    * caption - The caption to show on the tile, possibly shortened; empty when captions are hidden.
+    * fullcaption - The whole caption, for the viewer; empty when captions are hidden.
+    * label - What the thumbnail link is called: the caption, or the filename without one.
+    * captiontop - Whether the caption goes above the thumbnail rather than below it.
+    * width, height - The thumbnail's size, in pixels.
+    * extinfo - When the gallery shows file details: modified, size and dimensions.
+    * editmenu - When editing: action, menuid, cmid, image, page and options (value, label).
+
+    Example context (json):
+    {
+        "imageurl": "https://example.com/pluginfile.php/1/mod_lightboxgallery/gallery_images/0/bus.png",
+        "thumbnailurl": "https://example.com/pluginfile.php/1/mod_lightboxgallery/gallery_thumbs/0/bus.png.png",
+        "pending": false,
+        "caption": "The school bus",
+        "fullcaption": "The school bus",
+        "label": "The school bus",
+        "captiontop": false,
+        "width": 162,
+        "height": 132,
+        "extinfo": {"modified": "1/10/26, 14:00", "size": "120.5 KB", "dimensions": "800x600px"},
+        "editmenu": {
+            "action": "https://example.com/mod/lightboxgallery/imageedit.php",
+            "menuid": "lightboxgallery-edit-abc123",
+            "cmid": 5,
+            "image": "bus.png",
+            "page": 0,
+            "options": [{"value": "caption", "label": "Caption"}, {"value": "rotate", "label": "Rotate"}]
+        }
+    }
+}}
+<div class="lightbox-gallery-image-container">
+    <div class="lightbox-gallery-image-wrapper">
+        <div class="lightbox-gallery-image-frame">
+            {{#captiontop}}
+                <div class="lightbox-gallery-image-caption top">{{caption}}</div>
+            {{/captiontop}}
+            <a class="lightbox-gallery-image-thumbnail{{#pending}} lightbox-gallery-image-pending{{/pending}}"
+               href="{{imageurl}}" rel="lightbox_gallery" title="{{fullcaption}}"
+               style="{{#thumbnailurl}}background-image: url('{{thumbnailurl}}'); {{/thumbnailurl}}width: {{width}}px; height: {{height}}px;">
+                <span class="visually-hidden">{{label}}</span>
+            </a>
+            {{^captiontop}}
+                <div class="lightbox-gallery-image-caption bottom">{{caption}}</div>
+            {{/captiontop}}
+            {{#extinfo}}
+                <div class="lightbox-gallery-image-extinfo">{{modified}}<br>{{size}} {{dimensions}}</div>
+            {{/extinfo}}
+            {{#editmenu}}
+                <form action="{{action}}" method="post" class="lightbox-gallery-image-editmenu d-flex mb-1"
+                      style="width: {{width}}px;">
+                    <input type="hidden" name="id" value="{{cmid}}">
+                    <input type="hidden" name="image" value="{{image}}">
+                    <input type="hidden" name="page" value="{{page}}">
+                    <label for="{{menuid}}" class="visually-hidden">{{#str}}edit_choose, mod_lightboxgallery{{/str}}</label>
+                    <select name="tab" id="{{menuid}}" class="lightbox-edit-select form-select form-select-sm" required>
+                        <option value="" disabled selected>{{#str}}edit_choose, mod_lightboxgallery{{/str}}</option>
+                        {{#options}}
+                            <option value="{{value}}">{{label}}</option>
+                        {{/options}}
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm ms-1">{{#str}}go{{/str}}</button>
+                </form>
+            {{/editmenu}}
+        </div>
+    </div>
+</div>

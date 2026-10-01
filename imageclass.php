@@ -392,38 +392,6 @@ class lightboxgallery_image {
     }
 
     /**
-     * Get the form for the editing options.
-     *
-     * @return string
-     * @throws coding_exception
-     */
-    private function get_editing_options_form() {
-        global $CFG;
-
-        $options = $this->get_editing_options();
-
-        $customselect = 'custom-select';
-        if ($CFG->version >= 2024041400) {
-            $customselect = 'form-select ms-1';
-        }
-        $html = '<form action="' . $CFG->wwwroot . '/mod/lightboxgallery/imageedit.php" method="post"/>' .
-                    '<input type="hidden" name="id" value="' . $this->cmid . '" />' .
-                    '<input type="hidden" name="image" value="' . $this->storedfile->get_filename() . '" />' .
-                    '<input type="hidden" name="page" value="0" />' .
-                    '<select name="tab" class="lightbox-edit-select ' . $customselect . ' mb-1" style="width: ' .
-                    self::THUMBNAIL_WIDTH .
-                    'px;" ' . 'onchange="submit();">' .
-                    '<option disabled selected>' . get_string('edit_choose', 'lightboxgallery') . '</option>';
-        foreach ($options as $option) {
-            $html .= '<option value="' . $option . '">' . get_string('edit_' . $option, 'lightboxgallery') . '</option>';
-        }
-        $html .= '</select>' .
-                '</form>';
-
-        return $html;
-    }
-
-    /**
      * Get the image caption.
      *
      * @return string
@@ -458,58 +426,16 @@ class lightboxgallery_image {
     }
 
     /**
-     * Get the image display HTML.
+     * Get the image's tile for the gallery page.
      *
-     * @param bool $editing
+     * @param bool $editing Whether to show the edit menu.
+     * @param int $page The page of the gallery being shown, so editing returns to it.
      * @return string
-     * @throws coding_exception
-     * @throws dml_exception
      */
-    public function get_image_display_html($editing = false) {
-        if ($this->gallery->captionfull) {
-            $caption = $this->get_image_caption();
-        } else {
-            $caption = lightboxgallery_resize_text($this->get_image_caption(), self::CAPTION_PREVIEW_LENGTH);
-        }
-        $timemodified = userdate($this->storedfile->get_timemodified(), get_string('strftimedatetimeshort', 'langconfig'));
-        $filesize = round($this->storedfile->get_filesize() / 100) / 10;
+    public function get_image_display_html($editing = false, $page = 0) {
+        global $OUTPUT;
 
-        // Hide the caption.
-        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
-            $caption = ''; // Hide by cleaning the content (looks better than cleaning the whole div).
-        }
-        $posclass = ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) ? 'top' : 'bottom';
-        $captiondiv = html_writer::tag('div', s($caption), ['class' => "lightbox-gallery-image-caption $posclass"]);
-
-        $html = '<div class="lightbox-gallery-image-container">' .
-                    '<div class="lightbox-gallery-image-wrapper">' .
-                        '<div class="lightbox-gallery-image-frame">';
-        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_TOP) {
-            $html .= $captiondiv;
-        }
-        if ($this->thumbnailpending) {
-            // A plain tile until the background task has made the thumbnail.
-            $thumbclass = 'lightbox-gallery-image-thumbnail lightbox-gallery-image-pending';
-            $thumbstyle = '';
-        } else {
-            $thumbclass = 'lightbox-gallery-image-thumbnail';
-            $thumbstyle = 'background-image: url(\'' . $this->thumburl . '\'); ';
-        }
-        $html .= '<a class="' . $thumbclass . '" href="' .
-                 $this->imageurl . '" rel="lightbox_gallery" title="' . s($caption) .
-                 '" style="' . $thumbstyle . 'width: ' . self::THUMBNAIL_WIDTH . 'px; height: ' . self::THUMBNAIL_HEIGHT .
-                 'px;"></a>';
-        if ($this->gallery->captionpos == LIGHTBOXGALLERY_POS_BOT || $this->gallery->captionpos == LIGHTBOXGALLERY_POS_HID) {
-            $html .= $captiondiv;
-        }
-        $html .= $this->gallery->extinfo ? '<div class="lightbox-gallery-image-extinfo">' . $timemodified .
-                 '<br/>' . $filesize . 'KB ' . $this->width . 'x' . $this->height . 'px</div>' : '';
-        $html .= ($editing ? $this->get_editing_options_form() : '');
-        $html .= '</div>' .
-                    '</div>' .
-                '</div>';
-
-        return $html;
+        return $OUTPUT->render(new \mod_lightboxgallery\output\image_tile($this, $this->gallery, (bool) $editing, (int) $page));
     }
 
     /**
@@ -612,6 +538,24 @@ class lightboxgallery_image {
      */
     public function get_image_url() {
         return $this->imageurl;
+    }
+
+    /**
+     * Get the image's file.
+     *
+     * @return stored_file
+     */
+    public function get_stored_file() {
+        return $this->storedfile;
+    }
+
+    /**
+     * Get the gallery's course module id.
+     *
+     * @return int
+     */
+    public function get_cmid() {
+        return $this->cmid;
     }
 
     /**

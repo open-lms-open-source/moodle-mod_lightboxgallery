@@ -123,7 +123,7 @@ class gallery_page {
                 $this->pagethumbs[$filename],
                 $this->gallery->extinfo
             );
-            $html .= $image->get_image_display_html($this->editing);
+            $html .= $image->get_image_display_html($this->editing, $this->page);
         }
         return $html;
     }
