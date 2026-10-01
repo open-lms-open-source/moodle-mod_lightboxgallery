@@ -311,20 +311,15 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
 function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
     global $OUTPUT;
 
-    $userviewurl = new moodle_url('/user/view.php', ['id' => $activity->user->id, 'course' => $courseid]);
-    echo '<table border="0" cellpadding="3" cellspacing="0">' .
-         '<tr><td class="userpicture" valign="top">' . $OUTPUT->user_picture($activity->user, ['courseid' => $courseid]) .
-         '</td><td>' .
-         '<div class="title">' .
-         ($detail ? $OUTPUT->image_icon('monologo', $activity->name, 'mod_lightboxgallery') : '') .
-         '<a href="' . $activity->content->url . '">' .
-         s($activity->content->comment) . '</a>' .
-         '</div>' .
-         '<div class="user"> ' .
-         html_writer::link($userviewurl, fullname($activity->user, $viewfullnames)) .
-         ' - ' . userdate($activity->timestamp) .
-         '</div>' .
-         '</td></tr></table>';
+    echo $OUTPUT->render_from_template('mod_lightboxgallery/recent_activity_report', [
+        'userpicture' => $OUTPUT->user_picture($activity->user, ['courseid' => $courseid]),
+        'icon' => $detail ? $OUTPUT->image_icon('monologo', $activity->name, 'mod_lightboxgallery') : '',
+        'url' => (new moodle_url($activity->content->url))->out(false),
+        'preview' => $activity->content->comment,
+        'profileurl' => (new moodle_url('/user/view.php', ['id' => $activity->user->id, 'course' => $courseid]))->out(false),
+        'author' => fullname($activity->user, $viewfullnames),
+        'date' => userdate($activity->timestamp),
+    ]);
 
     return true;
 }
@@ -342,7 +337,7 @@ function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail
  * @throws dml_exception
  */
 function lightboxgallery_print_recent_activity($course, $viewfullnames, $timestart) {
-    global $DB, $CFG, $OUTPUT;
+    global $DB, $OUTPUT;
 
     $galleryids = [];
     $cmids = [];
@@ -370,27 +365,19 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
         return false;
     }
 
-    echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 6);
-
-    echo '<ul class="unlist">';
-
+    $items = [];
     foreach ($comments as $comment) {
-        $display = s(lightboxgallery_comment_preview($comment->commenttext));
-
-        $output = '<li>' .
-             ' <div class="head">' .
-             '  <div class="date">' . userdate($comment->timemodified, get_string('strftimerecent')) . '</div>' .
-             '  <div class="name">' . fullname($comment, $viewfullnames) . ' - ' . format_string($comment->name) . '</div>' .
-             ' </div>' .
-             ' <div class="info">' .
-             '  "<a href="' . lightboxgallery_comment_url($comment, $cmids[$comment->gallery]) . '">' .
-             $display . '</a>"' .
-             ' </div>' .
-             '</li>';
-        echo $output;
+        $items[] = [
+            'date' => userdate($comment->timemodified, get_string('strftimerecent')),
+            'author' => fullname($comment, $viewfullnames),
+            'gallery' => format_string($comment->name),
+            'url' => lightboxgallery_comment_url($comment, $cmids[$comment->gallery])->out(false),
+            'preview' => lightboxgallery_comment_preview($comment->commenttext),
+        ];
     }
 
-    echo '</ul>';
+    echo $OUTPUT->heading(get_string('newgallerycomments', 'lightboxgallery') . ':', 6);
+    echo $OUTPUT->render_from_template('mod_lightboxgallery/recent_activity_block', ['comments' => $items]);
 
     return true;
 }

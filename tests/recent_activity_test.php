@@ -172,4 +172,31 @@ final class recent_activity_test extends \advanced_testcase {
         $this->assertEquals($visible->cmid, $activities[0]->cmid);
         $this->assertSame('Visible comment', $activities[0]->content->comment);
     }
+
+    /**
+     * The author's name is escaped in the block and in the report, and links go to the comment.
+     */
+    public function test_author_name_is_escaped(): void {
+        global $DB;
+        $gallery = $this->create_gallery_with_comment('Nice one');
+        // Names are cleaned when saved through the API, so put markup in directly.
+        $DB->set_field('user', 'firstname', 'Sam <b>', ['id' => $this->student->id]);
+
+        $this->setUser($this->student);
+        [, $block] = $this->print_recent();
+        $this->assertStringContainsString('Sam &lt;b&gt;', $block);
+        $this->assertStringNotContainsString('<b>', $block);
+        $this->assertStringContainsString('#c', $block);
+
+        $activities = [];
+        $index = 0;
+        lightboxgallery_get_recent_mod_activity($activities, $index, time() - HOURSECS, $this->course->id, $gallery->cmid);
+        $activities[0]->user->firstname = 'Sam <b>';
+        ob_start();
+        lightboxgallery_print_recent_mod_activity($activities[0], $this->course->id, false, [], true);
+        $report = ob_get_clean();
+        $this->assertStringContainsString('Sam &lt;b&gt;', $report);
+        $this->assertStringNotContainsString('<b>', $report);
+        $this->assertStringContainsString('Nice one', $report);
+    }
 }
