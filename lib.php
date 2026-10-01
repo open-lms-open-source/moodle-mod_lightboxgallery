@@ -648,36 +648,13 @@ function lightboxgallery_comment_url($comment, int $cmid): moodle_url {
  * @param stdClass|null $user The comment's author, with the user picture fields; looked up if not given.
  */
 function lightboxgallery_print_comment($comment, $context, $user = null) {
-    global $DB, $CFG, $COURSE, $OUTPUT;
-
-    // phpcs:disable moodle.Commenting.TodoComment
-    // TODO: Move to renderer!
+    global $DB, $OUTPUT;
 
     if ($user === null) {
         $user = $DB->get_record('user', ['id' => $comment->userid]);
     }
 
-    $deleteurl = new moodle_url('/mod/lightboxgallery/comment.php', ['id' => $comment->gallery, 'delete' => $comment->id]);
-
-    echo '<table cellspacing="0" width="50%" class="boxaligncenter datacomment forumpost">' .
-         '<tr class="header"><td class="picture left">' . $OUTPUT->user_picture($user, ['courseid' => $COURSE->id]) . '</td>' .
-         '<td class="topic starter" align="left"><a name="c' . $comment->id . '"></a><div class="author">' .
-         '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $user->id . '&amp;course=' . $COURSE->id . '">' .
-         fullname($user, has_capability('moodle/site:viewfullnames', $context)) . '</a> - ' . userdate($comment->timemodified) .
-         '</div></td></tr>' .
-         '<tr><td class="left side">' .
-        // phpcs:disable moodle.Commenting.TodoComment
-        // TODO: user_group picture?
-         '</td><td class="content" align="left">' .
-         format_text($comment->commenttext, FORMAT_MOODLE) .
-         '<div class="commands">' .
-         (has_capability('mod/lightboxgallery:edit', $context) ? html_writer::link(
-             $deleteurl,
-             get_string('delete'),
-             ['class' => 'btn btn-link']
-         ) : '') .
-         '</div>' .
-         '</td></tr></table>';
+    echo $OUTPUT->render(new \mod_lightboxgallery\output\gallery_comment($comment, $user, $context));
 }
 
 /**

@@ -1,0 +1,62 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_lightboxgallery/gallery_comment
+
+    A comment on a gallery. Its id lets recent activity link straight to it (#c123).
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id - The comment's id.
+    * userpicture - HTML for the author's picture.
+    * fullname - The author's name.
+    * profileurl - The author's profile in this course.
+    * date - When the comment was made.
+    * content - The comment, already formatted as HTML.
+    * deleteurl - Where to delete the comment, for those who may; otherwise null.
+
+    Example context (json):
+    {
+        "id": 12,
+        "userpicture": "<img src=\"https://example.com/pix/u/f2.png\" class=\"userpicture\" alt=\"\">",
+        "fullname": "Sam Student",
+        "profileurl": "https://example.com/user/view.php?id=3&course=2",
+        "date": "Wednesday, 1 October 2026, 2:00 PM",
+        "content": "<p>Great photos from the field trip!</p>",
+        "deleteurl": "https://example.com/mod/lightboxgallery/comment.php?id=1&delete=12"
+    }
+}}
+<div class="lightboxgallery-comment card mb-3" id="c{{id}}">
+    <div class="card-body d-flex">
+        <div class="me-3">{{{userpicture}}}</div>
+        <div class="flex-grow-1">
+            <div class="lightboxgallery-comment-author">
+                <a href="{{profileurl}}">{{fullname}}</a>
+                <span class="text-muted">- {{date}}</span>
+            </div>
+            <div class="lightboxgallery-comment-content">{{{content}}}</div>
+            {{#deleteurl}}
+                <a class="btn btn-link px-0" href="{{deleteurl}}">{{#str}}delete{{/str}}</a>
+            {{/deleteurl}}
+        </div>
+    </div>
+</div>

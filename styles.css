@@ -140,6 +140,13 @@
     margin-bottom: 10px;
 }
 
+/* Comments (templates/gallery_comment.mustache) sit in a centred column, as before. */
+.lightboxgallery-comment {
+    max-width: 50rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
 /* The image viewer (amd/src/lightbox.js, templates/lightbox.mustache). */
 .mod-lightboxgallery-lightbox {
     max-width: 100vw;
