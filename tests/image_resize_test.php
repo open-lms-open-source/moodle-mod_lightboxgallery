@@ -79,7 +79,8 @@ final class image_resize_test extends \advanced_testcase {
      * @return lightboxgallery_image
      */
     private function add_image(int $width, int $height): lightboxgallery_image {
-        $storedfile = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery')->create_image($this->gallery, 'photo.png', $width, $height);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lightboxgallery');
+        $storedfile = $generator->create_image($this->gallery, 'photo.png', $width, $height);
         return new lightboxgallery_image($storedfile, $this->gallery, $this->cm);
     }
 

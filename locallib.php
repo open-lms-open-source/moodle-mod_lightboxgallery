@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/lib.php');
+require_once(__DIR__ . '/lib.php');
 require_once("$CFG->libdir/filelib.php");
 
 // How many characters of a comment to show in recent activity.
@@ -97,7 +97,7 @@ function lightboxgallery_check_zip(stored_file $zip, stdClass $course, int $maxf
  * @return void
  */
 function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0) {
-    require_once(dirname(__FILE__) . '/imageclass.php');
+    require_once(__DIR__ . '/imageclass.php');
 
     $fs = get_file_storage();
 
@@ -238,7 +238,7 @@ function lightboxgallery_resize_options() {
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
     global $CFG, $OUTPUT;
 
-    require_once(dirname(__FILE__) . '/imageclass.php');
+    require_once(__DIR__ . '/imageclass.php');
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $courseid);
     $context = context_module::instance($cm->id);
 

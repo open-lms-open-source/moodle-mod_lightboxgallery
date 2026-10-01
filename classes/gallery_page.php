@@ -26,7 +26,7 @@ namespace mod_lightboxgallery;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../imageclass.php');
+require_once(__DIR__ . '/../imageclass.php');
 
 /**
  * This class is used to display a page of images in the gallery.

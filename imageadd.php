@@ -22,9 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/imageadd_form.php');
-require_once(dirname(__FILE__) . '/imageclass.php');
+require_once(dirname(__DIR__, 2) . '/config.php');
+require_once(__DIR__ . '/imageadd_form.php');
+require_once(__DIR__ . '/imageclass.php');
 
 $id = required_param('id', PARAM_INT);
 

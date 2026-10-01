@@ -24,10 +24,10 @@
 
 use core\output\tabobject;
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
-require_once(dirname(__FILE__) . '/edit/base.class.php');
-require_once(dirname(__FILE__) . '/imageclass.php');
+require_once(dirname(__DIR__, 2) . '/config.php');
+require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/edit/base.class.php');
+require_once(__DIR__ . '/imageclass.php');
 
 global $DB;
 

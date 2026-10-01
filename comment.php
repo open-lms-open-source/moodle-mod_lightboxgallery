@@ -23,9 +23,9 @@
  */
 
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
-require_once(dirname(__FILE__) . '/comment_form.php');
+require_once(dirname(__DIR__, 2) . '/config.php');
+require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/comment_form.php');
 
 $id      = required_param('id', PARAM_INT);
 $delete  = optional_param('delete', 0, PARAM_INT);
