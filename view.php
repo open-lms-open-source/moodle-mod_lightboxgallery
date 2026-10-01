@@ -61,10 +61,9 @@ if ($gallery->ispublic && lightboxgallery_public_gallery_visible($course, $cm)) 
 }
 
 $context = context_module::instance($cm->id);
-$editing = $PAGE->user_is_editing();
-if ($editing) {
-    require_capability('mod/lightboxgallery:edit', $context);
-}
+// Anyone who can edit the gallery gets the edit mode switch here, even if they can't edit the course.
+$PAGE->set_other_editing_capability('mod/lightboxgallery:edit');
+$editing = $PAGE->user_is_editing() && has_capability('mod/lightboxgallery:edit', $context);
 
 if (empty($cm->visible) && !has_capability('moodle/course:viewhiddenactivities', $context)) {
     notice(get_string("activityiscurrentlyhidden"));
