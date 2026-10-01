@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version  = 2026100100;  // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2024100700;  // Requires this Moodle version.
+$plugin->requires = 2025100600;  // Requires this Moodle version.
 
 $plugin->component = 'mod_lightboxgallery';
 $plugin->maturity = MATURITY_BETA;
