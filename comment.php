@@ -36,14 +36,14 @@ if (!$gallery = $DB->get_record('lightboxgallery', ['id' => $id])) {
 }
 [$course, $cm] = get_course_and_cm_from_instance($gallery, 'lightboxgallery');
 
-if ($delete && ! $comment = $DB->get_record('lightboxgallery_comments', ['gallery' => $gallery->id, 'id' => $delete])) {
-    throw new \moodle_exception('Invalid comment ID');
+if ($delete) {
+    $comment = $DB->get_record('lightboxgallery_comments', ['gallery' => $gallery->id, 'id' => $delete], '*', MUST_EXIST);
 }
 
 require_login($course, true, $cm);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $id]);
+$PAGE->set_url('/mod/lightboxgallery/comment.php', array_filter(['id' => $gallery->id, 'delete' => $delete]));
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 
@@ -74,7 +74,7 @@ if ($delete && has_capability('mod/lightboxgallery:edit', $context)) {
 require_capability('mod/lightboxgallery:addcomment', $context);
 
 if (! $gallery->comments) {
-    throw new \moodle_exception('Comments disabled', $galleryurl);
+    throw new \moodle_exception('errorcommentsdisabled', 'lightboxgallery', $galleryurl);
 }
 
 $mform = new mod_lightboxgallery_comment_form(null, $gallery);
@@ -87,20 +87,17 @@ if ($mform->is_cancelled()) {
     $newcomment->userid = $USER->id;
     $newcomment->commenttext = $formadata->comment['text'];
     $newcomment->timemodified = time();
-    if ($DB->insert_record('lightboxgallery_comments', $newcomment)) {
-        $params = [
-            'context' => $context,
-            'other' => [
-                'lightboxgalleryid' => $gallery->id,
-            ],
-        ];
-        $event = \mod_lightboxgallery\event\gallery_comment_created::create($params);
-        $event->trigger();
+    $DB->insert_record('lightboxgallery_comments', $newcomment);
+    $params = [
+        'context' => $context,
+        'other' => [
+            'lightboxgalleryid' => $gallery->id,
+        ],
+    ];
+    $event = \mod_lightboxgallery\event\gallery_comment_created::create($params);
+    $event->trigger();
 
-        redirect($galleryurl, get_string('commentadded', 'lightboxgallery'));
-    } else {
-        throw new \moodle_exception('Comment creation failed');
-    }
+    redirect($galleryurl, get_string('commentadded', 'lightboxgallery'));
 }
 
 

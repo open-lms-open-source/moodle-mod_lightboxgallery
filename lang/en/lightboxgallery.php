@@ -73,6 +73,7 @@ $string['edit_rotate'] = 'Rotate';
 $string['edit_tag'] = 'Tag';
 $string['edit_thumbnail'] = 'Thumbnail';
 $string['editimage'] = 'Edit image';
+$string['errorcommentsdisabled'] = 'Comments are turned off for this gallery.';
 $string['errornofile'] = 'The requested file was not found: {$a}';
 $string['errornoimages'] = 'No images were found in this gallery';
 $string['errornosearchresults'] = 'Your search query returned no images';

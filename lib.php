@@ -309,16 +309,14 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
  * @throws \core\exception\moodle_exception
  */
 function lightboxgallery_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
-    global $CFG, $OUTPUT;
+    global $OUTPUT;
 
     $userviewurl = new moodle_url('/user/view.php', ['id' => $activity->user->id, 'course' => $courseid]);
     echo '<table border="0" cellpadding="3" cellspacing="0">' .
          '<tr><td class="userpicture" valign="top">' . $OUTPUT->user_picture($activity->user, ['courseid' => $courseid]) .
          '</td><td>' .
          '<div class="title">' .
-         ($detail ? '<img src="' . $CFG->modpixpath . '/' . $activity->type . '/icon.gif" class="icon" alt="' . s($activity->name) .
-             '" />' : ''
-         ) .
+         ($detail ? $OUTPUT->image_icon('monologo', $activity->name, 'mod_lightboxgallery') : '') .
          '<a href="' . $activity->content->url . '">' .
          s($activity->content->comment) . '</a>' .
          '</div>' .
@@ -395,25 +393,6 @@ function lightboxgallery_print_recent_activity($course, $viewfullnames, $timesta
     echo '</ul>';
 
     return true;
-}
-
-/**
- * Must return an array of users who are participants for a given instance
- * of newmodule. Must include every user involved in the instance,
- * independient of his role (student, teacher, admin...). The returned
- * objects must contain at least id property.
- * See other modules as example.
- *
- * @param int $galleryid ID of an instance of this module
- * @return boolean|array false if no participants, array of objects otherwise
- */
-function lightboxgallery_get_participants($galleryid) {
-    global $DB, $CFG;
-
-    return $DB->get_records_sql("SELECT DISTINCT u.id, u.id
-                                   FROM {user} u,
-                                        {lightboxgallery_comments} c
-                                  WHERE c.gallery = ? AND u.id = c.userid", [$galleryid]);
 }
 
 /**

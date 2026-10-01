@@ -37,7 +37,7 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
      */
     public function definition() {
 
-        global $COURSE, $cm;
+        global $COURSE;
 
         $mform =& $this->_form;
 
@@ -79,7 +79,7 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
             $mform->setAdvanced('resizegroup');
         }
 
-        $mform->addElement('hidden', 'id', $cm->id);
+        $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('addimage', 'lightboxgallery'));

@@ -37,7 +37,7 @@ $context = context_module::instance($cm->id);
 require_capability('mod/lightboxgallery:addimage', $context);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]);
+$PAGE->set_url('/mod/lightboxgallery/imageadd.php', ['id' => $cm->id]);
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 

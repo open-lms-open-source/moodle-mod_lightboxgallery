@@ -55,7 +55,7 @@ $PAGE->set_button($OUTPUT->single_button($buttonurl, get_string('backtogallery',
 
 $fs = get_file_storage();
 if (!$storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_images', '0', '/', $image)) {
-    throw new \moodle_exception(get_string('errornofile', 'lightboxgallery', $image));
+    throw new \moodle_exception('errornofile', 'lightboxgallery', '', $image);
 }
 $imageclass = new lightboxgallery_image($storedfile, $gallery, $cm);
 $imageclass->ensure_thumbnail();
