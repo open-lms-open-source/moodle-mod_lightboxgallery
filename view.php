@@ -109,7 +109,7 @@ if ($gallery->autoresize == LIGHTBOXGALLERY_AUTO_RESIZE_SCREEN || $gallery->auto
 }
 echo $OUTPUT->box_start('generalbox lightbox-gallery clearfix' . $resizecss);
 
-$gallerypage = new mod_lightboxgallery\gallery_page($cm, $gallery, $editing, $page);
+$gallerypage = new \mod_lightboxgallery\local\gallery_page($cm, $gallery, $editing, $page);
 echo $gallerypage->display_images();
 
 if ($gallerypage->image_count() < 1) {

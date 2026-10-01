@@ -17,6 +17,7 @@
 namespace mod_lightboxgallery;
 
 use lightboxgallery_image;
+use mod_lightboxgallery\local\gallery_page;
 
 defined('MOODLE_INTERNAL') || die();
 

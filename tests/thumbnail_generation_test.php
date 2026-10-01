@@ -17,6 +17,7 @@
 namespace mod_lightboxgallery;
 
 use lightboxgallery_image;
+use mod_lightboxgallery\local\gallery_page;
 use mod_lightboxgallery\task\generate_thumbnails;
 
 defined('MOODLE_INTERNAL') || die();

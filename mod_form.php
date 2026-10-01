@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/locallib.php');
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
+use mod_lightboxgallery\local\gallery_page;
+
 /**
  * Form definition class
  */
@@ -76,9 +78,9 @@ class mod_lightboxgallery_mod_form extends moodleform_mod {
         $mform->addElement('select', 'captionpos', get_string('captionpos', 'lightboxgallery'), $captionposopts);
 
         $options = [
-            \mod_lightboxgallery\gallery_page::SORTBY_FILENAME => get_string('sortbyfilename', 'lightboxgallery'),
-            \mod_lightboxgallery\gallery_page::SORTBY_FILENAME_NATURAL => get_string('sortbyfilenamenatural', 'lightboxgallery'),
-            \mod_lightboxgallery\gallery_page::SORTBY_CAPTION => get_string('sortbycaption', 'lightboxgallery'),
+            gallery_page::SORTBY_FILENAME => get_string('sortbyfilename', 'lightboxgallery'),
+            gallery_page::SORTBY_FILENAME_NATURAL => get_string('sortbyfilenamenatural', 'lightboxgallery'),
+            gallery_page::SORTBY_CAPTION => get_string('sortbycaption', 'lightboxgallery'),
         ];
 
         $mform->addElement('select', 'sortby', get_string('sortby', 'lightboxgallery'), $options);

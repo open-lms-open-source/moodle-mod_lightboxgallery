@@ -22,11 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_lightboxgallery;
+namespace mod_lightboxgallery\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../imageclass.php');
+global $CFG;
+require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
 
 /**
  * This class is used to display a page of images in the gallery.
