@@ -177,11 +177,9 @@ class lightboxgallery_image {
             $this->thumburl = $this->imageurl;
         }
 
-        if ($loadextrainfo) {
-            $imageinfo = $this->storedfile->get_imageinfo();
-            $this->height = $imageinfo['height'];
-            $this->width = $imageinfo['width'];
-        }
+        $imageinfo = $this->storedfile->get_imageinfo();
+        $this->height = $imageinfo['height'];
+        $this->width = $imageinfo['width'];
 
         // If we weren't given a thumbnail, double check if it exists before generating one.
         // Only a few are generated per request; the rest are left to a background task.
