@@ -118,7 +118,7 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
                     ? get_string('svgzunsupported', 'mod_lightboxgallery', $file->get_filename())
                     : get_string('invalidfiletype', 'error', $file->get_filename());
             } else {
-                $problem = null;
+                $problem = lightboxgallery_image::get_processing_problem($file);
             }
             if ($problem !== null) {
                 $problems[] = $problem;

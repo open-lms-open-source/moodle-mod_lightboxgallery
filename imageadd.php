@@ -69,8 +69,17 @@ if ($mform->is_cancelled()) {
         $resize = 0; // No resize.
     }
 
-    lightboxgallery_add_images($files, $context, $cm, $gallery, $resize);
-    redirect($CFG->wwwroot . '/mod/lightboxgallery/view.php?id=' . $cm->id);
+    $problems = lightboxgallery_add_images($files, $context, $cm, $gallery, $resize);
+    $viewurl = new moodle_url('/mod/lightboxgallery/view.php', ['id' => $cm->id]);
+    if ($problems) {
+        redirect(
+            $viewurl,
+            get_string('imagesskipped', 'lightboxgallery', implode(' ', $problems)),
+            null,
+            \core\output\notification::NOTIFY_WARNING
+        );
+    }
+    redirect($viewurl);
 }
 
 echo $OUTPUT->header();

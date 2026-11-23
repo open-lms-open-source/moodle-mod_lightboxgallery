@@ -51,6 +51,17 @@ class lightboxgallery_image {
     /** @var int The largest width or height, in pixels, that a resize can produce. */
     public const MAX_DIMENSION = 4096;
 
+    /**
+     * @var int The most pixels an image may have for the gallery to process it.
+     *
+     * GD holds about 5 bytes per pixel once an image is decoded, and an edit holds two
+     * copies, so 40 megapixels needs roughly 400MB, within the raised memory limit.
+     */
+    public const MAX_PIXELS = 40000000;
+
+    /** @var int[] The angles, in degrees, an image may be rotated by. */
+    public const ROTATE_ANGLES = [-90, 90, 180];
+
     /** @var int How many thumbnails one request may generate before the rest are left to a background task. */
     public const SYNC_THUMBNAIL_LIMIT = 10;
 
@@ -178,9 +189,7 @@ class lightboxgallery_image {
         }
 
         if ($loadextrainfo) {
-            $imageinfo = $this->storedfile->get_imageinfo();
-            $this->height = $imageinfo['height'];
-            $this->width = $imageinfo['width'];
+            $this->load_dimensions();
         }
 
         // If we weren't given a thumbnail, double check if it exists before generating one.
@@ -189,7 +198,7 @@ class lightboxgallery_image {
         if ($thumbnail) {
             $this->use_thumbnail($thumbnail);
         } else if ($this->storedfile->get_mimetype() == 'image/svg+xml' || self::claim_thumbnail_budget()) {
-            $this->use_thumbnail($this->create_thumbnail());
+            $this->use_thumbnail($this->create_thumbnail_or_placeholder());
         } else {
             $this->thumbnailpending = true;
             self::queue_thumbnail_generation($this->cmid);
@@ -254,21 +263,77 @@ class lightboxgallery_image {
             return $this->storedfile;
         }
 
+        // Decode before starting the output buffer, so a failure can't leave it open.
+        $resized = $this->get_image_resized(self::THUMBNAIL_HEIGHT, self::THUMBNAIL_WIDTH, $offsetx, $offsety);
+        ob_start();
+        imagepng($resized);
+        $thumbnail = ob_get_clean();
+
+        return $this->store_thumbnail($thumbnail);
+    }
+
+    /**
+     * Create the thumbnail, or a placeholder if the image can't be processed.
+     *
+     * A page that lists images must never fail because one of them is damaged or too
+     * large. The placeholder is stored as the thumbnail, so later requests don't keep
+     * trying to decode the image; an edit or a thumbnail reset makes a real one again.
+     *
+     * @return stored_file
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    private function create_thumbnail_or_placeholder() {
+        try {
+            return $this->create_thumbnail();
+        } catch (moodle_exception $e) {
+            debugging(
+                "Couldn't make a thumbnail for {$this->storedfile->get_filename()}: {$e->getMessage()}",
+                DEBUG_DEVELOPER
+            );
+        }
+
+        $placeholder = imagecreatetruecolor(self::THUMBNAIL_WIDTH, self::THUMBNAIL_HEIGHT);
+        imagefill($placeholder, 0, 0, imagecolorallocate($placeholder, 0xdd, 0xe2, 0xea));
+        ob_start();
+        imagepng($placeholder);
+        return $this->store_thumbnail(ob_get_clean());
+    }
+
+    /**
+     * Store the thumbnail, replacing any thumbnail the image already has.
+     *
+     * @param string $content The PNG content.
+     * @return stored_file
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    private function store_thumbnail(string $content) {
+        $fs = get_file_storage();
         $fileinfo = [
             'contextid' => $this->context->id,
             'component' => 'mod_lightboxgallery',
             'filearea' => 'gallery_thumbs',
             'itemid' => 0,
             'filepath' => $this->storedfile->get_filepath(),
-            'filename' => $this->storedfile->get_filename() . '.png', ];
-
-        ob_start();
-        imagepng($this->get_image_resized(self::THUMBNAIL_HEIGHT, self::THUMBNAIL_WIDTH, $offsetx, $offsety));
-        $thumbnail = ob_get_clean();
+            'filename' => $this->storedfile->get_filename() . '.png',
+        ];
 
         $this->delete_thumbnail();
-        $fs = get_file_storage();
-        return $fs->create_file_from_string($fileinfo, $thumbnail);
+        // Remove the stored file too, which may not be the one this object loaded.
+        $existing = $fs->get_file(
+            $fileinfo['contextid'],
+            $fileinfo['component'],
+            $fileinfo['filearea'],
+            $fileinfo['itemid'],
+            $fileinfo['filepath'],
+            $fileinfo['filename']
+        );
+        if ($existing) {
+            $existing->delete();
+        }
+
+        return $fs->create_file_from_string($fileinfo, $content);
     }
 
     /**
@@ -356,7 +421,8 @@ class lightboxgallery_image {
      * @return void
      */
     private function delete_thumbnail() {
-        if (isset($this->thumbnail) && is_object($this->thumbnail)) {
+        // When there's no separate thumbnail, $this->thumbnail is the image itself; never delete that here.
+        if (isset($this->thumbnail) && is_object($this->thumbnail) && $this->thumbnail !== $this->storedfile) {
             $this->thumbnail->delete();
             unset($this->thumbnail);
         }
@@ -456,13 +522,71 @@ class lightboxgallery_image {
     }
 
     /**
+     * Why the gallery can't process an image file, if it can't.
+     *
+     * Only reads the file's header, so it's cheap enough to run on every upload.
+     * It doesn't catch damaged image data; decoding does that.
+     *
+     * @param stored_file $file
+     * @return string|null A message saying what's wrong, or null if the image can be processed.
+     */
+    public static function get_processing_problem(stored_file $file): ?string {
+        if ($file->get_mimetype() == 'image/svg+xml') {
+            // SVG is never decoded.
+            return null;
+        }
+        $info = $file->get_imageinfo();
+        if (!$info || empty($info['width']) || empty($info['height'])) {
+            return get_string('imagecannotread', 'lightboxgallery', $file->get_filename());
+        }
+        if ($info['width'] * $info['height'] > self::MAX_PIXELS) {
+            return get_string('imagetoolarge', 'lightboxgallery', (object) [
+                'filename' => $file->get_filename(),
+                'megapixels' => round($info['width'] * $info['height'] / 1000000, 1),
+                'limit' => self::MAX_PIXELS / 1000000,
+            ]);
+        }
+        return null;
+    }
+
+    /**
+     * Decode the image so GD can work on it.
+     *
+     * Every edit and thumbnail goes through here, so a damaged or oversized image
+     * fails with an exception the caller can handle instead of a PHP error.
+     *
+     * @return GdImage
+     * @throws moodle_exception If the image is too large or can't be decoded.
+     */
+    private function decode_image() {
+        $this->load_dimensions();
+        if ($problem = self::get_processing_problem($this->storedfile)) {
+            throw new moodle_exception('imagenotprocessed', 'lightboxgallery', '', $problem);
+        }
+
+        raise_memory_limit(MEMORY_EXTRA);
+        // GD warns about damaged data as well as returning false; the false is what matters.
+        $image = @imagecreatefromstring($this->storedfile->get_content());
+        if ($image === false) {
+            throw new moodle_exception(
+                'imagenotprocessed',
+                'lightboxgallery',
+                '',
+                get_string('imagecannotread', 'lightboxgallery', $this->storedfile->get_filename())
+            );
+        }
+
+        return $image;
+    }
+
+    /**
      * Get the image flipped in a given direction.
      *
      * @param string $direction
      * @return false|GdImage|resource
      */
     private function get_image_flipped($direction) {
-        $image = imagecreatefromstring($this->storedfile->get_content());
+        $image = $this->decode_image();
         imagealphablending($image, false);
         imagesavealpha($image, true);
         imageflip($image, $direction == 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
@@ -485,8 +609,7 @@ class lightboxgallery_image {
         $offsetx = 0,
         $offsety = 0
     ) {
-        raise_memory_limit(MEMORY_EXTRA);
-        $image = imagecreatefromstring($this->storedfile->get_content());
+        $image = $this->decode_image();
         $resized = imagecreatetruecolor($width, $height);
         imagealphablending($resized, false);
         imagesavealpha($resized, true);
@@ -522,8 +645,7 @@ class lightboxgallery_image {
      * @return GdImage
      */
     private function get_image_scaled($width, $height) {
-        raise_memory_limit(MEMORY_EXTRA);
-        $image = imagecreatefromstring($this->storedfile->get_content());
+        $image = $this->decode_image();
         $scaled = imagecreatetruecolor($width, $height);
         imagealphablending($scaled, false);
         imagesavealpha($scaled, true);
@@ -539,7 +661,7 @@ class lightboxgallery_image {
      * @return false|GdImage|resource
      */
     private function get_image_rotated($angle) {
-        $image = imagecreatefromstring($this->storedfile->get_content());
+        $image = $this->decode_image();
         imagealphablending($image, false);
         imagesavealpha($image, true);
         $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
@@ -653,7 +775,7 @@ class lightboxgallery_image {
         if (!$this->thumbnailpending) {
             return;
         }
-        $this->use_thumbnail($this->create_thumbnail());
+        $this->use_thumbnail($this->create_thumbnail_or_placeholder());
         $this->thumbnailpending = false;
     }
 
@@ -871,7 +993,7 @@ class lightboxgallery_image {
     /**
      * Rotate the image by a given angle.
      *
-     * @param int $angle
+     * @param int $angle One of ROTATE_ANGLES.
      * @return string The image filename, which is unchanged.
      * @throws dml_exception
      * @throws file_exception
@@ -879,6 +1001,10 @@ class lightboxgallery_image {
      * @throws stored_file_creation_exception
      */
     public function rotate_image($angle) {
+        // Only right angles, as the form offers: any other angle grows the canvas on every rotation.
+        if (!in_array((int) $angle, self::ROTATE_ANGLES, true)) {
+            throw new moodle_exception('invalidparameter', 'debug');
+        }
         $this->replace_content($this->encode_image($this->get_image_rotated($angle)));
         return $this->storedfile->get_filename();
     }
@@ -918,9 +1044,8 @@ class lightboxgallery_image {
      */
     public function set_stored_file($storedfile) {
         $this->storedfile = $storedfile;
-        $imageinfo = $this->storedfile->get_imageinfo();
-
-        $this->height = $imageinfo['height'];
-        $this->width = $imageinfo['width'];
+        $this->width = null;
+        $this->height = null;
+        $this->load_dimensions();
     }
 }

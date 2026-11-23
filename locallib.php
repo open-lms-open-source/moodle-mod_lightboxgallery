@@ -98,9 +98,9 @@ function lightboxgallery_check_zip(
  * @param cm_info $cm
  * @param stdClass $gallery
  * @param int $resize
- * @return void
+ * @return string[] Why any images weren't added; empty if they all were.
  */
-function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0) {
+function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0): array {
     require_once(__DIR__ . '/imageclass.php');
 
     $fs = get_file_storage();
@@ -131,8 +131,14 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
         }
     }
 
+    $problems = [];
     foreach ($images as $storedfile) {
         if ($storedfile->is_valid_image()) {
+            // Images in a zip haven't been checked yet; single uploads were checked by the form.
+            if ($problem = lightboxgallery_image::get_processing_problem($storedfile)) {
+                $problems[] = $problem;
+                continue;
+            }
             $filename = $storedfile->get_filename();
             $fileinfo = [
                 'contextid'     => $context->id,
@@ -149,8 +155,15 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
                 if ($resize > 0) {
                     $resizeoptions = lightboxgallery_resize_options();
                     [$width, $height] = explode('x', $resizeoptions[$resize]);
-                    // Uploads are only ever shrunk to fit; small images keep their size.
-                    $image->resize_image($width, $height, false);
+                    try {
+                        // Uploads are only ever shrunk to fit; small images keep their size.
+                        $image->resize_image($width, $height, false);
+                    } catch (moodle_exception $e) {
+                        // The image data is damaged, so don't keep it.
+                        $image->delete_file();
+                        $problems[] = $e->getMessage();
+                        continue;
+                    }
                 }
 
                 $image->set_caption($filename);
@@ -158,6 +171,25 @@ function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0
         }
     }
     $fs->delete_area_files($context->id, 'mod_lightboxgallery', 'unpacktemp', 0);
+
+    return $problems;
+}
+
+/**
+ * Make a gallery's index picture from an image.
+ *
+ * @param lightboxgallery_image $image
+ * @return stored_file|null The index picture, or null if the image can't be processed.
+ * @throws file_exception
+ * @throws stored_file_creation_exception
+ */
+function lightboxgallery_try_create_index(lightboxgallery_image $image): ?stored_file {
+    try {
+        return $image->create_index();
+    } catch (moodle_exception $e) {
+        debugging("Couldn't make the gallery index picture: {$e->getMessage()}", DEBUG_DEVELOPER);
+        return null;
+    }
 }
 
 /**
@@ -247,24 +279,27 @@ function lightboxgallery_index_image_url($courseid, $gallery, $newimage = null) 
     $fs = get_file_storage();
     $storedfile = $fs->get_file($context->id, 'mod_lightboxgallery', 'gallery_index', '0', '/', 'index.png');
 
+    // An image that can't be processed leaves $index null, and the gallery gets the default picture.
+    $index = null;
     if (!is_null($newimage)) {
         // Replace the index with the chosen image.
         if (is_object($storedfile)) {
             $storedfile->delete();
         }
-        $index = $newimage->create_index();
+        $index = lightboxgallery_try_create_index($newimage);
     } else if (is_object($storedfile)) {
         $index = $storedfile;
     } else if ($file = lightboxgallery_first_indexable_image($context)) {
         if (lightboxgallery_image::claim_thumbnail_budget()) {
-            $image = new lightboxgallery_image($file, $gallery, $cm);
-            $index = $image->create_index();
+            $index = lightboxgallery_try_create_index(new lightboxgallery_image($file, $gallery, $cm));
         } else {
             // Too many images to process in this request; show the default picture until the task has run.
             lightboxgallery_image::queue_thumbnail_generation($cm->id);
             return $OUTPUT->image_url('index', 'mod_lightboxgallery');
         }
-    } else {
+    }
+
+    if (!$index) {
         $fileinfo = [
             'contextid' => $context->id,
             'component' => 'mod_lightboxgallery',
