@@ -15,10 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Definition of log events
- * NOTE: this is an example how to insert log event during installation/update.
- * It is not really essential to know about it, but these logs were created as example
- * in the previous 1.9 NEWMODULE.
+ * Legacy log actions, which map gallery log entries to the gallery's name.
  *
  * @package   mod_lightboxgallery
  * @copyright 2011 John Kelsh

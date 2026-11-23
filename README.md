@@ -1,6 +1,6 @@
 [![Moodle Plugin CI](https://github.com/open-lms-open-source/moodle-mod_lightboxgallery/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/open-lms-open-source/moodle-mod_lightboxgallery/actions/workflows/moodle-plugin-ci.yml)
 
-# Lightbox gallery activity for Moodle™ 3.10+
+# Lightbox gallery activity for Moodle™ 5.1+
 
 This resource allows you to create 'Lightbox' enabled image galleries within your Moodle™ course. The
 Lightbox system is a set of scripts than can be used to apply nice effects to image galleries.
@@ -17,12 +17,12 @@ scrolling through the images.
 You can install the plugin from the Moodle™ plugin repository from within your Moodle™ installation.
 ### Using a downloaded zip file
 You can download a zip of this module from: https://github.com/open-lms-open-source/moodle-mod_lightboxgallery/zipball/master
-Unzip it to your mod/ folder and rename the extracted folder to 'lightboxgallery'.
+Unzip it to your public/mod/ folder and rename the extracted folder to 'lightboxgallery'.
 ### Using Git
 To install using git, run the following command from the root of your moodle installation:  
-git clone git://github.com/open-lms-open-source/moodle-mod_lightboxgallery.git mod/lightboxgallery
+git clone https://github.com/open-lms-open-source/moodle-mod_lightboxgallery.git public/mod/lightboxgallery
 
-Then add mod/lightboxgallery to your gitignore.
+Then add public/mod/lightboxgallery to your gitignore.
 
 ## Credits
 Maintainer: Adam Olley (adam.olley@openlms.net)

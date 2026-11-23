@@ -32,19 +32,19 @@ require_once($CFG->dirroot . '/mod/lightboxgallery/imageclass.php');
  */
 class base {
     /**
-     * @var \lightboxgallery_image $imageobj The image object
+     * @var \lightboxgallery_image $imageobj Unused; kept for tools outside this plugin that may set it.
      */
     public $imageobj;
     /**
-     * @var \context_module $cm The context module
+     * @var \stdClass|\cm_info $cm The gallery's course module.
      */
     public $cm;
     /**
-     * @var \stdClass
+     * @var \stdClass The gallery record.
      */
     public $gallery;
     /**
-     * @var \stdClass
+     * @var string The image's filename.
      */
     public $image;
     /**
@@ -52,15 +52,15 @@ class base {
      */
     public $lbgimage;
     /**
-     * @var \stdClass
+     * @var string The name of this editing tool.
      */
     public $tab;
     /**
-     * @var bool|null
+     * @var bool Whether to show the image's thumbnail above the tool's form.
      */
     public $showthumb;
     /**
-     * @var \core\context\module|false
+     * @var \context_module The gallery's context.
      */
     public $context;
     /**
@@ -71,11 +71,11 @@ class base {
     /**
      * Constructor.
      *
-     * @param \stdClass $gallery
-     * @param \context_module $cm
-     * @param \stdClass $image
-     * @param \stdClass $tab
-     * @param bool|null $showthumb
+     * @param \stdClass $gallery The gallery record.
+     * @param \stdClass|\cm_info $cm The gallery's course module.
+     * @param string $image The image's filename.
+     * @param string $tab The name of this editing tool.
+     * @param bool $showthumb Whether to show the image's thumbnail above the tool's form.
      * @param int $page The page of the gallery the user came from.
      */
     public function __construct($gallery, $cm, $image, $tab, $showthumb = true, $page = 0) {
@@ -95,7 +95,7 @@ class base {
     /**
      * Check if the form is being processed.
      *
-     * @return mixed
+     * @return bool
      * @throws \coding_exception
      */
     public function processing() {

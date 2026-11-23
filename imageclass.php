@@ -18,17 +18,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/gdlib.php');
 
-/**
- *
- */
+/** Caption position: hidden. */
 define('LIGHTBOXGALLERY_POS_HID', 2);
-/**
- *
- */
+/** Caption position: above the thumbnail. */
 define('LIGHTBOXGALLERY_POS_TOP', 1);
-/**
- *
- */
+/** Caption position: below the thumbnail. */
 define('LIGHTBOXGALLERY_POS_BOT', 0);
 
 /**
@@ -75,9 +69,9 @@ class lightboxgallery_image {
     private $thumbnailpending = false;
 
     /**
-     * The course module object.
+     * The gallery's course module.
      *
-     * @var course_module
+     * @var stdClass|cm_info
      */
     private $cm;
 
@@ -91,7 +85,7 @@ class lightboxgallery_image {
     /**
      * The course module context.
      *
-     * @var \core\context\module|false
+     * @var context_module
      */
     private $context;
 
@@ -110,8 +104,9 @@ class lightboxgallery_image {
     private $imageurl;
 
     /**
-     * A quick lookup cache of this images metadata. Mainly useful during initial display.
-     * @var mixed|null
+     * This image's lightboxgallery_image_meta records, when the caller loaded them; null to query as needed.
+     *
+     * @var stdClass[]|null
      */
     private $metadata = null;
 
@@ -123,12 +118,15 @@ class lightboxgallery_image {
     private $storedfile;
 
     /**
-     * The tags for this image.
-     * @var array
+     * This image's tag records, keyed by id, once loaded.
+     *
+     * @var stdClass[]|null
      */
     private $tags;
     /**
-     * @var bool|mixed|stored_file
+     * The thumbnail, or the image itself when it has no separate thumbnail.
+     *
+     * @var stored_file|null
      */
     private $thumbnail;
     /**
@@ -138,23 +136,23 @@ class lightboxgallery_image {
     private $thumburl;
 
     /**
-     * @var mixed|null
+     * @var int|null The image's height in pixels, if known.
      */
     public $height = null;
     /**
-     * @var mixed|null
+     * @var int|null The image's width in pixels, if known.
      */
     public $width = null;
 
     /**
      * Constructor.
      *
-     * @param stdClass $storedfile
-     * @param stdClass $gallery
-     * @param context_module $cm
-     * @param stdClass|null $metadata
-     * @param bool|null $thumbnail
-     * @param bool|null  $loadextrainfo
+     * @param stored_file $storedfile The image file.
+     * @param stdClass $gallery The gallery record.
+     * @param stdClass|cm_info $cm The gallery's course module.
+     * @param stdClass[]|null $metadata The image's lightboxgallery_image_meta records, if already loaded.
+     * @param stored_file|false $thumbnail The image's thumbnail, if already loaded.
+     * @param bool $loadextrainfo Whether to load the image's dimensions now.
      */
     public function __construct($storedfile, $gallery, $cm, $metadata = null, $thumbnail = false, $loadextrainfo = true) {
         global $CFG;
@@ -375,7 +373,7 @@ class lightboxgallery_image {
     /**
      * Delete the file.
      *
-     * @param bool|null $meta
+     * @param bool $meta Whether to delete the image's captions and tags too.
      * @return void
      * @throws dml_exception
      */
@@ -447,8 +445,7 @@ class lightboxgallery_image {
      * Get the list of editing options allowed for this image.
      * Not all editing types are supported for all image formats.
      *
-     * @return string
-     * @throws coding_exception
+     * @return string[] The names of the editing tools.
      */
     public function get_editing_options() {
         global $CFG;
@@ -582,8 +579,9 @@ class lightboxgallery_image {
     /**
      * Get the image flipped in a given direction.
      *
-     * @param string $direction
-     * @return false|GdImage|resource
+     * @param string $direction 'vertical' or 'horizontal'.
+     * @return GdImage
+     * @throws moodle_exception If the image can't be decoded.
      */
     private function get_image_flipped($direction) {
         $image = $this->decode_image();
@@ -601,7 +599,8 @@ class lightboxgallery_image {
      * @param int $width
      * @param int $offsetx
      * @param int $offsety
-     * @return false|GdImage|resource
+     * @return GdImage
+     * @throws moodle_exception If the image can't be decoded.
      */
     private function get_image_resized(
         $height = self::THUMBNAIL_HEIGHT,
@@ -643,6 +642,7 @@ class lightboxgallery_image {
      * @param int $width
      * @param int $height
      * @return GdImage
+     * @throws moodle_exception If the image can't be decoded.
      */
     private function get_image_scaled($width, $height) {
         $image = $this->decode_image();
@@ -658,7 +658,8 @@ class lightboxgallery_image {
      * Get the image rotated by a given angle.
      *
      * @param int $angle
-     * @return false|GdImage|resource
+     * @return GdImage
+     * @throws moodle_exception If the image can't be decoded.
      */
     private function get_image_rotated($angle) {
         $image = $this->decode_image();
@@ -700,7 +701,7 @@ class lightboxgallery_image {
     /**
      * Get the image tags.
      *
-     * @return array
+     * @return stdClass[] The tag records, keyed by id.
      * @throws dml_exception
      */
     public function get_tags() {
@@ -1013,7 +1014,7 @@ class lightboxgallery_image {
      * Set the image caption in the database.
      *
      * @param string $caption
-     * @return bool|int
+     * @return bool|int True if the caption was updated, or the new record's id.
      * @throws dml_exception
      */
     public function set_caption($caption) {
@@ -1039,7 +1040,7 @@ class lightboxgallery_image {
     /**
      * Set the stored file.
      *
-     * @param stdClass $storedfile
+     * @param stored_file $storedfile
      * @return void
      */
     public function set_stored_file($storedfile) {

@@ -47,7 +47,7 @@ class gallery_page {
     public const SORTBY_FILENAME_NATURAL = 2;
 
     /**
-     * @var cm_info Course module information.
+     * @var \cm_info Course module information.
      */
     private $cm;
     /**
@@ -59,11 +59,11 @@ class gallery_page {
      */
     private $files;
     /**
-     * @var stdClass The gallery object.
+     * @var \stdClass The gallery object.
      */
     private $gallery;
     /**
-     * @var int The number of images on this page.
+     * @var int The number of images in the whole gallery.
      */
     private $imagecount;
     /**
@@ -90,8 +90,8 @@ class gallery_page {
     /**
      * Gallery view constructor.
      *
-     * @param cm_info $cm
-     * @param stdClass $gallery
+     * @param \cm_info $cm
+     * @param \stdClass $gallery
      * @param bool $editing
      * @param int $page Which page are we viewing.
      */
@@ -219,9 +219,9 @@ class gallery_page {
     }
 
     /**
-     * Get the number of images on this page.
+     * Get the number of images in the whole gallery, across all its pages.
      *
-     * @return mixed
+     * @return int
      */
     public function image_count() {
         return $this->imagecount;

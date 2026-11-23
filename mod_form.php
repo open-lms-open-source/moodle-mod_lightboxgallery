@@ -15,10 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The main newmodule configuration form
- *
- * It uses the standard core Moodle formslib. For more info about them, please
- * visit: http://docs.moodle.org/en/Development:lib/formslib.php
+ * The lightbox gallery activity settings form.
  *
  * @package   mod_lightboxgallery
  * @copyright 2011 John Kelsh <john.kelsh@netspot.com.au>

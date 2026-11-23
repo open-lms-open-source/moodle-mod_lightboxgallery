@@ -15,13 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library of interface functions and constants for module newmodule
+ * The functions Moodle core calls for the lightbox gallery activity.
  *
- * All the core Moodle functions, neeeded to allow the module to work
- * integrated in Moodle should be placed here.
- * All the newmodule specific functions, needed to implement all the module
- * logic, should go to locallib.php. This will help to save some memory when
- * Moodle is performing actions across all modules.
+ * Functions only the plugin itself uses belong in locallib.php, so they aren't
+ * loaded whenever Moodle works across all activities.
  *
  * @package   mod_lightboxgallery
  * @copyright 2011 John Kelsh
@@ -352,7 +349,7 @@ function lightboxgallery_get_recent_mod_activity(&$activities, &$index, $timesta
  * Prints recent activity
  *
  * @param stdClass $activity
- * @param id $courseid
+ * @param int $courseid
  * @param stdClass $detail
  * @param array $modnames
  * @param bool $viewfullnames

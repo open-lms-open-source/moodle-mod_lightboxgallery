@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/locallib.php');
@@ -21,7 +22,7 @@ require_once($CFG->libdir . '/formslib.php');
 require_once(__DIR__ . '/imageclass.php');
 
 /**
- * Prints a particular instance of lightboxgallery
+ * The form for adding images to a gallery.
  *
  * @package   mod_lightboxgallery
  * @author    Adam Olley <adam.olley@netspot.com.au>
@@ -86,9 +87,9 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
     }
 
     /**
-     * Set default values for the form.
+     * Check the uploaded files, removing any that can't be added.
      *
-     * @param stdClass $data
+     * @param array $data
      * @param array $files
      * @return array
      * @throws coding_exception
