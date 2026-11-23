@@ -42,7 +42,7 @@ function xmldb_lightboxgallery_upgrade($oldversion = 0) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2007111400) {
-        $table = new xmdbl_table('lightboxgallery');
+        $table = new xmldb_table('lightboxgallery');
 
         // Add perpage field.
         $field = new xmldb_field('perpage', XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'description');
