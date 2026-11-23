@@ -38,6 +38,7 @@ Feature: Manage the images in a lightboxgallery
     And I am on "Course 1" course homepage with editing mode on
     And I am on the "LBG" "lightboxgallery activity" page
     And I set the field "tab" to "Delete"
+    And I click on "Go" "button" in the ".lightbox-gallery-image-editmenu" "css_element"
     And I press "Yes"
     Then I should see "No images were found in this gallery"
 
@@ -66,6 +67,7 @@ Feature: Manage the images in a lightboxgallery
     And I am on "Course 1" course homepage with editing mode on
     And I am on the "LBG" "lightboxgallery activity" page
     And I set the field "tab" to "Caption"
+    And I click on "Go" "button" in the ".lightbox-gallery-image-editmenu" "css_element"
     And I set the field "caption" to "Map of Milton Keynes"
     And I press "Update"
     Then I should see "Map of Milton Keynes"
