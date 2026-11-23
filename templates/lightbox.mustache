@@ -20,11 +20,14 @@
     The viewer that opens when a gallery thumbnail is clicked. It's rendered once per page by
     mod_lightboxgallery/lightbox, which fills in the image, caption and counter.
 
+    The image element isn't here: an <img> must have a src, and there's none until an image is
+    chosen, so mod_lightboxgallery/lightbox adds it to the stage the first time one is shown.
+
     Classes required for JS:
     * none
 
     Data attributes required for JS:
-    * data-region="mod_lightboxgallery-lightbox", "image", "loading", "caption", "counter", "download"
+    * data-region="mod_lightboxgallery-lightbox", "stage", "loading", "caption", "counter", "download"
     * data-action="previous", "next", "close"
 
     Context variables required for this template:
@@ -36,8 +39,7 @@
 <dialog class="mod-lightboxgallery-lightbox" data-region="mod_lightboxgallery-lightbox"
         aria-label="{{#str}}imageviewer, mod_lightboxgallery{{/str}}">
     <div class="mod-lightboxgallery-lightbox-frame">
-        <div class="mod-lightboxgallery-lightbox-stage">
-            <img class="mod-lightboxgallery-lightbox-image" data-region="image" alt="" hidden>
+        <div class="mod-lightboxgallery-lightbox-stage" data-region="stage">
             <div class="mod-lightboxgallery-lightbox-loading" data-region="loading">
                 {{> core/loading }}
             </div>

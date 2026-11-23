@@ -34,6 +34,7 @@ import {getString} from 'core/str';
 const SELECTORS = {
     LINK: '.lightbox-gallery a[rel^="lightbox"]',
     DIALOG: '[data-region="mod_lightboxgallery-lightbox"]',
+    STAGE: '[data-region="stage"]',
     IMAGE: '[data-region="image"]',
     LOADING: '[data-region="loading"]',
     CAPTION: '[data-region="caption"]',
@@ -73,6 +74,26 @@ const getImageSet = (link) => {
 };
 
 /**
+ * Get the viewer's image element, adding it to the stage the first time.
+ *
+ * It isn't in the template because an <img> must have a src, and there's none until an image is chosen.
+ *
+ * @returns {HTMLImageElement}
+ */
+const getImageNode = () => {
+    let image = dialog.querySelector(SELECTORS.IMAGE);
+    if (!image) {
+        image = document.createElement('img');
+        image.className = 'mod-lightboxgallery-lightbox-image';
+        image.dataset.region = 'image';
+        image.alt = '';
+        image.hidden = true;
+        dialog.querySelector(SELECTORS.STAGE).prepend(image);
+    }
+    return image;
+};
+
+/**
  * Load an image, resolving once the browser has it.
  *
  * @param {string} url
@@ -97,7 +118,7 @@ const showImage = async(index) => {
     current = index;
     const {url, caption} = images[index];
 
-    const image = dialog.querySelector(SELECTORS.IMAGE);
+    const image = getImageNode();
     image.hidden = true;
     dialog.querySelector(SELECTORS.LOADING).hidden = false;
     dialog.querySelector(SELECTORS.PREVIOUS).hidden = index === 0;
