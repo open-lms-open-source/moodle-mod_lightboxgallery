@@ -180,6 +180,57 @@ function lightboxgallery_delete_instance($id) {
 }
 
 /**
+ * Add the gallery options to the course reset form.
+ *
+ * @param MoodleQuickForm $mform
+ * @return void
+ */
+function lightboxgallery_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'lightboxgalleryheader', get_string('modulenameplural', 'lightboxgallery'));
+    $mform->addElement('advcheckbox', 'reset_lightboxgallery_comments', get_string('resetcomments', 'lightboxgallery'));
+}
+
+/**
+ * The course reset form's default for the gallery options.
+ *
+ * Comments are user data, so they're deleted unless the person resetting chooses to keep them.
+ *
+ * @param stdClass $course
+ * @return array
+ */
+function lightboxgallery_reset_course_form_defaults($course) {
+    return ['reset_lightboxgallery_comments' => 1];
+}
+
+/**
+ * Delete the course's gallery user data that the course reset form asks for.
+ *
+ * Images, captions and tags are course content, not user data, so they're kept.
+ *
+ * @param stdClass $data The reset form's data, with courseid.
+ * @return array The status of each part of the reset, for the reset report.
+ */
+function lightboxgallery_reset_userdata($data) {
+    global $DB;
+
+    $status = [];
+    if (!empty($data->reset_lightboxgallery_comments)) {
+        $DB->delete_records_select(
+            'lightboxgallery_comments',
+            'gallery IN (SELECT id FROM {lightboxgallery} WHERE course = ?)',
+            [$data->courseid]
+        );
+        $status[] = [
+            'component' => get_string('modulenameplural', 'lightboxgallery'),
+            'item' => get_string('resetcomments', 'lightboxgallery'),
+            'error' => false,
+        ];
+    }
+
+    return $status;
+}
+
+/**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *

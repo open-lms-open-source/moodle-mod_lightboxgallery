@@ -141,6 +141,7 @@ $string['privacy:metadata:lightboxgallery_comments:commenttext'] = 'Stores the t
 $string['privacy:metadata:lightboxgallery_comments:gallery'] = 'The ID of the lightboxgallery activity the user is providing a comment for.';
 $string['privacy:metadata:lightboxgallery_comments:timemodified'] = 'The timestamp indicating when the lightboxgallery comment was modified by the user.';
 $string['privacy:metadata:lightboxgallery_comments:userid'] = 'The user who made the comment.';
+$string['resetcomments'] = 'Delete all gallery comments';
 $string['resizeto'] = 'Resize to';
 $string['rsssubscribe'] = 'Gallery RSS feed';
 $string['saveimage'] = 'Save {$a}';
