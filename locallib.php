@@ -202,19 +202,27 @@ function lightboxgallery_try_create_index(lightboxgallery_image $image): ?stored
  * @throws dml_exception
  */
 function lightboxgallery_edit_types($showall = false, $image = null) {
+    // Finding the tools scans Moodle's whole class map, and a gallery page asks once per image,
+    // so find them once per request. The classes can't change within a request.
+    static $alltypes = null;
+
     $result = [];
 
     $disabledplugins = explode(',', get_config('lightboxgallery', 'disabledplugins'));
 
-    // The editing tools are the classes in mod_lightboxgallery\local\edit, apart from their base class.
-    $edittypes = [];
-    foreach (array_keys(core_component::get_component_classes_in_namespace('mod_lightboxgallery', 'local\\edit')) as $class) {
-        $name = substr($class, strrpos($class, '\\') + 1);
-        if ($name !== 'base') {
-            $edittypes[] = $name;
+    if ($alltypes === null) {
+        // The editing tools are the classes in mod_lightboxgallery\local\edit, apart from their base class.
+        $alltypes = [];
+        foreach (array_keys(core_component::get_component_classes_in_namespace('mod_lightboxgallery', 'local\\edit')) as $class) {
+            $name = substr($class, strrpos($class, '\\') + 1);
+            if ($name !== 'base') {
+                $alltypes[] = $name;
+            }
         }
+        sort($alltypes);
     }
-    sort($edittypes);
+
+    $edittypes = $alltypes;
     if ($image !== null && !$showall) {
         $edittypes = array_intersect($image->get_editing_options(), $edittypes);
     }
