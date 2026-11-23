@@ -95,4 +95,62 @@ final class image_tags_test extends \advanced_testcase {
         $mine->delete_tag($mytagid);
         $this->assertFalse($DB->record_exists('lightboxgallery_image_meta', ['id' => $mytagid]));
     }
+
+    /**
+     * Adding a tag the image already has doesn't create a second copy.
+     */
+    public function test_add_tag_ignores_duplicates(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $image = $this->create_gallery_image('IMG_0001.png');
+
+        $tagid = $image->add_tag('beach');
+        $this->assertNotEmpty($tagid);
+
+        // The same tag, in any case or with extra whitespace, returns the existing tag.
+        $this->assertEquals($tagid, $image->add_tag('beach'));
+        $this->assertEquals($tagid, $image->add_tag('Beach'));
+        $this->assertEquals($tagid, $image->add_tag('  BEACH '));
+        $this->assertEquals(1, $DB->count_records('lightboxgallery_image_meta', ['metatype' => 'tag']));
+
+        // A different tag is still added, and shows up in the tag list.
+        $othertagid = $image->add_tag('sunset');
+        $this->assertNotEquals($tagid, $othertagid);
+        $this->assertEqualsCanonicalizing([$tagid, $othertagid], array_keys($image->get_tags()));
+
+        // Once deleted, the tag can be added again.
+        $image->delete_tag($tagid);
+        $this->assertCount(1, $image->get_tags());
+        $this->assertNotEmpty($image->add_tag('beach'));
+        $this->assertCount(2, $image->get_tags());
+    }
+
+    /**
+     * An empty or whitespace-only tag isn't added.
+     */
+    public function test_add_tag_rejects_empty(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $image = $this->create_gallery_image('IMG_0001.png');
+
+        $this->assertFalse($image->add_tag(''));
+        $this->assertFalse($image->add_tag('   '));
+        $this->assertFalse($DB->record_exists('lightboxgallery_image_meta', ['metatype' => 'tag']));
+    }
+
+    /**
+     * The same tag can be on a same-named image in another gallery.
+     */
+    public function test_add_tag_duplicate_check_is_per_gallery(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $first = $this->create_gallery_image('IMG_0001.png');
+        $samename = $this->create_gallery_image('IMG_0001.png');
+
+        $this->assertNotEquals($first->add_tag('beach'), $samename->add_tag('beach'));
+        $this->assertEquals(2, $DB->count_records('lightboxgallery_image_meta', ['metatype' => 'tag']));
+    }
 }

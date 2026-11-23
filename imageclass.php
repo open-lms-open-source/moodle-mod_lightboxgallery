@@ -201,20 +201,36 @@ class lightboxgallery_image {
     /**
      * Add a tag to the image.
      *
-     * @param stdClass $tag
-     * @return bool|int
+     * An image can't hold the same tag twice: if it already has the tag (ignoring case
+     * and surrounding whitespace), nothing is added and the existing tag's id is returned.
+     *
+     * @param string $tag
+     * @return bool|int The id of the new or existing tag, or false if the tag is empty.
      * @throws dml_exception
      */
     public function add_tag($tag) {
         global $DB;
 
-        $imagemeta = new stdClass();
-        $imagemeta->gallery = $this->cm->instance;
-        $imagemeta->image = $this->storedfile->get_filename();
-        $imagemeta->metatype = 'tag';
-        $imagemeta->description = $tag;
+        $tag = trim($tag);
+        if ($tag === '') {
+            return false;
+        }
 
-        return $DB->insert_record('lightboxgallery_image_meta', $imagemeta);
+        $params = [
+            'gallery' => $this->cm->instance,
+            'image' => $this->storedfile->get_filename(),
+            'metatype' => 'tag',
+            'description' => $tag,
+        ];
+        $select = 'gallery = :gallery AND image = :image AND metatype = :metatype AND '
+            . $DB->sql_equal($DB->sql_compare_text('description', 255), ':description', false);
+        $existing = $DB->get_records_select('lightboxgallery_image_meta', $select, $params, 'id', 'id', 0, 1);
+        if ($existing) {
+            return reset($existing)->id;
+        }
+
+        $this->tags = null;
+        return $DB->insert_record('lightboxgallery_image_meta', (object) $params);
     }
 
     /**
@@ -325,6 +341,7 @@ class lightboxgallery_image {
     public function delete_tag($tagid) {
         global $DB;
 
+        $this->tags = null;
         return $DB->delete_records('lightboxgallery_image_meta', [
             'id' => $tagid,
             'gallery' => $this->gallery->id,
