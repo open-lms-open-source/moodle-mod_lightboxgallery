@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 require_once(dirname(__DIR__, 2) . '/config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/comment_form.php');
