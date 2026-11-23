@@ -15,7 +15,6 @@ Feature: Set a lightboxgallery as public
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
     And the following "activities" exist:
       | activity        | name | course | intro        | idnumber | ispublic |
       | lightboxgallery | LBG  | C1     | Test gallery | lbg1     | 0        |
